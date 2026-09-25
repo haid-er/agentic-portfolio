@@ -1,0 +1,17 @@
+{
+  "default": "auto",
+  "themes": {
+    "almanac": {
+      "label": "Almanac",
+      "reads": "light",
+      "swapLabel": "Pulling a new proof",
+      "tokens": {}
+    },
+    "strata": {
+      "label": "Strata",
+      "reads": "dark",
+      "swapLabel": "Taking a core sample",
+      "tokens": {}
+    }
+  }
+}

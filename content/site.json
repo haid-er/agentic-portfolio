@@ -1,0 +1,185 @@
+{
+  "profile": {
+    "name": "Malik Haider Ali",
+    "headline": "Full-Stack Engineer",
+    "tagline": "Building scalable web platforms, AI-powered systems, and autonomous workflows.",
+    "shortBio": "",
+    "location": "Lahore, Pakistan",
+    "email": "malikhaiderali33@gmail.com",
+    "motto": "Code with purpose, build with passion, learn without limits.",
+    "pillars": [
+      {
+        "id": "fullstack",
+        "title": "Full-stack web",
+        "summary": ""
+      },
+      {
+        "id": "ai",
+        "title": "AI systems & agents",
+        "summary": ""
+      },
+      {
+        "id": "realtime",
+        "title": "Sensors & real-time",
+        "summary": ""
+      },
+      {
+        "id": "esg",
+        "title": "ESG & climate",
+        "summary": ""
+      },
+      {
+        "id": "fundamentals",
+        "title": "CS fundamentals",
+        "summary": ""
+      },
+      {
+        "id": "craft",
+        "title": "Design & craft",
+        "summary": ""
+      }
+    ],
+    "languages": [],
+    "interests": []
+  },
+  "hero": {
+    "kicker": [],
+    "role": "",
+    "lede": "",
+    "ctas": [
+      {
+        "label": "Open the playground",
+        "href": "/playground",
+        "variant": "primary"
+      }
+    ],
+    "plateTitle": "Plate 1 · Core sample of a career",
+    "plateNote": "newest on top",
+    "showGridReading": true
+  },
+  "about": {
+    "body": []
+  },
+  "contact": {
+    "blurb": "",
+    "formEnabled": false
+  },
+  "socials": [
+    {
+      "id": "github",
+      "label": "GitHub",
+      "url": "https://github.com/haid-er",
+      "handle": "haid-er",
+      "icon": "Github",
+      "enabled": true
+    },
+    {
+      "id": "linkedin",
+      "label": "LinkedIn",
+      "url": "https://www.linkedin.com/in/haid-er/",
+      "handle": "in/haid-er",
+      "icon": "Linkedin",
+      "enabled": true
+    }
+  ],
+  "sections": [
+    {
+      "id": "hero",
+      "enabled": true,
+      "title": ""
+    },
+    {
+      "id": "experience",
+      "enabled": true,
+      "title": "Working record",
+      "navLabel": "Record"
+    },
+    {
+      "id": "skills",
+      "enabled": true,
+      "title": "Skill → proof",
+      "navLabel": "Proofs"
+    },
+    {
+      "id": "playground",
+      "enabled": true,
+      "title": "Playground",
+      "navLabel": "Playground"
+    },
+    {
+      "id": "projects",
+      "enabled": true,
+      "title": "Projects"
+    },
+    {
+      "id": "research",
+      "enabled": true,
+      "title": "Research"
+    },
+    {
+      "id": "about",
+      "enabled": true,
+      "title": "About"
+    },
+    {
+      "id": "education",
+      "enabled": true,
+      "title": "Education"
+    },
+    {
+      "id": "certifications",
+      "enabled": true,
+      "title": "Certifications"
+    },
+    {
+      "id": "achievements",
+      "enabled": true,
+      "title": "Achievements"
+    },
+    {
+      "id": "services",
+      "enabled": true,
+      "title": "Services"
+    },
+    {
+      "id": "testimonials",
+      "enabled": true,
+      "title": "Testimonials"
+    },
+    {
+      "id": "github",
+      "enabled": true,
+      "title": "On GitHub"
+    },
+    {
+      "id": "resume",
+      "enabled": true,
+      "title": "Résumé"
+    },
+    {
+      "id": "contact",
+      "enabled": true,
+      "title": "Contact"
+    }
+  ],
+  "seo": {
+    "title": "Malik Haider Ali — Full-Stack Engineer",
+    "titleTemplate": "%s · Malik Haider Ali",
+    "description": "Malik Haider Ali is a Full-Stack Engineer building scalable web platforms, AI-powered systems, and autonomous workflows.",
+    "keywords": [],
+    "siteUrl": "https://malik-haider-portfolio.vercel.app",
+    "sameAs": [
+      "https://github.com/haid-er",
+      "https://www.linkedin.com/in/haid-er/"
+    ]
+  },
+  "analytics": {
+    "enabled": true
+  },
+  "contactFormEndpoint": "",
+  "masthead": {
+    "location": "Lahore, Pakistan",
+    "strapline": "Every claim has a working proof",
+    "colophon": "Printed at zero running cost."
+  }
+}

@@ -1,0 +1,672 @@
+<!doctype html>
+<html lang="en" data-theme="vellum">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Message Schematic</title>
+<!--
+  CONCEPT 2 — "MESSAGE SCHEMATIC"  (designer #2, angle: Systems)
+
+  Rationale: Malik's through-line is not a stack, it is a shape — a producer pushing messages through a broker to
+  consumers. It appears in his research (an Android app streaming IMU readings over Wi-Fi into RabbitMQ, drained by a Java
+  consumer), in his production work (background processing, workflow orchestration and audit logs at Euthyna) and in his
+  agent pipelines (planner -> workers -> reviewer). So the site is drawn as a system diagram of itself: the hero is an
+  exchange that routes his three inputs (sensors, documents, goals) to the three things his own tagline says he builds;
+  sections are queues whose items are messages with headers (routing key, timestamp, mode) and a "proves" binding to a
+  playground demo; skills are wired to demos with a visible cable instead of floating as tags. Two worlds share this
+  wiring. "Drafting Vellum" (light) is the engineer's drawing sheet: warm vellum, graphite ink, a vermilion revision
+  pen, a title block and dimension leaders, which also nods to his graphic-design credit. "Night Switchboard" (dark) is
+  the same drawing wired up and live at 2 a.m.: an oil-black olive panel with perforations, amber indicator lamps and
+  patch-cable red, with packets actually moving on the wires. The switcher is a patch plug that you move between two
+  sockets; the change is shown as a queue drain, where seven message bars deliver the new world row by row, then ACK.
+  No gradients, no glass, no navy/purple/cyan, no emoji. The type pairs are Archivo Expanded with IBM Plex for the drawing
+  and Big Shoulders Stencil with Space Grotesk and JetBrains Mono for the panel. Every fact comes from docs/context.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,400..800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=Big+Shoulders+Stencil+Display:wght@600;800&family=Space+Grotesk:wght@400;500;600&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — THEME A: "Drafting Vellum" (reads light)
+   ============================================================ */
+:root, [data-theme="vellum"] {
+  /* color */
+  --bg:        #EFEBDF;   /* vellum */
+  --bg-2:      #E5DFCE;   /* sheet margin / panel */
+  --surface:   #F7F4EA;   /* card */
+  --ink:       #1D1B17;   /* graphite ink            14.4:1 on bg */
+  --ink-2:     #4A463D;   /* secondary ink           7.9:1 on bg */
+  --ink-3:     #6A6456;   /* annotations (large/mono) 4.9:1 on bg */
+  --rule:      #1D1B17;
+  --grid:      rgba(29,27,23,.075);
+  --accent:    #A8350F;   /* vermilion revision pen   5.5:1 on bg */
+  --accent-ink:#FFF8EE;   /* text on accent */
+  --ok:        #2E6337;   /* approved stamp green     6.0:1 on bg */
+  --wire:      #1D1B17;
+  --packet:    #A8350F;
+  --focus:     #A8350F;
+  /* texture */
+  --texture:   linear-gradient(var(--grid) 1px, transparent 1px) 0 0/24px 24px,
+               linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/24px 24px;
+  --texture-2: radial-gradient(rgba(29,27,23,.05) 0.6px, transparent 0.8px) 0 0/4px 4px; /* paper tooth */
+  --line-w:    1.25px;
+  --node-fill: #F7F4EA;
+  /* type */
+  --font-display: "Archivo", "Arial Narrow", sans-serif;
+  --display-stretch: 125%;
+  --display-weight: 800;
+  --display-case: none;
+  --font-body: "IBM Plex Sans", system-ui, sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, monospace;
+  --fs-xs: .75rem;  --fs-sm: .875rem; --fs-md: 1rem; --fs-lg: 1.25rem;
+  --fs-xl: clamp(1.5rem, 1.1rem + 1.6vw, 2.25rem);
+  --fs-hero: clamp(2.6rem, 1.2rem + 6.2vw, 6rem);
+  --lh-tight: 0.92; --track-mono: .04em;
+  /* radius — drafting is square */
+  --r-sm: 0px; --r-md: 2px; --r-lg: 2px; --r-pill: 2px;
+  /* spacing (4pt) */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px;
+  /* motion — ink is deliberate: slow draw, no bounce */
+  --ease: cubic-bezier(.2,.7,.2,1);
+  --dur-1: 140ms; --dur-2: 280ms; --dur-3: 900ms;
+  --flow-speed: 7s;         /* packets crawl like a pen trace */
+  --flow-dash: 2 14;        /* dotted pen trace */
+  --lamp-blink: 0;          /* no lamps on paper */
+}
+
+/* ============================================================
+   TOKENS — THEME B: "Night Switchboard" (reads dark)
+   ============================================================ */
+[data-theme="switchboard"] {
+  /* color */
+  --bg:        #12140F;   /* oil-black olive panel */
+  --bg-2:      #191C15;
+  --surface:   #1E2219;
+  --ink:       #ECE3CC;   /* warm lamp-lit cream      14.5:1 on bg */
+  --ink-2:     #B3AD97;   /* 8.3:1 */
+  --ink-3:     #8F8A76;   /* 5.3:1 (4.7:1 on surface) */
+  --rule:      #3A3F31;
+  --grid:      rgba(236,227,204,.05);
+  --accent:    #FFB23E;   /* amber indicator lamp     10.3:1 on bg */
+  --accent-ink:#12140F;
+  --ok:        #A6D46E;   /* line-ok green            10.8:1 */
+  --wire:      #5B6150;
+  --packet:    #FF6B4A;   /* patch-cable red           6.6:1 */
+  --focus:     #FFB23E;
+  /* texture */
+  --texture:   radial-gradient(rgba(236,227,204,.07) 1.1px, transparent 1.4px) 0 0/12px 12px; /* perforated panel */
+  --texture-2: repeating-linear-gradient(0deg, rgba(0,0,0,.18) 0 1px, transparent 1px 3px);     /* faint scanline */
+  --line-w:    1.5px;
+  --node-fill: #1E2219;
+  /* type */
+  --font-display: "Big Shoulders Stencil Display", "Arial Narrow", sans-serif;
+  --display-stretch: 100%;
+  --display-weight: 800;
+  --display-case: uppercase;
+  --font-body: "Space Grotesk", system-ui, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, monospace;
+  --fs-xs: .75rem;  --fs-sm: .875rem; --fs-md: 1rem; --fs-lg: 1.25rem;
+  --fs-xl: clamp(1.6rem, 1.2rem + 1.8vw, 2.5rem);
+  --fs-hero: clamp(3.2rem, 1.4rem + 8vw, 8rem);
+  --lh-tight: 0.86; --track-mono: .02em;
+  /* radius — rack hardware is softened */
+  --r-sm: 3px; --r-md: 6px; --r-lg: 10px; --r-pill: 999px;
+  /* spacing — same 4pt grid, shared layout */
+  --s1: 4px; --s2: 8px; --s3: 12px; --s4: 16px; --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px;
+  /* motion — electric: fast packets, lamp blink */
+  --ease: cubic-bezier(.3,0,.1,1);
+  --dur-1: 100ms; --dur-2: 200ms; --dur-3: 600ms;
+  --flow-speed: 2.6s;
+  --flow-dash: 10 70;       /* discrete packets */
+  --lamp-blink: 1;
+}
+
+/* ============================================================ base */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:400 var(--fs-md)/1.55 var(--font-body);
+  background-image:var(--texture-2), var(--texture);
+  transition: background-color var(--dur-2) var(--ease), color var(--dur-2) var(--ease);
+  overflow-x:hidden;
+}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--focus); outline-offset:3px}
+.mono{font-family:var(--font-mono); letter-spacing:var(--track-mono)}
+.wrap{max-width:1200px; margin:0 auto; padding:0 16px}
+@media (min-width:768px){.wrap{padding:0 32px}}
+.skip{position:absolute;left:-999px;top:8px;background:var(--accent);color:var(--accent-ink);padding:8px 12px;z-index:99}
+.skip:focus{left:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ============================================================ header */
+header.top{position:sticky;top:0;z-index:20;background:var(--bg);border-bottom:var(--line-w) solid var(--rule)}
+.top .wrap{display:flex;align-items:center;gap:var(--s4);height:60px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font:600 var(--fs-sm)/1 var(--font-mono)}
+.brand .glyph{width:26px;height:26px}
+.brand small{display:block;color:var(--ink-3);font-weight:400;font-size:11px;margin-top:3px}
+nav.routes{margin-left:auto;display:none;gap:2px}
+nav.routes a{font:500 var(--fs-sm)/1 var(--font-mono);text-decoration:none;padding:8px 10px;border-radius:var(--r-sm);color:var(--ink-2)}
+nav.routes a:hover{color:var(--ink);background:var(--bg-2)}
+nav.routes a span{color:var(--accent)}
+@media (min-width:900px){nav.routes{display:flex}}
+
+/* the patch switch */
+.patch{
+  margin-left:auto; display:inline-grid; grid-template-columns:auto 34px auto; align-items:center; gap:6px;
+  background:var(--bg-2); border:var(--line-w) solid var(--rule); border-radius:var(--r-pill);
+  padding:5px 8px; cursor:pointer; color:var(--ink); font:600 11px/1 var(--font-mono); letter-spacing:.06em;
+}
+@media (min-width:900px){.patch{margin-left:var(--s3)}}
+.patch .sock{opacity:.55;transition:opacity var(--dur-2)}
+.patch .rail{position:relative;height:14px;border-top:var(--line-w) dashed var(--ink-3);top:7px}
+.patch .plug{position:absolute;top:-9px;left:0;width:12px;height:12px;border-radius:50%;background:var(--accent);
+  box-shadow:0 0 0 3px var(--bg-2), 0 0 0 4px var(--accent);transition:left var(--dur-3) var(--ease)}
+[data-theme="vellum"] .patch .s-a,[data-theme="switchboard"] .patch .s-b{opacity:1}
+[data-theme="switchboard"] .patch .plug{left:22px}
+.patch .full{display:none}
+@media (min-width:520px){.patch .full{display:inline}.patch .short{display:none}}
+.menu-btn{display:inline-flex;align-items:center;gap:6px;background:none;border:var(--line-w) solid var(--rule);color:var(--ink);
+  border-radius:var(--r-sm);font:600 12px/1 var(--font-mono);padding:9px 10px;cursor:pointer}
+@media (min-width:900px){.menu-btn{display:none}}
+
+/* mobile routing-table drawer */
+.drawer{position:fixed;inset:60px 0 auto 0;background:var(--bg);border-bottom:var(--line-w) solid var(--rule);
+  transform:translateY(-8px);opacity:0;pointer-events:none;transition:all var(--dur-2) var(--ease);z-index:19}
+.drawer.open{transform:none;opacity:1;pointer-events:auto}
+.rt{width:100%;border-collapse:collapse;font:500 var(--fs-sm)/1.2 var(--font-mono)}
+.rt caption{text-align:left;padding:var(--s4) 16px var(--s2);color:var(--ink-3);font-size:11px;letter-spacing:.08em}
+.rt td{padding:14px 16px;border-top:1px solid var(--rule)}
+.rt a{text-decoration:none;display:block}
+.rt .k{color:var(--accent);width:1%;white-space:nowrap}
+.rt .d{color:var(--ink-3);text-align:right;font-size:11px}
+
+/* ============================================================ sheet frame (title block) */
+.sheet-meta{display:flex;flex-wrap:wrap;gap:0;border:var(--line-w) solid var(--rule);border-top:0;font:500 11px/1.3 var(--font-mono);color:var(--ink-2)}
+.sheet-meta div{padding:6px 10px;border-right:1px solid var(--rule)}
+.sheet-meta div:last-child{border-right:0;margin-left:auto}
+.sheet-meta b{color:var(--ink);font-weight:600}
+
+/* ============================================================ hero */
+.hero{padding:var(--s6) 0 var(--s7)}
+.hero-grid{display:grid;gap:var(--s6)}
+@media (min-width:1000px){.hero-grid{grid-template-columns:1.05fr 1fr;align-items:center;gap:var(--s7)}}
+.eyebrow{font:500 var(--fs-xs)/1.3 var(--font-mono);color:var(--ink-3);letter-spacing:.1em;text-transform:uppercase;display:flex;gap:10px;align-items:center}
+.eyebrow .lamp{width:9px;height:9px;border-radius:50%;background:var(--ok);display:inline-block}
+[data-theme="switchboard"] .eyebrow .lamp{box-shadow:0 0 8px var(--ok);animation:blink 2.4s steps(2) infinite}
+[data-theme="vellum"] .eyebrow .lamp{background:none;border:1.5px solid var(--ok);border-radius:0;transform:rotate(45deg)}
+h1{font-family:var(--font-display);font-stretch:var(--display-stretch);font-weight:var(--display-weight);text-transform:var(--display-case);
+  font-size:var(--fs-hero);line-height:var(--lh-tight);letter-spacing:-.02em;margin:var(--s4) 0 var(--s4)}
+[data-theme="switchboard"] h1{letter-spacing:.005em}
+h1 .role{display:block;font-size:.42em;letter-spacing:0;line-height:1.1;margin-top:.35em;color:var(--accent)}
+.lede{font-size:var(--fs-lg);max-width:34ch;color:var(--ink-2);margin:0 0 var(--s5)}
+.lede b{color:var(--ink);font-weight:600}
+.ctas{display:flex;flex-wrap:wrap;gap:var(--s3)}
+.port{display:inline-flex;align-items:center;gap:10px;text-decoration:none;font:600 var(--fs-sm)/1 var(--font-mono);
+  padding:13px 16px;border:var(--line-w) solid var(--rule);border-radius:var(--r-md);min-height:44px;
+  transition:transform var(--dur-1) var(--ease), background var(--dur-2)}
+.port:hover{transform:translate(-2px,-2px);box-shadow:3px 3px 0 var(--rule)}
+.port.primary{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.port .pin{width:8px;height:8px;border:1.5px solid currentColor;border-radius:50%}
+.headers{margin-top:var(--s6);display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));border:var(--line-w) solid var(--rule);border-radius:var(--r-md);overflow:hidden}
+.headers div{padding:10px 12px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);margin:0 -1px -1px 0}
+.headers dt{font:500 10.5px/1.2 var(--font-mono);color:var(--ink-3);letter-spacing:.08em;text-transform:uppercase}
+.headers dd{margin:4px 0 0;font:600 var(--fs-sm)/1.3 var(--font-mono)}
+
+/* schematic */
+.schem{position:relative;border:var(--line-w) solid var(--rule);background:var(--surface);border-radius:var(--r-lg);padding:var(--s3)}
+.schem svg{display:block;width:100%;height:auto}
+.schem .cap{display:flex;justify-content:space-between;font:500 10.5px/1.2 var(--font-mono);color:var(--ink-3);letter-spacing:.06em;padding:2px 4px 8px}
+.n rect{fill:var(--node-fill);stroke:var(--wire);stroke-width:var(--line-w)}
+.n text{fill:var(--ink);font:600 12px var(--font-mono)}
+.n .sub{fill:var(--ink-3);font:400 10px var(--font-mono)}
+.x rect{fill:var(--accent)}
+.x text{fill:var(--accent-ink);font:700 13px var(--font-mono)}
+.x .sub{fill:var(--accent-ink);opacity:.85;font:500 10px var(--font-mono)}
+.x .outer{fill:none;stroke:var(--accent);stroke-width:var(--line-w);stroke-dasharray:3 3}
+.wire{fill:none;stroke:var(--wire);stroke-width:var(--line-w)}
+.flow{fill:none;stroke:var(--packet);stroke-width:4;stroke-linecap:round;stroke-dasharray:var(--flow-dash);animation:flow var(--flow-speed) linear infinite}
+[data-theme="vellum"] .flow{stroke-width:2.2}
+.rk{fill:var(--ink-3);font:500 9.5px var(--font-mono)}
+.dim{stroke:var(--accent);stroke-width:1;fill:none}
+.dimt{fill:var(--accent);font:500 9.5px var(--font-mono)}
+[data-theme="switchboard"] .dim,[data-theme="switchboard"] .dimt{display:none}
+.lampdot{fill:var(--ok)}
+[data-theme="vellum"] .lampdot{display:none}
+[data-theme="switchboard"] .lampdot{animation:blink 1.6s steps(2) infinite}
+@keyframes flow{to{stroke-dashoffset:-240}}
+@keyframes blink{50%{opacity:.25}}
+
+/* ============================================================ section: queue */
+section{padding:var(--s7) 0;border-top:var(--line-w) solid var(--rule)}
+.sec-head{display:grid;gap:var(--s2);margin-bottom:var(--s5)}
+@media (min-width:900px){.sec-head{grid-template-columns:220px 1fr;align-items:end}}
+.sec-no{font:600 var(--fs-xs)/1 var(--font-mono);color:var(--accent);letter-spacing:.1em}
+h2{font-family:var(--font-display);font-stretch:var(--display-stretch);font-weight:var(--display-weight);text-transform:var(--display-case);
+  font-size:var(--fs-xl);line-height:1;margin:0;letter-spacing:-.01em}
+.sec-head p{margin:6px 0 0;color:var(--ink-2);max-width:60ch}
+.queue{position:relative;display:grid;gap:var(--s4);padding-left:26px}
+.queue::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;border-left:var(--line-w) dashed var(--wire)}
+.msg{position:relative;background:var(--surface);border:var(--line-w) solid var(--rule);border-radius:var(--r-md)}
+.msg::before{content:"";position:absolute;left:-23px;top:20px;width:12px;height:12px;border-radius:50%;background:var(--bg);border:2px solid var(--accent)}
+.msg.head::before{background:var(--accent)}
+[data-theme="switchboard"] .msg.head::before{box-shadow:0 0 10px var(--accent)}
+.msg-h{display:flex;flex-wrap:wrap;gap:4px 16px;padding:8px 14px;border-bottom:1px solid var(--rule);font:500 11px/1.4 var(--font-mono);color:var(--ink-3)}
+.msg-h b{color:var(--ink-2);font-weight:600}
+.msg-h .st{margin-left:auto;color:var(--ok);font-weight:600}
+.msg-b{padding:14px;display:grid;gap:10px}
+@media (min-width:900px){.msg-b{grid-template-columns:1fr 1.3fr;gap:24px}}
+.msg-b h3{margin:0;font:600 var(--fs-lg)/1.2 var(--font-body)}
+.msg-b .org{margin:4px 0 0;color:var(--ink-2);font-size:var(--fs-sm)}
+.msg-b ul{margin:0;padding-left:18px;color:var(--ink-2);font-size:var(--fs-sm)}
+.msg-b li{margin:0 0 4px}
+.metric{font-family:var(--font-mono);color:var(--ink);background:var(--bg-2);padding:1px 5px;border-radius:var(--r-sm);font-weight:600;white-space:nowrap}
+.binds{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;align-items:center;font:500 11px/1 var(--font-mono);color:var(--ink-3)}
+.binds a{padding:6px 8px;border:1px solid var(--rule);border-radius:var(--r-sm);text-decoration:none;color:var(--accent)}
+
+/* ============================================================ skill -> demo wires */
+.wires{display:flex;gap:var(--s3);overflow-x:auto;padding:4px 2px 12px;scroll-snap-type:x mandatory;margin:0 -16px;padding-left:16px;padding-right:16px}
+@media (min-width:900px){.wires{flex-wrap:wrap;overflow:visible;margin:0;padding-left:2px}}
+.w{flex:0 0 auto;scroll-snap-align:start;display:inline-flex;align-items:center;text-decoration:none;font:500 var(--fs-sm)/1 var(--font-mono);min-height:44px}
+.w .sk{padding:10px 12px;border:var(--line-w) solid var(--rule);border-radius:var(--r-md) 0 0 var(--r-md);background:var(--surface);color:var(--ink);font-weight:600}
+.w .cable{position:relative;width:34px;height:2px;background:var(--wire);overflow:hidden}
+.w .cable::after{content:"";position:absolute;top:0;left:-10px;width:10px;height:2px;background:var(--packet);opacity:0}
+.w:hover .cable::after,.w:focus-visible .cable::after{opacity:1;animation:zip .6s linear infinite}
+.w .dm{padding:10px 12px;border:var(--line-w) dashed var(--accent);border-radius:0 var(--r-md) var(--r-md) 0;color:var(--accent)}
+@keyframes zip{to{left:34px}}
+
+/* ============================================================ playground card */
+.pg{display:grid;gap:var(--s5)}
+@media (min-width:900px){.pg{grid-template-columns:1.2fr 1fr;align-items:start}}
+.card{background:var(--surface);border:var(--line-w) solid var(--rule);border-radius:var(--r-lg);overflow:hidden}
+.card-top{display:flex;justify-content:space-between;align-items:center;padding:10px 14px;border-bottom:1px solid var(--rule);font:500 11px/1 var(--font-mono);color:var(--ink-3)}
+.card-top .tag{color:var(--accent);font-weight:600}
+.card-viz{padding:10px 14px 0;border-bottom:1px solid var(--rule);background:var(--bg-2)}
+.card-viz svg{display:block;width:100%;height:auto}
+.card-body{padding:14px}
+.card-body h3{margin:0 0 6px;font-family:var(--font-display);font-stretch:var(--display-stretch);text-transform:var(--display-case);font-weight:var(--display-weight);font-size:1.5rem;line-height:1}
+.card-body p{margin:0 0 12px;color:var(--ink-2);font-size:var(--fs-sm)}
+.proves{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px}
+.proves span{font:500 11px/1 var(--font-mono);padding:6px 8px;border:1px solid var(--rule);border-radius:var(--r-pill);color:var(--ink-2)}
+.card-actions{display:flex;gap:8px;flex-wrap:wrap}
+.q-depth rect.bar{fill:var(--accent)}
+[data-theme="switchboard"] .q-depth rect.bar{animation:depth 2.8s var(--ease) infinite alternate}
+.q-depth rect.bar:nth-child(2){animation-delay:.4s}.q-depth rect.bar:nth-child(3){animation-delay:.9s}
+@keyframes depth{from{transform:scaleY(.35)}to{transform:scaleY(1)}}
+.q-depth rect.bar{transform-origin:bottom;transform-box:fill-box}
+
+/* phone frame (mobile nav spec) */
+.phone{width:min(100%,320px);margin:0 auto;border:var(--line-w) solid var(--rule);border-radius:calc(var(--r-lg) + 14px);padding:10px;background:var(--bg-2)}
+.phone-screen{border:1px solid var(--rule);border-radius:calc(var(--r-lg) + 6px);overflow:hidden;background:var(--bg);background-image:var(--texture)}
+.phone .ph-top{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:var(--line-w) solid var(--rule);font:600 12px/1 var(--font-mono)}
+.phone .rt td{padding:12px}
+.phone .rt caption{padding:12px 12px 6px}
+.phone-note{margin-top:10px;text-align:center;font:500 11px/1.4 var(--font-mono);color:var(--ink-3)}
+
+/* ============================================================ token spec */
+.tokens{display:grid;gap:var(--s5)}
+@media (min-width:900px){.tokens{grid-template-columns:1fr 1fr}}
+.tk{border:var(--line-w) solid var(--rule);border-radius:var(--r-md);padding:14px;font:500 12px/1.5 var(--font-mono)}
+.tk h3{margin:0 0 10px;font:700 13px/1 var(--font-mono);letter-spacing:.06em;text-transform:uppercase}
+.tk .sw{display:grid;grid-template-columns:repeat(auto-fill,minmax(88px,1fr));gap:6px;margin-bottom:10px}
+.tk .sw div{border:1px solid rgba(127,127,127,.4);border-radius:3px;padding:26px 6px 5px;font-size:10px;color:#1D1B17;background-clip:padding-box}
+.tk .sw div.d{color:#ECE3CC}
+.tk dl{margin:0;display:grid;grid-template-columns:auto 1fr;gap:3px 12px}
+.tk dt{color:var(--ink-3)} .tk dd{margin:0;color:var(--ink-2)}
+
+footer{border-top:var(--line-w) solid var(--rule);padding:var(--s5) 0 var(--s7)}
+.tblock{display:grid;grid-template-columns:repeat(2,1fr);border:var(--line-w) solid var(--rule);font:500 11px/1.4 var(--font-mono)}
+@media (min-width:768px){.tblock{grid-template-columns:2fr 1fr 1fr 1fr}}
+.tblock div{padding:8px 10px;border-right:1px solid var(--rule);border-bottom:1px solid var(--rule);margin:0 -1px -1px 0}
+.tblock span{display:block;color:var(--ink-3);font-size:10px;letter-spacing:.08em;text-transform:uppercase}
+
+/* ============================================================ theme transition: queue drain */
+.route{position:fixed;inset:0;z-index:100;pointer-events:none;display:grid;grid-template-rows:repeat(7,1fr)}
+.route i{display:block;margin-bottom:-1px;background:var(--to-bg);transform:scaleX(0);transform-origin:left;position:relative}
+.route i::after{content:"";position:absolute;right:0;top:0;bottom:0;width:6px;background:var(--to-accent)}
+.route.in i{animation:bar-in 420ms var(--ease) forwards}
+.route.out i{transform:scaleX(1);transform-origin:right;animation:bar-out 380ms var(--ease) forwards}
+.route i:nth-child(1){animation-delay:0ms}.route i:nth-child(2){animation-delay:45ms}.route i:nth-child(3){animation-delay:90ms}
+.route i:nth-child(4){animation-delay:135ms}.route i:nth-child(5){animation-delay:180ms}.route i:nth-child(6){animation-delay:225ms}.route i:nth-child(7){animation-delay:270ms}
+.route .log{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font:600 13px/1.6 "JetBrains Mono",monospace;color:var(--to-ink);
+  opacity:0;white-space:pre;text-align:left}
+.route.in .log{animation:fade 200ms 300ms forwards}
+.route.out .log{opacity:1;animation:fade 180ms reverse forwards}
+@keyframes bar-in{to{transform:scaleX(1)}}
+@keyframes bar-out{to{transform:scaleX(0)}}
+@keyframes fade{to{opacity:1}}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation:none!important;transition:none!important}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- theme transition overlay -->
+<div class="route" id="route" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><div class="log" id="routeLog"></div></div>
+
+<header class="top">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Malik Haider Ali, home">
+      <svg class="glyph" viewBox="0 0 26 26" aria-hidden="true"><rect x="1" y="1" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5 8h5v10H5M21 8h-5v10h5M10 13h6" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="13" cy="13" r="2.2" fill="var(--accent)"/></svg>
+      <span>m.haider.ali<small>full-stack engineer</small></span>
+    </a>
+    <nav class="routes" aria-label="Primary">
+      <a href="#work"><span>/</span>work</a><a href="#skills"><span>/</span>skills</a><a href="#playground"><span>/</span>playground</a><a href="#research"><span>/</span>research</a><a href="#contact"><span>/</span>contact</a>
+    </nav>
+    <button class="patch" id="patch" type="button" aria-label="Switch world. Current: Drafting Vellum">
+      <span class="sock s-a"><span class="full">VELLUM</span><span class="short">VEL</span></span>
+      <span class="rail" aria-hidden="true"><span class="plug"></span></span>
+      <span class="sock s-b"><span class="full">SWITCHBOARD</span><span class="short">SWB</span></span>
+    </button>
+    <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="drawer">routes <span aria-hidden="true">[5]</span></button>
+  </div>
+</header>
+<div class="drawer" id="drawer">
+  <table class="rt"><caption>ROUTING TABLE — tap a binding</caption>
+    <tr><td class="k">/work</td><td><a href="#work">Experience</a></td><td class="d">career.q</td></tr>
+    <tr><td class="k">/skills</td><td><a href="#skills">Skills to demos</a></td><td class="d">skill.*</td></tr>
+    <tr><td class="k">/playground</td><td><a href="#playground">Playground</a></td><td class="d">demo.*</td></tr>
+    <tr><td class="k">/research</td><td><a href="#research">HumCareADL</a></td><td class="d">paper.q</td></tr>
+    <tr><td class="k">/contact</td><td><a href="#contact">Contact</a></td><td class="d">reply_to</td></tr>
+  </table>
+</div>
+
+<main id="main">
+<div class="wrap" id="top">
+  <div class="sheet-meta" aria-label="Drawing sheet metadata">
+    <div>SHEET <b>01/05</b></div><div>DWG <b>HOME</b></div><div class="hide-sm">SCALE <b>1:1</b></div><div>REV <b>2026.09</b></div>
+  </div>
+
+  <!-- ===================== HERO ===================== -->
+  <div class="hero">
+    <div class="hero-grid">
+      <div>
+        <div class="eyebrow"><span class="lamp" aria-hidden="true"></span>Lahore, Pakistan · building for Euthyna, London</div>
+        <h1>Malik Haider Ali<span class="role">Full-Stack Engineer</span></h1>
+        <p class="lede">Building <b>scalable web platforms</b>, <b>AI-powered systems</b> and <b>autonomous workflows</b>. Every claim on this site is wired to a working demo.</p>
+        <div class="ctas">
+          <a class="port primary" href="#playground"><span class="pin" aria-hidden="true"></span>consume /playground</a>
+          <a class="port" href="#work"><span class="pin" aria-hidden="true"></span>read career.q</a>
+        </div>
+        <dl class="headers" aria-label="Message headers">
+          <div><dt>x-experience</dt><dd>3+ years</dd></div>
+          <div><dt>x-paper</dt><dd>HumCareADL · MTAP</dd></div>
+          <div><dt>x-perf</dt><dd>27s &rarr; 3.5s</dd></div>
+          <div><dt>x-degree</dt><dd>BS IT · PUCIT</dd></div>
+        </dl>
+      </div>
+
+      <figure class="schem" aria-labelledby="schemcap" style="margin:0">
+        <div class="cap"><span id="schemcap">FIG.1 — WHAT GOES IN, WHAT COMES OUT</span><span>topic exchange</span></div>
+        <svg viewBox="0 0 560 400" role="img" aria-label="Diagram: sensor data, documents and goals flow through a full-stack core into scalable web platforms, AI-powered systems and autonomous workflows.">
+          <!-- wires -->
+          <g>
+            <path class="wire" d="M140 62 H180 V180 H220"/>
+            <path class="wire" d="M140 200 H220"/>
+            <path class="wire" d="M140 338 H180 V220 H220"/>
+            <path class="wire" d="M340 180 H380 V62 H420"/>
+            <path class="wire" d="M340 200 H420"/>
+            <path class="wire" d="M340 220 H380 V338 H420"/>
+          </g>
+          <g>
+            <path class="flow" d="M140 62 H180 V180 H220"/>
+            <path class="flow" style="animation-delay:-.9s" d="M140 200 H220"/>
+            <path class="flow" style="animation-delay:-1.7s" d="M140 338 H180 V220 H220"/>
+            <path class="flow" style="animation-delay:-.4s" d="M340 180 H380 V62 H420"/>
+            <path class="flow" style="animation-delay:-1.2s" d="M340 200 H420"/>
+            <path class="flow" style="animation-delay:-2s" d="M340 220 H380 V338 H420"/>
+          </g>
+          <!-- routing keys -->
+          <text class="rk" x="186" y="118">sensor.imu.#</text>
+          <text class="rk" x="150" y="192">doc.extract</text>
+          <text class="rk" x="186" y="290">agent.plan</text>
+          <text class="rk" x="346" y="118">ship.web</text>
+          <text class="rk" x="352" y="192">ai.*</text>
+          <text class="rk" x="346" y="290">flow.auto</text>
+          <!-- producers -->
+          <g class="n"><rect x="10" y="40" width="130" height="44"/><text x="20" y="60">imu.sensors</text><text class="sub" x="20" y="75">android &rarr; wi-fi</text><circle class="lampdot" cx="130" cy="50" r="3"/></g>
+          <g class="n"><rect x="10" y="178" width="130" height="44"/><text x="20" y="198">documents</text><text class="sub" x="20" y="213">pdf · image · report</text><circle class="lampdot" cx="130" cy="188" r="3"/></g>
+          <g class="n"><rect x="10" y="316" width="130" height="44"/><text x="20" y="336">goals</text><text class="sub" x="20" y="351">prompts · tasks</text><circle class="lampdot" cx="130" cy="326" r="3"/></g>
+          <!-- exchange -->
+          <g class="x">
+            <rect class="outer" x="212" y="142" width="136" height="116"/>
+            <rect x="220" y="150" width="120" height="100"/>
+            <text x="232" y="180">full-stack</text><text x="232" y="197">core</text>
+            <text class="sub" x="232" y="220">node · nestjs</text><text class="sub" x="232" y="234">react · postgres</text>
+          </g>
+          <!-- consumers -->
+          <g class="n"><rect x="420" y="40" width="130" height="44"/><text x="430" y="60">web platforms</text><text class="sub" x="430" y="75">scalable</text></g>
+          <g class="n"><rect x="420" y="178" width="130" height="44"/><text x="430" y="198">AI systems</text><text class="sub" x="430" y="213">llm · rag · vision</text></g>
+          <g class="n"><rect x="420" y="316" width="130" height="44"/><text x="430" y="336">autonomous</text><text class="sub" x="430" y="351">workflows · agents</text></g>
+          <!-- drafting dimensions (vellum only) -->
+          <path class="dim" d="M10 386 H550 M10 380 V392 M550 380 V392"/>
+          <text class="dimt" x="232" y="382">producer &rarr; consumer</text>
+          <path class="dim" d="M348 142 l22 -26 h40"/>
+          <text class="dimt" x="374" y="112">REV: agents</text>
+        </svg>
+      </figure>
+    </div>
+  </div>
+</div>
+
+<!-- ===================== SECTION: experience as a queue ===================== -->
+<section id="work" aria-labelledby="work-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-no">02 / career.q</div>
+      <div><h2 id="work-h">Experience, read as a message log</h2>
+        <p>Newest message at the head. Each one carries its headers and the demos that replay the work.</p></div>
+    </div>
+    <div class="queue">
+      <article class="msg head">
+        <div class="msg-h"><span>routing_key <b>role.current</b></span><span>ts <b>Sep 2025 – present</b></span><span>mode <b>remote</b></span><span class="st">DELIVERING</span></div>
+        <div class="msg-b">
+          <div><h3>Full-Stack Developer</h3><p class="org">Euthyna (Terra Instinct) · London, UK</p></div>
+          <ul>
+            <li>AI sustainability reporting: climate risk, GHG calculations, disclosure gap analysis, transition planning.</li>
+            <li>LLM-driven structured ESG workflows, including estimation pipelines.</li>
+            <li>Workflow orchestration, RBAC, background processing, transactional audit logging.</li>
+          </ul>
+          <div class="binds">proves &rarr; <a href="#playground">esg-gap-checker</a><a href="#playground">rbac-audit-lab</a><a href="#playground">bullmq-jobs</a></div>
+        </div>
+      </article>
+      <article class="msg">
+        <div class="msg-h"><span>routing_key <b>role.prev</b></span><span>ts <b>Jun 2025 – Aug 2025</b></span><span>mode <b>on-site</b></span><span class="st">ACK</span></div>
+        <div class="msg-b">
+          <div><h3>Associate Software Engineer</h3><p class="org">Piron Labs (Pentaloop) · Lahore</p></div>
+          <ul>
+            <li>Kickstart HQ field-service management: scheduling, dispatching, invoicing, payments.</li>
+            <li>Response time <span class="metric">27s &rarr; 3.5s</span> via webpack optimisation, code splitting and compression.</li>
+          </ul>
+          <div class="binds">proves &rarr; <a href="#playground">web-perf-lab</a><a href="#playground">dispatch-board</a></div>
+        </div>
+      </article>
+      <article class="msg">
+        <div class="msg-h"><span>routing_key <b>role.prev</b></span><span>ts <b>Jun 2024 – Jun 2025</b></span><span>mode <b>hybrid</b></span><span class="st">ACK</span></div>
+        <div class="msg-b">
+          <div><h3>Full-Stack Developer</h3><p class="org">Webox Systems · Lahore</p></div>
+          <ul>
+            <li>VoodVR, an AI VR video platform: dashboards, profile and creator flows in React and Node.</li>
+            <li>Stripe Connect payments, subscriptions, webhook billing; real-time chat; AWS deployment.</li>
+          </ul>
+          <div class="binds">proves &rarr; <a href="#playground">stripe-connect-flow</a><a href="#playground">live-chat</a></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== SKILL -> DEMO chip row ===================== -->
+<section id="skills" aria-labelledby="skills-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-no">03 / skill.*</div>
+      <div><h2 id="skills-h">Every skill is patched to a demo</h2><p>A skill with no cable does not ship. Hover a binding to send a packet.</p></div>
+    </div>
+    <div class="wires" role="list">
+      <a role="listitem" class="w" href="#playground"><span class="sk">RabbitMQ</span><span class="cable"></span><span class="dm">rabbitmq-sim</span></a>
+      <a role="listitem" class="w" href="#playground"><span class="sk">BullMQ</span><span class="cable"></span><span class="dm">bullmq-jobs</span></a>
+      <a role="listitem" class="w" href="#playground"><span class="sk">CNN-LSTM</span><span class="cable"></span><span class="dm">har-live</span></a>
+      <a role="listitem" class="w" href="#playground"><span class="sk">Zod</span><span class="cable"></span><span class="dm">layered-api-lab</span></a>
+      <a role="listitem" class="w" href="#playground"><span class="sk">CASL</span><span class="cable"></span><span class="dm">rbac-audit-lab</span></a>
+      <a role="listitem" class="w" href="#playground"><span class="sk">Langfuse</span><span class="cable"></span><span class="dm">agent-orchestra</span></a>
+      <a role="listitem" class="w" href="#playground"><span class="sk">MCP</span><span class="cable"></span><span class="dm">mcp-tool-lab</span></a>
+      <a role="listitem" class="w" href="#playground"><span class="sk">Pinecone</span><span class="cable"></span><span class="dm">vector-space-explorer</span></a>
+      <a role="listitem" class="w" href="#playground"><span class="sk">GHG Protocol</span><span class="cable"></span><span class="dm">ghg-calculator</span></a>
+      <a role="listitem" class="w" href="#playground"><span class="sk">Stripe Connect</span><span class="cable"></span><span class="dm">stripe-connect-flow</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== PLAYGROUND CARD + MOBILE NAV SPEC ===================== -->
+<section id="playground" aria-labelledby="pg-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-no">04 / demo.*</div>
+      <div><h2 id="pg-h">Playground</h2><p>Cards are bench instruments: a live preview, what it proves, and which real work it mirrors.</p></div>
+    </div>
+    <div class="pg">
+      <article class="card" aria-labelledby="c1">
+        <div class="card-top"><span class="tag">demo.realtime</span><span>simulated · runs in browser</span></div>
+        <div class="card-viz">
+          <svg viewBox="0 0 440 150" aria-hidden="true">
+            <g class="n"><rect x="6" y="20" width="84" height="30"/><text x="14" y="39">producer</text></g>
+            <g class="n"><rect x="6" y="100" width="84" height="30"/><text x="14" y="119">producer</text></g>
+            <path class="wire" d="M90 35 H120 V75 H150 M90 115 H120 V75"/>
+            <path class="flow" d="M90 35 H120 V75 H150"/><path class="flow" style="animation-delay:-1.3s" d="M90 115 H120 V75 H150"/>
+            <g class="x"><rect x="150" y="55" width="80" height="40"/><text x="160" y="79">topic.x</text></g>
+            <path class="wire" d="M230 75 H262"/><path class="flow" style="animation-delay:-.6s" d="M230 75 H262"/>
+            <g class="n"><rect x="262" y="45" width="74" height="60"/><text x="270" y="62">queue</text></g>
+            <g class="q-depth"><rect class="bar" x="272" y="72" width="14" height="26"/><rect class="bar" x="290" y="72" width="14" height="26"/><rect class="bar" x="308" y="72" width="14" height="26"/></g>
+            <path class="wire" d="M336 75 H360"/><path class="flow" style="animation-delay:-1.9s" d="M336 75 H360"/>
+            <g class="n"><rect x="360" y="55" width="74" height="40"/><text x="368" y="79">consumer</text></g>
+            <text class="rk" x="262" y="122">prefetch · ack · dead-letter</text>
+          </svg>
+        </div>
+        <div class="card-body">
+          <h3 id="c1">rabbitmq-sim</h3>
+          <p>A visual broker with direct, topic and fanout exchanges, acks, prefetch and dead-letter queues. It mirrors MotionIQ, where an Android app streamed phone IMU data over Wi-Fi into RabbitMQ for a Java consumer.</p>
+          <div class="proves"><span>RabbitMQ</span><span>IoT streaming</span><span>Java consumer</span></div>
+          <div class="card-actions"><a class="port primary" href="#playground"><span class="pin" aria-hidden="true"></span>open demo</a><a class="port" href="#playground">how it works</a></div>
+        </div>
+      </article>
+
+      <div>
+        <div class="phone" aria-label="Mobile navigation specimen">
+          <div class="phone-screen">
+            <div class="ph-top"><span>m.haider.ali</span><span style="border:var(--line-w) solid var(--rule);padding:6px 8px;border-radius:var(--r-sm)">close</span></div>
+            <table class="rt"><caption>ROUTING TABLE — tap a binding</caption>
+              <tr><td class="k">/work</td><td>Experience</td><td class="d">career.q</td></tr>
+              <tr><td class="k">/skills</td><td>Skills to demos</td><td class="d">skill.*</td></tr>
+              <tr><td class="k">/playground</td><td>Playground</td><td class="d">demo.*</td></tr>
+              <tr><td class="k">/research</td><td>HumCareADL</td><td class="d">paper.q</td></tr>
+              <tr><td class="k">/contact</td><td>Contact</td><td class="d">reply_to</td></tr>
+            </table>
+            <div style="padding:12px;border-top:1px solid var(--rule);display:flex;justify-content:space-between;align-items:center;font:500 11px var(--font-mono);color:var(--ink-3)"><span>world</span><span style="color:var(--accent);font-weight:600" class="worldname">DRAFTING VELLUM</span></div>
+          </div>
+        </div>
+        <p class="phone-note">FIG.4 — mobile nav: the menu is a routing table. Rows are 44px+ tap targets.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ===================== TOKENS ===================== -->
+<section id="research" aria-labelledby="tk-h">
+  <div class="wrap">
+    <div class="sec-head">
+      <div class="sec-no">05 / tokens</div>
+      <div><h2 id="tk-h">Two worlds, one wiring</h2><p>Both themes share layout, spacing and structure. Colour, texture, type, radius and motion change. Admin can rename and retune each.</p></div>
+    </div>
+    <div class="tokens">
+      <div class="tk" style="background:#EFEBDF;color:#1D1B17;border-color:#1D1B17;font-family:'IBM Plex Mono',monospace">
+        <h3 style="font-family:Archivo;font-stretch:125%;font-weight:800;font-size:18px;letter-spacing:0;text-transform:none">Drafting Vellum <small style="font:500 11px 'IBM Plex Mono'">light</small></h3>
+        <div class="sw">
+          <div style="background:#EFEBDF">bg #EFEBDF</div><div style="background:#E5DFCE">bg-2 #E5DFCE</div><div style="background:#F7F4EA">surface #F7F4EA</div>
+          <div class="d" style="background:#1D1B17">ink #1D1B17</div><div class="d" style="background:#4A463D">ink-2 #4A463D</div><div class="d" style="background:#A8350F">accent #A8350F</div><div class="d" style="background:#2E6337">ok #2E6337</div>
+        </div>
+        <dl style="--ink-3:#6A6456;--ink-2:#4A463D">
+          <dt>texture</dt><dd>24px drafting grid + 4px paper tooth</dd>
+          <dt>type</dt><dd>Archivo 125% wdth 800 / IBM Plex Sans / Plex Mono</dd>
+          <dt>scale</dt><dd>12 · 14 · 16 · 20 · 24–36 · 42–96</dd>
+          <dt>radius</dt><dd>0 · 2 · 2 · 2 (square, drafted)</dd>
+          <dt>spacing</dt><dd>4 · 8 · 12 · 16 · 24 · 32 · 48 · 72</dd>
+          <dt>motion</dt><dd>ease (.2,.7,.2,1) · 140/280/900ms · dotted pen trace, 7s loop, no lamps</dd>
+        </dl>
+      </div>
+      <div class="tk" style="background:#12140F;color:#ECE3CC;border-color:#3A3F31;font-family:'JetBrains Mono',monospace">
+        <h3 style="font-family:'Big Shoulders Stencil Display';font-weight:800;font-size:22px;letter-spacing:.02em">Night Switchboard <small style="font:500 11px 'JetBrains Mono';text-transform:none">dark</small></h3>
+        <div class="sw">
+          <div class="d" style="background:#12140F">bg #12140F</div><div class="d" style="background:#191C15">bg-2 #191C15</div><div class="d" style="background:#1E2219">surface #1E2219</div>
+          <div style="background:#ECE3CC">ink #ECE3CC</div><div style="background:#B3AD97">ink-2 #B3AD97</div><div style="background:#FFB23E">accent #FFB23E</div><div style="background:#FF6B4A">packet #FF6B4A</div><div style="background:#A6D46E">ok #A6D46E</div>
+        </div>
+        <dl style="--ink-3:#8F8A76;--ink-2:#B3AD97">
+          <dt>texture</dt><dd>12px perforated panel + 3px scanline</dd>
+          <dt>type</dt><dd>Big Shoulders Stencil 800 caps / Space Grotesk / JetBrains Mono</dd>
+          <dt>scale</dt><dd>12 · 14 · 16 · 20 · 26–40 · 51–128</dd>
+          <dt>radius</dt><dd>3 · 6 · 10 · pill (rack hardware)</dd>
+          <dt>spacing</dt><dd>4 · 8 · 12 · 16 · 24 · 32 · 48 · 72 (shared)</dd>
+          <dt>motion</dt><dd>ease (.3,0,.1,1) · 100/200/600ms · discrete packets 2.6s, lamp blink, queue-depth pulse</dd>
+        </dl>
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <div class="tblock">
+      <div><span>project</span>Malik Haider Ali — portfolio, drawn as a system</div>
+      <div><span>drawn by</span>M. H. Ali</div>
+      <div><span>world</span><b class="worldname">DRAFTING VELLUM</b></div>
+      <div><span>note</span>Code with purpose, build with passion, learn without limits.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var worlds={
+    vellum:{name:'DRAFTING VELLUM',bg:'#EFEBDF',accent:'#A8350F',ink:'#1D1B17'},
+    switchboard:{name:'NIGHT SWITCHBOARD',bg:'#12140F',accent:'#FFB23E',ink:'#ECE3CC'}
+  };
+  var q=new URLSearchParams(location.search).get('theme');
+  var saved=null; try{saved=localStorage.getItem('world')}catch(e){}
+  var initial=worlds[q]?q:(worlds[saved]?saved:(matchMedia('(prefers-color-scheme: dark)').matches?'switchboard':'vellum'));
+  var patch=document.getElementById('patch'), route=document.getElementById('route'), log=document.getElementById('routeLog');
+  function apply(t){
+    root.setAttribute('data-theme',t);
+    document.querySelectorAll('.worldname').forEach(function(n){n.textContent=worlds[t].name});
+    patch.setAttribute('aria-label','Switch world. Current: '+worlds[t].name.toLowerCase());
+    try{localStorage.setItem('world',t)}catch(e){}
+  }
+  apply(initial);
+  var busy=false;
+  patch.addEventListener('click',function(){
+    if(busy)return;
+    var cur=root.getAttribute('data-theme'), next=cur==='vellum'?'switchboard':'vellum', w=worlds[next];
+    if(matchMedia('(prefers-reduced-motion: reduce)').matches){apply(next);return}
+    busy=true;
+    route.style.setProperty('--to-bg',w.bg);route.style.setProperty('--to-accent',w.accent);route.style.setProperty('--to-ink',w.ink);
+    log.textContent='publish  theme.'+next+'\nroute    7 bars -> body\nack      '+w.name.toLowerCase();
+    route.className='route in';
+    setTimeout(function(){
+      apply(next);
+      route.className='route out';
+      setTimeout(function(){route.className='route';busy=false},720);
+    },760);
+  });
+  var mb=document.getElementById('menuBtn'), dr=document.getElementById('drawer');
+  mb.addEventListener('click',function(){var o=dr.classList.toggle('open');mb.setAttribute('aria-expanded',o)});
+  dr.addEventListener('click',function(e){if(e.target.closest('a')){dr.classList.remove('open');mb.setAttribute('aria-expanded','false')}});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape'){dr.classList.remove('open');mb.setAttribute('aria-expanded','false')}});
+})();
+</script>
+</body>
+</html>
