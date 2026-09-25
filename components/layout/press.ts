@@ -155,19 +155,30 @@ function overlayPress(next: ThemeKey, labels: ThemeLabels): Promise<void> {
     mountPoint().append(root)
 
     const easing = 'cubic-bezier(.7,0,.3,1)'
+    // 1. ink-on: bands roll in from the left, 45ms apart.
     inks.forEach((ink, i) => {
-      ink.animate([{ transform: 'translateX(-101%)' }, { transform: 'translateX(0)' }], { duration: ROLL, delay: i * STAGGER, easing, fill: 'both' })
-      // No backwards fill: during its delay the ink-on pose above stays in effect.
-      ink.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(101%)' }], { duration: ROLL, delay: LIFT_AT + i * STAGGER, easing, fill: 'forwards' })
+      ink.animate([{ transform: 'translateX(-101%)' }, { transform: 'translateX(0)' }], { duration: ROLL, delay: i * STAGGER, easing, fill: 'forwards' })
     })
-    const total = LIFT_AT + (BANDS - 1) * STAGGER + ROLL
-    tag.animate(
-      [{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none', offset: 0.1 }, { opacity: 1, transform: 'none', offset: 0.8 }, { opacity: 0 }],
-      { duration: total, fill: 'both' },
-    )
+    tag.animate([{ opacity: 0, transform: 'translateY(4px)' }, { opacity: 1, transform: 'none' }], { duration: 180, delay: 60, fill: 'both' })
 
-    window.setTimeout(() => flip(next, labels), FLIP_AT)
-    window.setTimeout(() => { root.remove(); resolve() }, total + 40)
+    // Never leave the page covered (e.g. frames paused in a hidden tab).
+    const safety = window.setTimeout(() => { root.remove(); resolve() }, 3000)
+
+    // 2. flip under full cover, 3. lift off once the new world has painted
+    //    (two frames), so a slow re-render can never reveal the old world.
+    window.setTimeout(() => {
+      flip(next, labels)
+      requestAnimationFrame(() => requestAnimationFrame(() => {
+        const lifts = inks.map((ink, i) =>
+          ink.animate([{ transform: 'translateX(0)' }, { transform: 'translateX(101%)' }], { duration: ROLL, delay: (LIFT_AT - FLIP_AT) + i * STAGGER, easing, fill: 'forwards' }),
+        )
+        tag.animate([{ opacity: 1 }, { opacity: 0 }], { duration: 200, fill: 'forwards' })
+        const done = () => { window.clearTimeout(safety); root.remove(); resolve() }
+        const last = lifts[lifts.length - 1]
+        if (last) last.finished.then(done, done)
+        else done()
+      }))
+    }, FLIP_AT)
   })
 }
 

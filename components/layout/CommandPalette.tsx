@@ -22,7 +22,17 @@ const GROUP_ORDER: IndexGroup[] = ['section', 'demo', 'project', 'page', 'action
 
 const norm = (s: string) => s.toLowerCase().normalize('NFKD').replace(/[̀-ͯ]/g, '')
 
-/** Small, readable ranking: prefix > word prefix > substring > keyword > subsequence. */
+/** True when every character of `q` appears in `s` in order ("hr lv" ~ "har live"). */
+function subsequence(s: string, q: string): boolean {
+  let i = 0
+  for (const ch of s) if (ch === q[i]) i++
+  return i === q.length
+}
+
+/**
+ * Small, readable ranking: prefix > word prefix > substring > slug substring >
+ * fuzzy (in-order letters) > every word somewhere in the keywords.
+ */
 export function scoreEntry(e: IndexEntry, q: string): number {
   if (!q) return 1
   const label = norm(e.label)
@@ -31,10 +41,10 @@ export function scoreEntry(e: IndexEntry, q: string): number {
   if (label.split(/[\s\-–·/]+/).some((w) => w.startsWith(q))) return 80
   if (label.includes(q)) return 60
   if (hint.includes(q)) return 50
-  if (q.split(/\s+/).every((w) => norm(`${e.label} ${e.hint} ${e.keywords}`).includes(w))) return 30
-  let i = 0
-  for (const ch of label) if (ch === q[i]) i++
-  return i === q.length ? 10 : 0
+  const tight = q.replace(/\s+/g, '')
+  if (subsequence(label.replace(/\s+/g, ''), tight) || subsequence(hint.replace(/-/g, ''), tight)) return 40
+  const hay = norm(`${e.label} ${e.hint} ${e.keywords}`)
+  return q.split(/\s+/).every((w) => hay.includes(w)) ? 30 : 0
 }
 
 export function CommandPalette({ entries, groupLabels, labels, title }: {

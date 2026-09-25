@@ -56,7 +56,7 @@ export function FolioBar({ items, spyIds, label, contentsLabel }: {
               <NavLink href={s.href} aria-current={on ? (s.href.startsWith('/#') ? 'location' : 'page') : undefined} className={cx(ITEM, on && 'text-ink')}>
                 <Edge on={on} />
                 <Icon name={s.icon} size={22} className={on ? 'text-accent' : undefined} />
-                <span className="block max-w-full truncate">{s.label}</span>
+                <span className="block max-w-full truncate tracking-normal">{s.label}</span>
               </NavLink>
             </li>
           )
@@ -65,7 +65,7 @@ export function FolioBar({ items, spyIds, label, contentsLabel }: {
           <button type="button" onClick={openContents} aria-haspopup="dialog" className={cx(ITEM, 'w-full')}>
             <Edge on={false} />
             <Icon name="leaders" size={22} />
-            <span className="block max-w-full truncate">{contentsLabel}</span>
+            <span className="block max-w-full truncate tracking-normal">{contentsLabel}</span>
           </button>
         </li>
       </ul>

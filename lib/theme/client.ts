@@ -8,23 +8,39 @@ import { useSyncExternalStore } from 'react'
 import { THEME_KEYS, type ThemeKey } from '@/lib/content/schema'
 import { THEME_EVENT, THEME_STORAGE_KEY } from './index'
 
+const isKey = (v: string | null | undefined): v is ThemeKey =>
+  (THEME_KEYS as readonly string[]).includes(v ?? '')
+
 export function getThemeKey(): ThemeKey {
   if (typeof document === 'undefined') return 'almanac'
   const t = document.documentElement.getAttribute('data-theme')
-  return (THEME_KEYS as readonly string[]).includes(t ?? '') ? (t as ThemeKey) : 'almanac'
+  return isKey(t) ? t : 'almanac'
 }
 
-/** Flip the world immediately (the switcher wraps this in its transition). */
+/**
+ * Flip the world immediately (the switcher wraps this in its transition).
+ * `color-scheme` and the browser chrome colour follow the world's own tokens
+ * (content/theme.json `reads` + `--bg`), so a retuned world stays consistent.
+ */
 export function setTheme(key: ThemeKey, opts: { persist?: boolean } = {}) {
   const d = document.documentElement
   d.setAttribute('data-theme', key)
-  const scheme = key === 'strata' ? 'dark' : 'light'
+  d.style.colorScheme = '' // drop the previous inline value so the world's own color-scheme is read
+  const cs = getComputedStyle(d)
+  const scheme = cs.getPropertyValue('color-scheme').trim() || (key === 'strata' ? 'dark' : 'light')
   d.style.colorScheme = scheme
   document.querySelector('meta[name="color-scheme"]')?.setAttribute('content', scheme)
+  const bg = cs.getPropertyValue('--bg').trim()
+  if (bg) document.querySelectorAll('meta[name="theme-color"]').forEach((m) => m.setAttribute('content', bg))
   if (opts.persist !== false) {
     try { localStorage.setItem(THEME_STORAGE_KEY, key) } catch { /* private mode */ }
   }
-  window.dispatchEvent(new CustomEvent(THEME_EVENT, { detail: key }))
+  window.dispatchEvent(new CustomEvent<ThemeKey>(THEME_EVENT, { detail: key }))
+}
+
+/** Forget the stored choice; the next load follows `?theme=`, the admin default or the OS. */
+export function clearStoredTheme() {
+  try { localStorage.removeItem(THEME_STORAGE_KEY) } catch { /* private mode */ }
 }
 
 function subscribe(cb: () => void) {
@@ -43,4 +59,16 @@ export function useThemeKey(): ThemeKey {
 export function readToken(name: `--${string}`, el?: Element | null): string {
   if (typeof window === 'undefined') return ''
   return getComputedStyle(el ?? document.documentElement).getPropertyValue(name).trim()
+}
+
+/** Several tokens at once, e.g. readTokens(['--data-1', '--data-2']) for a canvas palette. */
+export function readTokens<N extends `--${string}`>(names: readonly N[], el?: Element | null): Record<N, string> {
+  const out = {} as Record<N, string>
+  if (typeof window === 'undefined') {
+    for (const n of names) out[n] = ''
+    return out
+  }
+  const cs = getComputedStyle(el ?? document.documentElement)
+  for (const n of names) out[n] = cs.getPropertyValue(n).trim()
+  return out
 }
