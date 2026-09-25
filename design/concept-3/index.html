@@ -1,0 +1,696 @@
+<!doctype html>
+<html lang="en" data-theme="almanac">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Ground Truth Press</title>
+<meta name="description" content="Concept 3 for the Malik Haider Ali portfolio: two print worlds, Almanac and Strata.">
+<!--
+  RATIONALE (Concept 3 "Ground Truth Press", designer #3, angle: Earth & print)
+  Malik has two crafts that rarely share a page: he writes software for the ground itself (ESG and GHG reporting,
+  climate risk and transition planning at Euthyna, alongside Terra Instinct's real-estate decarbonisation), and he is a
+  graphic designer by habit (Best Graphic Designer credit at PUCIT). So the portfolio is printed matter about the earth.
+  The recurring device is the core sample: his career is drawn as sediment, newest layer on top (PUCIT 2021, first C
+  repos 2022, Webox and VoodVR 2024, MotionIQ sensors to RabbitMQ Dec 2024, Piron Labs' 27s to 3.5s 2025, Euthyna
+  2025 to now), and each layer links to a playground demo that proves it. The same layout is printed twice.
+  "Almanac" (reads light) is a risograph field almanac on uncoated cream stock: spruce and vermilion ink, halftone
+  dots, hairline rules, folio numbers, and an overprint that drifts slightly out of register. "Strata" (reads dark) is a
+  soil core under a field lamp: loam-black ground, chalk text, ochre and lichen contour lines, pebble-soft corners and
+  sediment that settles as it loads. Switching is not a sun and moon. You "pull a new proof": ink bands roll across
+  the page like a brayer, the plate is swapped under them, and the page is lifted off in the other world. Motion is CSS
+  and SVG only, and prefers-reduced-motion drops it to a short cross-fade. The only live number on the page is a real
+  reading from carbonintensity.org.uk. Nothing is invented; missing data stays blank.
+-->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght,SOFT,WONK@0,9..144,300..900,0..100,0..1;1,9..144,300..900,0..100,0..1&family=Newsreader:ital,opsz,wght@0,6..72,400..700;1,6..72,400..700&family=DM+Mono:wght@400;500&family=Bricolage+Grotesque:opsz,wdth,wght@12..96,75..100,300..800&family=Hanken+Grotesk:wght@400;500;600;700&family=Martian+Mono:wdth,wght@87.5,400;87.5,600&display=swap" rel="stylesheet">
+<style>
+/* =====================================================================
+   TOKENS — THEME 1: "ALMANAC" (reads light). Risograph field almanac.
+   ===================================================================== */
+:root, [data-theme="almanac"]{
+  color-scheme: light;
+  /* colour */
+  --bg:#F2EADB;            /* uncoated cream stock */
+  --bg-2:#E9DEC9;          /* second sheet / inset */
+  --surface:#F7F1E6;
+  --ink:#1D2B22;           /* spruce-black, 13.1:1 on bg */
+  --ink-2:#4A5448;         /* secondary text, 7.0:1 */
+  --accent:#1F6B47;        /* riso green, 5.6:1 */
+  --accent-2:#D2462A;      /* riso vermilion (decorative / large) */
+  --accent-ink:#9E2F16;    /* vermilion safe for small text, 6.2:1 */
+  --on-accent:#F7F1E6;
+  --rule:#1D2B22;
+  --rule-soft:rgba(29,43,34,.22);
+  --halftone:rgba(31,107,71,.9);
+  --overprint:rgba(210,70,42,.85);
+  /* texture */
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .35 0 0 0 0 .28 0 0 0 0 .18 0 0 0 .16 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --pattern: radial-gradient(circle at 1.5px 1.5px, rgba(31,107,71,.13) 1.1px, transparent 1.6px) 0 0/7px 7px;
+  --blend: multiply;
+  /* type */
+  --font-display:"Fraunces", Georgia, serif;
+  --font-body:"Newsreader", Georgia, serif;
+  --font-mono:"DM Mono", ui-monospace, monospace;
+  --display-settings:"opsz" 144, "SOFT" 30, "WONK" 1;
+  --display-weight:560;
+  --display-stretch:100%;
+  --display-case:none;
+  --display-track:-0.025em;
+  --fs-00:.75rem; --fs-0:.875rem; --fs-1:1.0625rem; --fs-2:1.375rem; --fs-3:1.875rem; --fs-4:2.5rem;
+  --fs-hero:clamp(3.2rem, 11vw, 8.6rem);   /* ratio ~1.333, perfect fourth */
+  --lh-body:1.55;
+  /* radius */
+  --r-0:0; --r-1:2px; --r-2:3px; --r-pill:2px;   /* printed slugs: square cut */
+  /* spacing (8pt, generous margins like a book) */
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:24px; --s-6:32px; --s-7:48px; --s-8:72px; --s-9:112px;
+  --gutter:16px; --measure:62ch;
+  /* motion */
+  --dur-fast:140ms; --dur-med:320ms; --dur-slow:1100ms;
+  --ease-out:cubic-bezier(.2,.7,.2,1);
+  --ease-press:cubic-bezier(.7,0,.3,1);
+  --accent-motion: misregister 7s ease-in-out infinite;   /* overprint drifts out of register */
+  --swap-label:"Pulling a new proof";
+}
+
+/* =====================================================================
+   TOKENS — THEME 2: "STRATA" (reads dark). Soil core under a field lamp.
+   ===================================================================== */
+[data-theme="strata"]{
+  color-scheme: dark;
+  /* colour */
+  --bg:#16110D;            /* loam */
+  --bg-2:#1F1813;
+  --surface:#241C16;
+  --ink:#EEE5D2;           /* chalk, 15.4:1 on bg */
+  --ink-2:#BDB09A;         /* 8.6:1 */
+  --accent:#E0AE4C;        /* ochre, 9.4:1 */
+  --accent-2:#A9C98A;      /* lichen, 10.3:1 */
+  --accent-ink:#E0AE4C;
+  --on-accent:#16110D;
+  --rule:#6B5A48;
+  --rule-soft:rgba(238,229,210,.14);
+  --halftone:rgba(224,174,76,.9);
+  --overprint:rgba(169,201,138,.9);
+  /* texture */
+  --grain:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.7' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .9 0 0 0 0 .8 0 0 0 0 .6 0 0 0 .07 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --pattern:
+    repeating-radial-gradient(circle at 18% 30%, transparent 0 38px, rgba(224,174,76,.07) 38px 39px),
+    repeating-radial-gradient(circle at 86% 78%, transparent 0 46px, rgba(169,201,138,.06) 46px 47px);
+  --blend: screen;
+  /* type */
+  --font-display:"Bricolage Grotesque", "Arial Narrow", sans-serif;
+  --font-body:"Hanken Grotesk", system-ui, sans-serif;
+  --font-mono:"Martian Mono", ui-monospace, monospace;
+  --display-settings:"opsz" 96, "wdth" 75;
+  --display-weight:780;
+  --display-stretch:75%;
+  --display-case:uppercase;
+  --display-track:-0.01em;
+  --fs-00:.6875rem; --fs-0:.8125rem; --fs-1:1rem; --fs-2:1.25rem; --fs-3:1.5625rem; --fs-4:2rem;
+  --fs-hero:clamp(3.4rem, 13vw, 9.4rem);  /* ratio 1.25, major third, condensed caps */
+  --lh-body:1.6;
+  /* radius */
+  --r-0:6px; --r-1:12px; --r-2:22px; --r-pill:999px;   /* water-worn pebbles */
+  /* spacing (tighter, like a borehole log) */
+  --s-1:4px; --s-2:8px; --s-3:12px; --s-4:16px; --s-5:22px; --s-6:28px; --s-7:44px; --s-8:64px; --s-9:96px;
+  --gutter:16px; --measure:60ch;
+  /* motion */
+  --dur-fast:160ms; --dur-med:420ms; --dur-slow:1100ms;
+  --ease-out:cubic-bezier(.16,.8,.24,1);
+  --ease-press:cubic-bezier(.7,0,.3,1);
+  --accent-motion: contour-drift 40s linear infinite;    /* contour lines creep like groundwater */
+  --swap-label:"Taking a core sample";
+}
+
+/* ===================== base ===================== */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font:400 var(--fs-1)/var(--lh-body) var(--font-body);
+  overflow-x:hidden;
+}
+body::before{ /* paper grain / soil grain */
+  content:""; position:fixed; inset:0; pointer-events:none; z-index:0;
+  background-image:var(--grain); mix-blend-mode:var(--blend);
+}
+body::after{ /* halftone field / contour field */
+  content:""; position:fixed; inset:-60px; pointer-events:none; z-index:0;
+  background:var(--pattern); animation:var(--accent-motion);
+}
+[data-theme="almanac"] body::after{animation:none}
+main,header,footer{position:relative; z-index:1}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--accent); outline-offset:3px}
+.wrap{max-width:1240px; margin:0 auto; padding:0 var(--gutter)}
+@media (min-width:768px){ :root, [data-theme]{ --gutter:32px } }
+@media (min-width:1280px){ :root, [data-theme]{ --gutter:48px } }
+.mono{font-family:var(--font-mono); font-size:var(--fs-00); letter-spacing:.06em; text-transform:uppercase}
+.skip{position:absolute; left:-999px; top:8px; background:var(--ink); color:var(--bg); padding:8px 12px; z-index:50}
+.skip:focus{left:8px}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.display{
+  font-family:var(--font-display); font-variation-settings:var(--display-settings);
+  font-weight:var(--display-weight); font-stretch:var(--display-stretch);
+  text-transform:var(--display-case); letter-spacing:var(--display-track);
+}
+
+/* ===================== masthead / nav ===================== */
+.mast{border-bottom:1px solid var(--rule)}
+.mast-top{display:flex; justify-content:space-between; gap:12px; padding:8px 0; border-bottom:1px solid var(--rule-soft); color:var(--ink-2)}
+.mast-top .hide-s{display:none}
+@media (min-width:768px){ .mast-top .hide-s{display:inline} }
+.mast-row{display:flex; align-items:center; justify-content:space-between; gap:16px; padding:14px 0}
+.brand{display:flex; align-items:center; gap:10px; text-decoration:none}
+.reg{width:22px; height:22px; flex:none; color:var(--accent-2)}
+.brand b{font-family:var(--font-display); font-variation-settings:var(--display-settings); font-weight:var(--display-weight); font-stretch:var(--display-stretch); text-transform:var(--display-case); font-size:1.25rem; letter-spacing:var(--display-track); line-height:1}
+.nav{display:none; gap:26px; list-style:none; margin:0; padding:0}
+.nav a{text-decoration:none; font-family:var(--font-mono); font-size:var(--fs-00); letter-spacing:.08em; text-transform:uppercase; padding:6px 0; border-bottom:1px solid transparent}
+.nav a:hover{border-color:var(--accent-2)}
+.nav a[aria-current]{border-color:var(--ink)}
+.bar-actions{display:flex; align-items:center; gap:10px}
+@media (min-width:960px){ .nav{display:flex} .menu-btn{display:none !important} }
+
+/* the switch: "pull a new proof" */
+.proof-btn{
+  display:inline-flex; align-items:center; gap:10px; cursor:pointer;
+  background:var(--surface); color:var(--ink); border:1px solid var(--rule);
+  border-radius:var(--r-pill); padding:7px 12px 7px 8px; min-height:44px;
+  font:500 var(--fs-00)/1 var(--font-mono); letter-spacing:.06em; text-transform:uppercase;
+  transition:transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast);
+  box-shadow:3px 3px 0 var(--rule);
+}
+.proof-btn:hover{transform:translate(-1px,-1px); box-shadow:4px 4px 0 var(--rule)}
+.proof-btn:active{transform:translate(3px,3px); box-shadow:0 0 0 var(--rule)}
+.swatches{position:relative; width:34px; height:22px; flex:none}
+.swatches i{position:absolute; top:1px; width:20px; height:20px; border-radius:50%; border:1px solid var(--rule)}
+.swatches i:first-child{left:0; background:#F2EADB; box-shadow:inset 0 0 0 4px #1F6B47}
+.swatches i:last-child{left:13px; background:#16110D; box-shadow:inset 0 0 0 4px #E0AE4C; mix-blend-mode:normal}
+.proof-btn .lbl-s{display:none}
+@media (min-width:520px){ .proof-btn .lbl-s{display:inline} }
+.menu-btn{display:inline-flex; align-items:center; gap:8px; min-height:44px; padding:0 12px; background:transparent; color:var(--ink); border:1px solid var(--rule); border-radius:var(--r-pill); font:500 var(--fs-00)/1 var(--font-mono); letter-spacing:.08em; text-transform:uppercase; cursor:pointer}
+
+/* ===================== mobile contents sheet ===================== */
+.sheet{position:fixed; inset:0; z-index:40; display:flex; flex-direction:column; background:var(--bg); padding:16px var(--gutter) 24px;
+  transform:translateY(-102%); transition:transform var(--dur-med) var(--ease-press); visibility:hidden}
+.sheet::before{content:""; position:absolute; inset:0; background:var(--pattern); opacity:.9; pointer-events:none}
+.sheet.open{transform:none; visibility:visible}
+.sheet > *{position:relative}
+.sheet-head{display:flex; justify-content:space-between; align-items:center; border-bottom:2px solid var(--rule); padding-bottom:12px}
+.sheet h2{margin:22px 0 6px; font-size:var(--fs-4); line-height:1}
+.toc{list-style:none; margin:10px 0 0; padding:0; counter-reset:toc}
+.toc li{counter-increment:toc}
+.toc a{display:flex; align-items:baseline; gap:10px; padding:14px 0; text-decoration:none; border-bottom:1px solid var(--rule-soft); font-size:var(--fs-2); font-family:var(--font-display); font-variation-settings:var(--display-settings); font-weight:500; font-stretch:var(--display-stretch)}
+[data-theme="strata"] .toc a{text-transform:uppercase; font-weight:700}
+.toc a::after{content:""; flex:1; border-bottom:2px dotted var(--rule-soft); transform:translateY(-4px); order:2}
+.toc a .fol{order:3; font-family:var(--font-mono); font-size:var(--fs-0); color:var(--accent-ink)}
+.toc a .ttl{order:1}
+[data-theme="strata"] .toc a{border-left:6px solid var(--layer, var(--accent)); padding-left:12px; border-radius:0 var(--r-1) var(--r-1) 0; margin-bottom:6px; background:var(--surface); border-bottom:0}
+.sheet-foot{margin-top:auto; padding-top:18px; display:flex; flex-direction:column; gap:12px}
+.sheet-foot .proof-btn{justify-content:center}
+.sheet-foot .proof-btn .lbl-s{display:inline}
+
+/* ===================== hero ===================== */
+.hero{padding:var(--s-7) 0 var(--s-8); border-bottom:1px solid var(--rule)}
+.hero-grid{display:grid; gap:var(--s-7)}
+@media (min-width:960px){ .hero-grid{grid-template-columns:1.25fr 1fr; align-items:end} }
+.kicker{display:flex; flex-wrap:wrap; gap:6px 14px; color:var(--ink-2); margin-bottom:var(--s-5)}
+.kicker span+span::before{content:"/"; margin-right:14px; color:var(--accent-2)}
+.hero h1{margin:0; font-size:var(--fs-hero); line-height:.86; position:relative}
+.hero h1 .ln{display:block}
+.hero h1 .ov{ /* the overprint: a second ink pass, slightly out of register */
+  position:absolute; inset:0; color:var(--overprint); mix-blend-mode:var(--blend); pointer-events:none;
+  animation:misregister 7s ease-in-out infinite; clip-path:inset(0 0 52% 0);
+}
+[data-theme="strata"] .hero h1 .ov{animation:settle 1.4s var(--ease-out) both; clip-path:inset(62% 0 0 0); opacity:.9}
+.role{margin:var(--s-5) 0 0; font-size:var(--fs-3); line-height:1.15; font-family:var(--font-display); font-variation-settings:var(--display-settings); font-weight:400; font-style:italic; max-width:20ch}
+[data-theme="strata"] .role{font-style:normal; font-weight:520; text-transform:none; font-variation-settings:"opsz" 32, "wdth" 100; font-stretch:100%; letter-spacing:-.015em; max-width:22ch}
+.role em{font-style:normal; color:var(--accent)}
+.lede{max-width:var(--measure); margin:var(--s-5) 0 0; color:var(--ink-2)}
+.lede::first-letter{font-family:var(--font-display); font-variation-settings:var(--display-settings); float:left; font-size:3.4em; line-height:.82; padding:6px 8px 0 0; color:var(--accent-ink); font-weight:700}
+.cta{display:flex; flex-wrap:wrap; gap:12px; margin-top:var(--s-6)}
+.btn{display:inline-flex; align-items:center; gap:10px; min-height:48px; padding:0 20px; text-decoration:none; font:500 var(--fs-0)/1 var(--font-mono); letter-spacing:.06em; text-transform:uppercase; border-radius:var(--r-pill); border:1px solid var(--ink); transition:background var(--dur-fast), color var(--dur-fast), transform var(--dur-fast) var(--ease-out)}
+.btn.solid{background:var(--ink); color:var(--bg)}
+.btn.solid:hover{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+.btn.line:hover{transform:translateY(-2px)}
+.btn svg{width:16px;height:16px}
+
+/* the plate / the core */
+.plate{position:relative; border:1px solid var(--rule); background:var(--surface); border-radius:var(--r-1); overflow:hidden}
+.plate-head{display:flex; justify-content:space-between; gap:8px; padding:10px 14px; border-bottom:1px solid var(--rule); color:var(--ink-2)}
+.plate svg.core{display:block; width:100%; height:auto}
+.core .layer-fill{fill:url(#ht-1)}
+.core .layer-line{fill:none; stroke:var(--ink); stroke-width:1}
+.core .lab{font-family:var(--font-mono); font-size:10.5px; letter-spacing:.04em; fill:var(--ink)}
+.core .lab-y{fill:var(--accent-ink); font-weight:500}
+.core a:hover .lab, .core a:focus .lab{text-decoration:underline}
+.core a:focus-visible{outline:none}
+.core a:focus-visible .hit{stroke:var(--accent); stroke-width:2}
+.core .hit{fill:transparent}
+.core .over{fill:none; stroke:var(--overprint); stroke-width:3; mix-blend-mode:var(--blend); animation:misregister 7s ease-in-out infinite}
+[data-theme="strata"] .core .layer-fill{fill:var(--surface)}
+[data-theme="strata"] .core .layer-line{stroke:var(--c); stroke-width:1.6}
+[data-theme="strata"] .core .contour{display:inline}
+[data-theme="strata"] .core .over{animation:none; stroke:var(--accent); stroke-width:2; stroke-dasharray:2 6}
+.core .contour{display:none; fill:none; stroke:var(--c); stroke-opacity:.35; stroke-width:1}
+[data-theme="strata"] .core .lg{animation:settle 1.2s var(--ease-out) both; animation-delay:calc(var(--i) * 90ms)}
+.reading{display:grid; grid-template-columns:1fr auto; gap:4px 12px; padding:12px 14px; border-top:1px solid var(--rule); align-items:end}
+.reading .v{font-family:var(--font-display); font-variation-settings:var(--display-settings); font-weight:var(--display-weight); font-stretch:var(--display-stretch); font-size:var(--fs-4); line-height:1}
+.reading .u{color:var(--ink-2)}
+.reading p{grid-column:1/-1; margin:0; font-size:var(--fs-0); color:var(--ink-2)}
+.reading .idx{justify-self:end; padding:4px 8px; border:1px solid var(--rule); border-radius:var(--r-pill); color:var(--accent-ink)}
+
+/* ===================== section: working record ===================== */
+.sec{padding:var(--s-8) 0; border-bottom:1px solid var(--rule)}
+.sec-head{display:grid; gap:12px; margin-bottom:var(--s-6)}
+@media (min-width:768px){ .sec-head{grid-template-columns:auto 1fr auto; align-items:end; gap:24px} }
+.folio{font-family:var(--font-display); font-variation-settings:var(--display-settings); font-weight:300; font-size:var(--fs-4); line-height:1; color:var(--accent-ink)}
+[data-theme="strata"] .folio{font-weight:700; color:var(--accent-2)}
+.sec h2{margin:0; font-size:clamp(2.2rem,6vw,4rem); line-height:.95}
+.sec-head .note{color:var(--ink-2); max-width:36ch; font-size:var(--fs-0)}
+.ledger{display:grid; gap:0; border-top:2px solid var(--rule)}
+@media (min-width:900px){ .ledger{grid-template-columns:repeat(3,1fr)} }
+.entry{padding:var(--s-5) 0; border-bottom:1px solid var(--rule-soft); display:flex; flex-direction:column; gap:10px}
+@media (min-width:900px){
+  .entry{padding:var(--s-5) var(--s-5) var(--s-5) 0; border-bottom:0}
+  .entry + .entry{border-left:1px solid var(--rule-soft); padding-left:var(--s-5)}
+}
+[data-theme="strata"] .entry{background:var(--surface); border-radius:var(--r-1); padding:var(--s-5); margin-top:12px; border:0; border-top:4px solid var(--layer)}
+@media (min-width:900px){ [data-theme="strata"] .ledger{gap:14px; border-top:0} [data-theme="strata"] .entry + .entry{border-left:0; padding-left:var(--s-5)} }
+.entry .when{color:var(--ink-2)}
+.entry h3{margin:0; font-size:var(--fs-3); line-height:1.05; font-family:var(--font-display); font-variation-settings:var(--display-settings); font-weight:600; font-stretch:var(--display-stretch)}
+[data-theme="strata"] .entry h3{text-transform:uppercase; font-weight:760}
+.entry .org{font-style:italic; color:var(--ink-2); margin:0}
+[data-theme="strata"] .entry .org{font-style:normal}
+.entry ul{margin:0; padding:0 0 0 1.1em; font-size:var(--fs-0)}
+.entry li{margin:4px 0}
+.fig{display:flex; align-items:baseline; gap:10px; flex-wrap:wrap; font-family:var(--font-display); font-variation-settings:var(--display-settings); font-weight:var(--display-weight); font-stretch:var(--display-stretch); font-size:var(--fs-4); line-height:1}
+.fig s{text-decoration-color:var(--accent-2); text-decoration-thickness:3px; color:var(--ink-2)}
+.fig b{color:var(--accent)}
+.proof{margin-top:auto; display:inline-flex; align-items:center; gap:8px; align-self:flex-start; text-decoration:none; color:var(--accent-ink); font-family:var(--font-mono); font-size:var(--fs-00); letter-spacing:.06em; text-transform:uppercase; border-bottom:1px solid currentColor; padding:6px 0}
+.proof:hover{color:var(--ink)}
+.stamp{display:grid; place-items:center; text-align:center; width:132px; height:132px; border-radius:50%; border:2px solid var(--accent-2); color:var(--accent-ink); transform:rotate(-9deg); font-family:var(--font-mono); font-size:10px; letter-spacing:.12em; text-transform:uppercase; line-height:1.4; padding:14px; flex:none}
+.stamp b{display:block; font-family:var(--font-display); font-variation-settings:var(--display-settings); font-size:17px; letter-spacing:0; text-transform:none; line-height:1.05; margin:4px 0}
+[data-theme="strata"] .stamp{border-style:dashed; color:var(--accent-2); border-color:var(--accent-2)}
+.aside{display:flex; gap:var(--s-5); align-items:center; margin-top:var(--s-6); padding:var(--s-5); border:1px solid var(--rule); border-radius:var(--r-1); background:var(--bg-2)}
+.aside p{margin:0; font-size:var(--fs-0)}
+.aside h3{margin:0 0 6px; font-size:var(--fs-2); font-family:var(--font-display); font-variation-settings:var(--display-settings); font-stretch:var(--display-stretch); font-weight:600}
+@media (max-width:560px){ .aside{flex-direction:column; align-items:flex-start} }
+
+/* ===================== chips: skill -> demo ===================== */
+.chips-wrap{padding:var(--s-7) 0; border-bottom:1px solid var(--rule)}
+.chips-head{display:flex; justify-content:space-between; align-items:baseline; gap:12px; margin-bottom:16px; color:var(--ink-2)}
+.chips{display:flex; flex-wrap:wrap; gap:10px; list-style:none; margin:0; padding:0}
+.chip{display:inline-flex; align-items:stretch; text-decoration:none; min-height:44px; border:1px solid var(--rule); border-radius:var(--r-pill); overflow:hidden; background:var(--surface); transition:transform var(--dur-fast) var(--ease-out), box-shadow var(--dur-fast)}
+.chip .sk{display:flex; align-items:center; padding:0 12px; font-family:var(--font-display); font-variation-settings:var(--display-settings); font-stretch:var(--display-stretch); font-weight:600; font-size:var(--fs-0)}
+[data-theme="strata"] .chip .sk{text-transform:uppercase; letter-spacing:.03em; font-variation-settings:"opsz" 14, "wdth" 100; font-stretch:100%; font-weight:650}
+.chip .dm{display:flex; align-items:center; gap:6px; padding:0 12px; font-family:var(--font-mono); font-size:var(--fs-00); letter-spacing:.02em; background:var(--bg-2); border-left:1px solid var(--rule); color:var(--ink-2)}
+.chip .dm svg{width:12px; height:12px; color:var(--accent-ink)}
+.chip:hover{transform:translateY(-2px); box-shadow:0 3px 0 var(--rule)}
+.chip:hover .dm{background:var(--accent); color:var(--on-accent)}
+.chip:hover .dm svg{color:var(--on-accent)}
+[data-theme="strata"] .chip{border-color:var(--rule); box-shadow:inset 0 -3px 0 var(--layer, var(--accent))}
+[data-theme="strata"] .chip:hover{box-shadow:inset 0 -3px 0 var(--layer, var(--accent)), 0 6px 18px rgba(0,0,0,.4)}
+
+/* ===================== playground card ===================== */
+.play{padding:var(--s-8) 0}
+.play-grid{display:grid; gap:var(--s-6)}
+@media (min-width:900px){ .play-grid{grid-template-columns:1fr 1.2fr; align-items:center} }
+.play-intro h2{margin:0 0 12px; font-size:clamp(2rem,5vw,3.4rem); line-height:.95}
+.play-intro p{color:var(--ink-2); max-width:44ch; margin:0}
+.card{position:relative; display:grid; border:1px solid var(--rule); border-radius:var(--r-2); background:var(--surface); overflow:hidden}
+@media (min-width:600px){ .card{grid-template-columns:230px 1fr} }
+[data-theme="almanac"] .card{box-shadow:6px 6px 0 var(--accent-2)}
+[data-theme="strata"] .card{box-shadow:0 18px 40px rgba(0,0,0,.45)}
+.poster{position:relative; background:var(--bg-2); border-bottom:1px solid var(--rule); aspect-ratio:3/4; max-height:360px; width:100%}
+@media (min-width:600px){ .poster{border-bottom:0; border-right:1px solid var(--rule); max-height:none} }
+.poster svg{display:block; width:100%; height:100%}
+.card-body{padding:var(--s-5); display:flex; flex-direction:column; gap:12px}
+.card-body .mono{color:var(--ink-2)}
+.card-body h3{margin:0; font-size:var(--fs-3); line-height:1; font-family:var(--font-display); font-variation-settings:var(--display-settings); font-stretch:var(--display-stretch); font-weight:640}
+[data-theme="strata"] .card-body h3{text-transform:uppercase; font-weight:780}
+.card-body p{margin:0; font-size:var(--fs-0)}
+.mirrors{padding:10px 12px; border-left:3px solid var(--accent-2); background:var(--bg-2); font-size:var(--fs-0); border-radius:0 var(--r-0) var(--r-0) 0}
+.tags{display:flex; flex-wrap:wrap; gap:6px; list-style:none; margin:0; padding:0}
+.tags li{font-family:var(--font-mono); font-size:var(--fs-00); padding:4px 8px; border:1px solid var(--rule-soft); border-radius:var(--r-pill); color:var(--ink-2)}
+.card-actions{display:flex; gap:10px; flex-wrap:wrap; margin-top:auto}
+.card-actions .btn{min-height:44px; padding:0 14px; font-size:var(--fs-00)}
+.card-actions button.btn{background:transparent; color:var(--ink); cursor:pointer}
+
+footer{padding:var(--s-6) 0 var(--s-8); color:var(--ink-2)}
+footer .wrap{display:flex; flex-wrap:wrap; gap:10px 24px; justify-content:space-between; border-top:2px solid var(--rule); padding-top:16px}
+.colophon{font-style:italic}
+
+/* ===================== the transition: pull a new proof ===================== */
+.press{position:fixed; inset:0; z-index:60; pointer-events:none; display:grid; grid-template-rows:repeat(7,1fr); visibility:hidden}
+.press.run{visibility:visible}
+.press i{display:block; background:var(--to-bg); transform:scaleX(0); transform-origin:left center; position:relative}
+.press i::after{content:""; position:absolute; top:0; bottom:0; right:-14px; width:14px; background:linear-gradient(90deg, var(--to-accent), transparent); opacity:.9}
+.press.run i{animation:roll-in 520ms var(--ease-press) forwards, roll-out 520ms var(--ease-press) 640ms forwards; animation-delay:calc(var(--k) * 45ms), calc(640ms + var(--k) * 45ms)}
+.press .tag{position:absolute; inset:0; display:grid; place-items:center; opacity:0}
+.press.run .tag{animation:tag 1.3s ease both}
+.press .tag div{display:flex; align-items:center; gap:14px; padding:12px 18px; color:var(--to-ink); font:500 12px/1 var(--font-mono); letter-spacing:.14em; text-transform:uppercase; border:1px solid var(--to-ink); background:var(--to-bg)}
+.press .tag svg{width:26px; height:26px; color:var(--to-accent)}
+
+@keyframes roll-in{from{transform:scaleX(0); transform-origin:left} to{transform:scaleX(1); transform-origin:left}}
+@keyframes roll-out{from{transform:scaleX(1); transform-origin:right} to{transform:scaleX(0); transform-origin:right}}
+@keyframes tag{0%,25%{opacity:0; transform:scale(.96)} 40%,70%{opacity:1; transform:none} 100%{opacity:0}}
+@keyframes misregister{0%,100%{transform:translate(0,0)} 30%{transform:translate(2px,-1px)} 60%{transform:translate(-1px,2px)}}
+@keyframes contour-drift{from{transform:translate(0,0)} to{transform:translate(-40px,-60px)}}
+@keyframes settle{from{transform:translateY(-14px); opacity:0} to{transform:none; opacity:1}}
+
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation:none !important; transition-duration:1ms !important}
+  .press.run{visibility:hidden}
+  body.fade main, body.fade header{opacity:.001}
+}
+body.fade main, body.fade header{transition:opacity 150ms !important}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<!-- shared glyphs (SVG, never emoji) -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="g-reg" viewBox="0 0 24 24"><circle cx="12" cy="12" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M12 1v22M1 12h22" stroke="currentColor" stroke-width="1.5"/></symbol>
+    <symbol id="g-arrow" viewBox="0 0 16 16"><path d="M2 8h11M9 4l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="square"/></symbol>
+    <symbol id="g-core" viewBox="0 0 16 16"><rect x="4.5" y="1.5" width="7" height="13" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 6h7M4.5 9.5h7" stroke="currentColor" stroke-width="1.2"/></symbol>
+    <pattern id="ht-1" width="6" height="6" patternUnits="userSpaceOnUse"><circle cx="3" cy="3" r="1.25" fill="var(--halftone)"/></pattern>
+    <pattern id="ht-2" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><circle cx="2.5" cy="2.5" r="1.7" fill="var(--halftone)"/></pattern>
+    <pattern id="ht-3" width="7" height="7" patternUnits="userSpaceOnUse" patternTransform="rotate(15)"><circle cx="3.5" cy="3.5" r=".9" fill="var(--halftone)"/></pattern>
+    <pattern id="ht-4" width="4" height="4" patternUnits="userSpaceOnUse"><path d="M0 4L4 0" stroke="var(--halftone)" stroke-width=".9"/></pattern>
+  </defs>
+</svg>
+
+<!-- theme transition overlay -->
+<div class="press" id="press" aria-hidden="true">
+  <i style="--k:0"></i><i style="--k:1"></i><i style="--k:2"></i><i style="--k:3"></i><i style="--k:4"></i><i style="--k:5"></i><i style="--k:6"></i>
+  <div class="tag"><div><svg><use href="#g-reg"/></svg><span id="pressLabel">Pulling a new proof</span></div></div>
+</div>
+
+<header class="mast">
+  <div class="wrap">
+    <div class="mast-top mono">
+      <span>Lahore, Pakistan</span>
+      <span class="hide-s">Every claim has a working proof</span>
+      <span id="edition">Edition: Almanac</span>
+    </div>
+    <div class="mast-row">
+      <a class="brand" href="#top" aria-label="Malik Haider Ali, home"><svg class="reg" aria-hidden="true"><use href="#g-reg"/></svg><b>Malik Haider Ali</b></a>
+      <nav aria-label="Primary"><ul class="nav">
+        <li><a href="#record" aria-current="true">Record</a></li>
+        <li><a href="#proofs">Proofs</a></li>
+        <li><a href="#playground">Playground</a></li>
+        <li><a href="#research">Research</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul></nav>
+      <div class="bar-actions">
+        <button class="proof-btn js-swap" type="button"><span class="swatches" aria-hidden="true"><i></i><i></i></span><span class="lbl-s js-swap-lbl">Reprint in Strata</span><span class="sr js-swap-sr">Switch theme to Strata</span></button>
+        <button class="menu-btn" id="menuBtn" type="button" aria-expanded="false" aria-controls="sheet">Contents</button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- mobile nav: an almanac contents page / a borehole log -->
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-labelledby="sheetTitle">
+  <div class="sheet-head">
+    <span class="brand"><svg class="reg" aria-hidden="true"><use href="#g-reg"/></svg><b>M. H. Ali</b></span>
+    <button class="menu-btn" id="closeBtn" type="button" style="display:inline-flex">Close</button>
+  </div>
+  <h2 class="display" id="sheetTitle">Contents</h2>
+  <p class="mono" style="color:var(--ink-2);margin:0">Read top to bottom, newest layer first</p>
+  <ol class="toc">
+    <li><a href="#record" style="--layer:#E0AE4C"><span class="ttl">Working record</span><span class="fol">02</span></a></li>
+    <li><a href="#proofs" style="--layer:#A9C98A"><span class="ttl">Skills, proven</span><span class="fol">03</span></a></li>
+    <li><a href="#playground" style="--layer:#C8643B"><span class="ttl">Playground</span><span class="fol">04</span></a></li>
+    <li><a href="#research" style="--layer:#BDB09A"><span class="ttl">Research</span><span class="fol">05</span></a></li>
+    <li><a href="#contact" style="--layer:#E0AE4C"><span class="ttl">Contact</span><span class="fol">06</span></a></li>
+  </ol>
+  <div class="sheet-foot">
+    <button class="proof-btn js-swap" type="button"><span class="swatches" aria-hidden="true"><i></i><i></i></span><span class="lbl-s js-swap-lbl">Reprint in Strata</span></button>
+    <span class="mono" style="color:var(--ink-2)">github.com/haid-er</span>
+  </div>
+</div>
+
+<main id="main">
+  <!-- ============ HERO ============ -->
+  <section class="hero" id="top">
+    <div class="wrap hero-grid">
+      <div>
+        <div class="kicker mono"><span>No. 01</span><span>Full-Stack Engineer</span><span>Euthyna, London (remote)</span></div>
+        <h1 class="display" aria-label="Malik Haider Ali">
+          <span class="ln">Malik</span><span class="ln">Haider Ali</span>
+          <span class="ov" aria-hidden="true"><span class="ln">Malik</span><span class="ln">Haider Ali</span></span>
+        </h1>
+        <p class="role">Building scalable web platforms, <em>AI-powered systems</em>, and autonomous workflows.</p>
+        <p class="lede">Software for the ground under our feet: AI sustainability reporting at Euthyna, from GHG calculations and climate risk to disclosure gap analysis and transition planning. Before that, sensor pipelines for human-activity research, and a designer's habit of setting every page by hand.</p>
+        <div class="cta">
+          <a class="btn solid" href="#playground">Open the playground <svg aria-hidden="true"><use href="#g-arrow"/></svg></a>
+          <a class="btn line" href="#research">Read the paper</a>
+        </div>
+      </div>
+
+      <figure class="plate" style="margin:0" aria-labelledby="plateCap">
+        <div class="plate-head mono"><span id="plateCap">Plate 1 · Core sample of a career</span><span>newest on top</span></div>
+        <svg class="core" id="core" viewBox="0 0 520 430" role="group" aria-label="Career layers, newest first; each layer links to a demo that proves it"></svg>
+        <figcaption class="reading" aria-live="polite">
+          <span class="v" id="ciVal">…</span><span class="idx mono" id="ciIdx">reading</span>
+          <span class="u mono">gCO<sub>2</sub>/kWh · UK grid, right now</span><span></span>
+          <p id="ciNote">Live from carbonintensity.org.uk, the same free feed behind the grid-carbon-live demo.</p>
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ SECTION: WORKING RECORD ============ -->
+  <section class="sec" id="record" aria-labelledby="recTitle">
+    <div class="wrap">
+      <div class="sec-head">
+        <span class="folio">02</span>
+        <h2 class="display" id="recTitle">Working record</h2>
+        <p class="note">Three roles, set in columns. Each one ends in a demo you can press, not a paragraph you have to believe.</p>
+      </div>
+      <div class="ledger">
+        <article class="entry" style="--layer:#E0AE4C">
+          <span class="when mono">Sep 2025 – present · remote</span>
+          <h3>Full-Stack Developer</h3>
+          <p class="org">Euthyna (Terra Instinct), London</p>
+          <ul>
+            <li>AI sustainability reporting: climate risk, GHG calculations, disclosure gap analysis, transition planning.</li>
+            <li>LLM-driven structured ESG workflows, including estimation pipelines.</li>
+            <li>Workflow orchestration, RBAC, background processing, transactional audit logging.</li>
+          </ul>
+          <a class="proof" href="#esg-gap-checker">Proof: esg-gap-checker <svg width="12" height="12" aria-hidden="true"><use href="#g-arrow"/></svg></a>
+        </article>
+        <article class="entry" style="--layer:#A9C98A">
+          <span class="when mono">Jun 2025 – Aug 2025 · Lahore</span>
+          <h3>Associate Software Engineer</h3>
+          <p class="org">Piron Labs (Pentaloop) · Kickstart HQ</p>
+          <div class="fig" aria-label="Response time cut from 27 seconds to 3.5 seconds"><s>27s</s><span aria-hidden="true">→</span><b>3.5s</b></div>
+          <ul>
+            <li>Response time cut via webpack optimisation, code splitting and compression.</li>
+            <li>Lazy loading and fewer API calls across scheduling, dispatching and invoicing.</li>
+          </ul>
+          <a class="proof" href="#web-perf-lab">Proof: web-perf-lab <svg width="12" height="12" aria-hidden="true"><use href="#g-arrow"/></svg></a>
+        </article>
+        <article class="entry" style="--layer:#C8643B">
+          <span class="when mono">Jun 2024 – Jun 2025 · hybrid</span>
+          <h3>Full-Stack Developer</h3>
+          <p class="org">Webox Systems · VoodVR</p>
+          <ul>
+            <li>Dashboards, profile and creator flows in React and Node.</li>
+            <li>Stripe Connect payments, subscriptions and webhook billing.</li>
+            <li>Real-time chat with Stream Chat; AWS deployment.</li>
+          </ul>
+          <a class="proof" href="#stripe-connect-flow">Proof: stripe-connect-flow <svg width="12" height="12" aria-hidden="true"><use href="#g-arrow"/></svg></a>
+        </article>
+      </div>
+      <div class="aside" id="research">
+        <div class="stamp" aria-label="Best Graphic Designer credit, PUCIT">PUCIT<b>Best Graphic Designer</b>credit</div>
+        <div>
+          <h3>HumCareADL · Multimedia Tools and Applications, 2026</h3>
+          <p>Second author on a peer-reviewed wearable-sensor activity-recognition paper (vol. 85, art. 731). Built the MotionIQ collection pipeline: an Android app streaming phone sensors over Wi-Fi into RabbitMQ, and an 8-step Python preprocessing sequence.</p>
+          <a class="proof" href="#har-live" style="margin-top:10px">Proof: har-live <svg width="12" height="12" aria-hidden="true"><use href="#g-arrow"/></svg></a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ CHIPS: SKILL -> DEMO ============ -->
+  <section class="chips-wrap" id="proofs" aria-labelledby="chipTitle">
+    <div class="wrap">
+      <div class="chips-head"><h2 class="mono" id="chipTitle" style="margin:0;font-weight:500">03 · Skill → proof</h2><span class="mono">each slug opens a live demo</span></div>
+      <ul class="chips">
+        <li><a class="chip" href="#ghg-calculator" style="--layer:#E0AE4C"><span class="sk">GHG Protocol</span><span class="dm"><svg aria-hidden="true"><use href="#g-arrow"/></svg>ghg-calculator</span></a></li>
+        <li><a class="chip" href="#ownership-extractor" style="--layer:#E0AE4C"><span class="sk">Boundary-setting</span><span class="dm"><svg aria-hidden="true"><use href="#g-arrow"/></svg>ownership-extractor</span></a></li>
+        <li><a class="chip" href="#rabbitmq-sim" style="--layer:#A9C98A"><span class="sk">RabbitMQ</span><span class="dm"><svg aria-hidden="true"><use href="#g-arrow"/></svg>rabbitmq-sim</span></a></li>
+        <li><a class="chip" href="#org-chart-extractor" style="--layer:#A9C98A"><span class="sk">Vision extraction</span><span class="dm"><svg aria-hidden="true"><use href="#g-arrow"/></svg>org-chart-extractor</span></a></li>
+        <li><a class="chip" href="#vector-space-explorer" style="--layer:#C8643B"><span class="sk">Pinecone · RAG</span><span class="dm"><svg aria-hidden="true"><use href="#g-arrow"/></svg>vector-space-explorer</span></a></li>
+        <li><a class="chip" href="#rbac-audit-lab" style="--layer:#C8643B"><span class="sk">CASL · RBAC</span><span class="dm"><svg aria-hidden="true"><use href="#g-arrow"/></svg>rbac-audit-lab</span></a></li>
+        <li><a class="chip" href="#mcp-tool-lab" style="--layer:#BDB09A"><span class="sk">MCP</span><span class="dm"><svg aria-hidden="true"><use href="#g-arrow"/></svg>mcp-tool-lab</span></a></li>
+        <li><a class="chip" href="#design-studio" style="--layer:#BDB09A"><span class="sk">Graphic design</span><span class="dm"><svg aria-hidden="true"><use href="#g-arrow"/></svg>design-studio</span></a></li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- ============ PLAYGROUND CARD ============ -->
+  <section class="play" id="playground" aria-labelledby="playTitle">
+    <div class="wrap play-grid">
+      <div class="play-intro">
+        <span class="folio">04</span>
+        <h2 class="display" id="playTitle">Playground</h2>
+        <p>Thirty-odd small, working tools. Each names the real work it mirrors and the skills it proves. This one is the print shop: the hobby, made pressable.</p>
+      </div>
+      <article class="card" aria-labelledby="cardTitle">
+        <div class="poster" id="poster" aria-hidden="true"></div>
+        <div class="card-body">
+          <span class="mono">Design &amp; play · runs in your browser</span>
+          <h3 id="cardTitle">Poster press</h3>
+          <p>A seeded generative poster maker: grid, type and shapes, exported as PNG or SVG. Same seed, same print.</p>
+          <div class="mirrors"><span class="mono" style="color:var(--accent-ink)">Mirrors</span><br>Graphic design, the hobby behind the PUCIT Best Graphic Designer credit.</div>
+          <ul class="tags" aria-label="Proves"><li>graphic design</li><li>canvas</li><li>SVG</li></ul>
+          <div class="card-actions">
+            <a class="btn solid" href="#design-studio">Open demo <svg aria-hidden="true"><use href="#g-arrow"/></svg></a>
+            <button class="btn" type="button" id="reseed">Pull another print</button>
+          </div>
+          <span class="mono" id="seedLbl" style="color:var(--ink-2)">seed 0417</span>
+        </div>
+      </article>
+    </div>
+  </section>
+</main>
+
+<footer id="contact">
+  <div class="wrap">
+    <span class="mono">malikhaiderali33@gmail.com · github.com/haid-er · linkedin.com/in/haid-er</span>
+    <span class="colophon" id="colophon">Set in Fraunces, Newsreader and DM Mono. Printed at zero running cost.</span>
+  </div>
+</footer>
+
+<script>
+(function(){
+  var root=document.documentElement;
+  var THEMES={
+    almanac:{name:'Almanac', next:'strata', bg:'#F2EADB', ink:'#1D2B22', accent:'#D2462A', label:'Pulling a new proof', colophon:'Set in Fraunces, Newsreader and DM Mono. Printed at zero running cost.'},
+    strata:{name:'Strata', next:'almanac', bg:'#16110D', ink:'#EEE5D2', accent:'#E0AE4C', label:'Taking a core sample', colophon:'Set in Bricolage Grotesque, Hanken Grotesk and Martian Mono. Printed at zero running cost.'}
+  };
+
+  /* ---------- career core sample (facts: research-findings.md, projects.md) ---------- */
+  var LAYERS=[
+    {y:'2025 →', t:'Euthyna · ESG + AI pipelines', d:'esg-gap-checker', c:'#E0AE4C', p:'ht-2'},
+    {y:'2025',   t:'Piron Labs · 27s → 3.5s',     d:'web-perf-lab', c:'#A9C98A', p:'ht-3'},
+    {y:'2024',   t:'MotionIQ · sensors → RabbitMQ', d:'rabbitmq-sim', c:'#C8643B', p:'ht-1'},
+    {y:'2024',   t:'Webox · VoodVR, Stripe Connect', d:'stripe-connect-flow', c:'#BDB09A', p:'ht-4'},
+    {y:'2022',   t:'First repos · C, C++',        d:'code-judge', c:'#8E7B62', p:'ht-3'},
+    {y:'2021',   t:'PUCIT · BS Information Technology', d:'algo-visualizer', c:'#6B5A48', p:'ht-1'}
+  ];
+  function pts(y,amp,ph,w){ var a=[]; for(var x=0;x<=w;x+=20){ a.push([x, y+Math.sin(x/70+ph)*amp+Math.sin(x/23+ph*2)*amp*.35]); } return a; }
+  function wave(y,amp,ph,w){ /* a gently folded sediment boundary */
+    return 'M'+pts(y,amp,ph,w).map(function(p){return p[0]+' '+p[1].toFixed(1)}).join(' L');
+  }
+  function buildCore(){
+    var svg=document.getElementById('core'), W=520, top=18, h=66, NS='http://www.w3.org/2000/svg', out='';
+    LAYERS.forEach(function(L,i){
+      var y0=top+i*h, y1=y0+h, a0=i?4+i*.6:0, a1=i===LAYERS.length-1?0:4+(i+1)*.6, ph=i*1.3;
+      var upper=wave(y0,a0,ph,W);
+      var lo=pts(y1,a1,(i+1)*1.3,W).reverse();
+      var body=upper+' L'+lo.map(function(p){return p[0]+' '+p[1].toFixed(1)}).join(' L')+' Z';
+      var contours='';
+      for(var k=1;k<4;k++){ contours+='<path class="contour" style="--c:'+L.c+'" d="'+wave(y0+k*h/4,a0*.8+1,ph+k*.5,W)+'"/>'; }
+      out+='<g class="lg" style="--i:'+i+'"><a href="#'+L.d+'" aria-label="'+L.y+', '+L.t.replace(/→/g,'to')+'. Proof: '+L.d+'">'+
+        '<path class="hit" d="'+body+'"/>'+
+        '<path class="layer-fill" style="fill:url(#'+L.p+')" d="'+body+'"/>'+contours+
+        '<path class="layer-line" style="--c:'+L.c+'" d="'+upper+'"/>'+
+        '<rect x="14" y="'+(y0+h/2-12)+'" width="'+(W-28)+'" height="24" rx="3" fill="var(--surface)" opacity=".92"/>'+
+        '<text class="lab lab-y" x="24" y="'+(y0+h/2+4)+'">'+L.y+'</text>'+
+        '<text class="lab" x="92" y="'+(y0+h/2+4)+'">'+L.t+'</text>'+
+        '<text class="lab" x="'+(W-24)+'" y="'+(y0+h/2+4)+'" text-anchor="end" opacity=".7">'+L.d+'</text>'+
+        '</a></g>';
+    });
+    out+='<path class="over" d="'+wave(top+h*.1,3,.4,W)+'"/>';
+    svg.innerHTML=out;
+  }
+  buildCore();
+  /* narrow screens: drop the demo slug column so labels never collide */
+  function fitCore(){ var narrow=document.getElementById('core').getBoundingClientRect().width<460;
+    document.querySelectorAll('#core text[text-anchor="end"]').forEach(function(t){t.style.display=narrow?'none':''});
+    document.querySelectorAll('#core .lab').forEach(function(t){t.style.fontSize=narrow?'15px':''}); }
+  fitCore(); addEventListener('resize',fitCore);
+
+  /* ---------- live reading: carbonintensity.org.uk (real data, or an honest blank) ---------- */
+  fetch('https://api.carbonintensity.org.uk/intensity').then(function(r){return r.json()}).then(function(j){
+    var d=j.data[0].intensity; var v=d.actual!=null?d.actual:d.forecast;
+    document.getElementById('ciVal').textContent=v;
+    document.getElementById('ciIdx').textContent=d.index;
+  }).catch(function(){
+    document.getElementById('ciVal').textContent='—';
+    document.getElementById('ciIdx').textContent='offline';
+    document.getElementById('ciNote').textContent='The live feed is unreachable from here, so no number is shown. Nothing is estimated.';
+  });
+
+  /* ---------- poster press (seeded, deterministic) ---------- */
+  var seed=417;
+  function rng(s){return function(){s=(s*1664525+1013904223)%4294967296;return s/4294967296}}
+  function poster(){
+    var R=rng(seed), cs=getComputedStyle(root), ink=cs.getPropertyValue('--ink').trim(), a1=cs.getPropertyValue('--accent').trim(), a2=cs.getPropertyValue('--accent-2').trim(), bg=cs.getPropertyValue('--bg-2').trim(), fd=cs.getPropertyValue('--font-display').trim();
+    var strata=root.dataset.theme==='strata', s='<svg viewBox="0 0 300 400" preserveAspectRatio="xMidYMid slice" xmlns="http://www.w3.org/2000/svg"><rect width="300" height="400" fill="'+bg+'"/>';
+    for(var i=0;i<7;i++){
+      var x=Math.floor(R()*4)*75, y=Math.floor(R()*5)*80, c=[ink,a1,a2][i%3], k=R();
+      if(strata){ s+='<circle cx="'+(x+37)+'" cy="'+(y+40)+'" r="'+(20+k*60)+'" fill="none" stroke="'+c+'" stroke-width="'+(1+k*6)+'" opacity=".85"/>'; }
+      else if(k<.5){ s+='<rect x="'+x+'" y="'+y+'" width="'+(75+R()*75)+'" height="'+(40+R()*80)+'" fill="'+c+'" style="mix-blend-mode:multiply" opacity=".88"/>'; }
+      else { s+='<circle cx="'+(x+37)+'" cy="'+(y+40)+'" r="'+(18+k*44)+'" fill="'+c+'" style="mix-blend-mode:multiply" opacity=".85"/>'; }
+    }
+    for(var g=1;g<4;g++) s+='<line x1="'+g*75+'" y1="0" x2="'+g*75+'" y2="400" stroke="'+ink+'" stroke-opacity=".12"/>';
+    s+='<text x="16" y="360" font-family=\''+fd+'\' font-size="64" font-weight="800" fill="'+ink+'" style="letter-spacing:-2px">'+(strata?'CORE':'Proof')+'</text>';
+    s+='<text x="18" y="386" font-family="monospace" font-size="10" fill="'+ink+'" letter-spacing="2">HAID-ER · SEED '+String(seed).padStart(4,'0')+'</text></svg>';
+    document.getElementById('poster').innerHTML=s;
+    document.getElementById('seedLbl').textContent='seed '+String(seed).padStart(4,'0');
+  }
+  document.getElementById('reseed').addEventListener('click',function(){seed=Math.floor(Math.random()*9999);poster()});
+
+  /* ---------- theme: prefers-color-scheme default, persisted, swapped under the press ---------- */
+  function apply(t){
+    root.dataset.theme=t; var T=THEMES[t], N=THEMES[T.next];
+    document.getElementById('edition').textContent='Edition: '+T.name;
+    document.getElementById('colophon').textContent=T.colophon;
+    document.querySelectorAll('.js-swap-lbl').forEach(function(e){e.textContent='Reprint in '+N.name});
+    document.querySelectorAll('.js-swap').forEach(function(b){b.setAttribute('aria-label','Switch theme to '+N.name+' (now '+T.name+')')});
+    try{localStorage.setItem('gtp-theme',t)}catch(e){}
+    buildCore(); fitCore(); poster();
+  }
+  var saved=null; try{saved=localStorage.getItem('gtp-theme')}catch(e){}
+  var qs=new URLSearchParams(location.search).get('theme');
+  apply(qs||saved||(matchMedia('(prefers-color-scheme: dark)').matches?'strata':'almanac'));
+
+  var press=document.getElementById('press'), busy=false;
+  var reduce=matchMedia('(prefers-reduced-motion: reduce)');
+  function swap(){
+    if(busy) return; busy=true;
+    var next=THEMES[root.dataset.theme].next, N=THEMES[next];
+    if(reduce.matches){
+      document.body.classList.add('fade');
+      setTimeout(function(){apply(next); document.body.classList.remove('fade'); busy=false},150); return;
+    }
+    press.style.setProperty('--to-bg',N.bg); press.style.setProperty('--to-ink',N.ink); press.style.setProperty('--to-accent',N.accent);
+    document.getElementById('pressLabel').textContent=N.label+' · '+N.name;
+    press.classList.remove('run'); void press.offsetWidth; press.classList.add('run');
+    setTimeout(function(){apply(next)},600);            /* swap the plate while the bands cover it */
+    setTimeout(function(){press.classList.remove('run'); busy=false},1500);
+  }
+  document.querySelectorAll('.js-swap').forEach(function(b){b.addEventListener('click',swap)});
+
+  /* ---------- mobile contents sheet ---------- */
+  var sheet=document.getElementById('sheet'), mb=document.getElementById('menuBtn'), cb=document.getElementById('closeBtn');
+  function openSheet(o){ sheet.classList.toggle('open',o); mb.setAttribute('aria-expanded',o); if(o) cb.focus(); else mb.focus(); }
+  mb.addEventListener('click',function(){openSheet(true)});
+  cb.addEventListener('click',function(){openSheet(false)});
+  sheet.addEventListener('click',function(e){ if(e.target.closest('.toc a')) openSheet(false) });
+  addEventListener('keydown',function(e){ if(e.key==='Escape'&&sheet.classList.contains('open')) openSheet(false) });
+  window.__openSheet=openSheet; window.__swap=swap;
+})();
+</script>
+</body>
+</html>

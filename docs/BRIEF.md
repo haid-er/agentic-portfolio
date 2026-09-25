@@ -24,7 +24,10 @@ A design panel of 3 designers produces distinct concepts, and a judge picks one 
 **Hard constraints**
 - Banned: dark-navy with purple or cyan gradients, glassmorphism, the generic SaaS hero, Inter as the only typeface, emoji as icons.
 - Needs a real point of view drawn from his story: sensor signals and HAR research, message queues and agent pipelines, ESG and decarbonisation, graphic design.
-- Light and dark themes must both be designed, not just inverted. Admin can override brand tokens.
+- **Two themes, both surprising, NOT "light/dark".** They are two named, distinct worlds that share one layout, for example "Field Notes" and "Signal Room". Each has its own palette, texture and accent motion.
+  - The switcher is part of the experience (a memorable transition), not a sun/moon icon.
+  - One theme reads light and one reads dark. `prefers-color-scheme` picks the default, and both must pass WCAG AA.
+  - Admin can rename and retune both themes' tokens.
 - Fonts: Google Fonts via `next/font`. Motion: CSS/canvas/SVG only, honouring `prefers-reduced-motion`.
 
 ## 4. AI policy (free-first, capped)
@@ -47,7 +50,8 @@ A design panel of 3 designers produces distinct concepts, and a judge picks one 
 
 ## 6. Delivery
 1. Work on the session branch, then open a PR into `main`. Merge when CI and QA are green.
-2. Deploy to a **new** Vercel project (`malik-haider-portfolio`).
-   - Do NOT touch the existing `malikhaider.vercel.app` project or domain; the switch happens later, after Malik approves.
+2. Deploy to the **existing** Vercel project `agentic-portfolio` (URL https://malik-haider-portfolio.vercel.app, already Git-connected to this repo).
+   - Set its production branch to `main`; merging the PR then deploys.
+   - Do NOT touch the old `malikhaider.vercel.app` project or domain; the switch happens later, after Malik approves.
    - Vercel env: `ADMIN_PASSWORD` (from session env), `ADMIN_SECRET` (random, never printed), `GITHUB_TOKEN` (from `GITHUB_FINE_GRAIN_PERMISSION_TOKEN`), `GITHUB_REPO=haid-er/agentic-portfolio`, `GITHUB_BRANCH=main`, and the AI keys.
 3. Smoke-test the live URL at 360px and 1280px, then report.

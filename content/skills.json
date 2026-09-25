@@ -1,0 +1,14 @@
+{
+  "items": [
+    {
+      "id": "react",
+      "name": "React",
+      "pillar": "fullstack",
+      "level": "core",
+      "demoSlugs": [
+        "kanban-board"
+      ],
+      "enabled": true
+    }
+  ]
+}

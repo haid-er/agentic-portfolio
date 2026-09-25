@@ -1,0 +1,150 @@
+{
+  "intro": "",
+  "featured": "har-live",
+  "demos": [
+    {
+      "slug": "org-chart-extractor",
+      "enabled": true
+    },
+    {
+      "slug": "esg-gap-checker",
+      "enabled": true
+    },
+    {
+      "slug": "ownership-extractor",
+      "enabled": true
+    },
+    {
+      "slug": "ask-malik",
+      "enabled": true
+    },
+    {
+      "slug": "agent-orchestra",
+      "enabled": true
+    },
+    {
+      "slug": "mcp-tool-lab",
+      "enabled": true
+    },
+    {
+      "slug": "vector-space-explorer",
+      "enabled": true
+    },
+    {
+      "slug": "legal-rag-assistant",
+      "enabled": true
+    },
+    {
+      "slug": "prompt-cost-lab",
+      "enabled": true
+    },
+    {
+      "slug": "har-live",
+      "enabled": true
+    },
+    {
+      "slug": "sensor-pipeline",
+      "enabled": true
+    },
+    {
+      "slug": "neural-playground",
+      "enabled": true
+    },
+    {
+      "slug": "rabbitmq-sim",
+      "enabled": true
+    },
+    {
+      "slug": "bullmq-jobs",
+      "enabled": true
+    },
+    {
+      "slug": "live-telemetry",
+      "enabled": true
+    },
+    {
+      "slug": "layered-api-lab",
+      "enabled": true
+    },
+    {
+      "slug": "rbac-audit-lab",
+      "enabled": true
+    },
+    {
+      "slug": "rate-limiter",
+      "enabled": true
+    },
+    {
+      "slug": "ghg-calculator",
+      "enabled": true
+    },
+    {
+      "slug": "grid-carbon-live",
+      "enabled": true
+    },
+    {
+      "slug": "solar-pv-estimator",
+      "enabled": true
+    },
+    {
+      "slug": "stripe-connect-flow",
+      "enabled": true
+    },
+    {
+      "slug": "web-perf-lab",
+      "enabled": true
+    },
+    {
+      "slug": "dispatch-board",
+      "enabled": true
+    },
+    {
+      "slug": "live-chat",
+      "enabled": true
+    },
+    {
+      "slug": "kanban-board",
+      "enabled": true
+    },
+    {
+      "slug": "data-grid",
+      "enabled": true
+    },
+    {
+      "slug": "algo-visualizer",
+      "enabled": true
+    },
+    {
+      "slug": "code-judge",
+      "enabled": true
+    },
+    {
+      "slug": "sql-playground",
+      "enabled": true
+    },
+    {
+      "slug": "design-studio",
+      "enabled": true
+    },
+    {
+      "slug": "theme-lab",
+      "enabled": true
+    },
+    {
+      "slug": "cricket-sim",
+      "enabled": true
+    },
+    {
+      "slug": "automation-recorder",
+      "enabled": true
+    },
+    {
+      "slug": "ci-pipeline",
+      "enabled": true
+    },
+    {
+      "slug": "system-design-canvas",
+      "enabled": true
+    }
+  ]
+}
