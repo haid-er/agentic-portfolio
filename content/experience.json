@@ -1,3 +1,120 @@
 {
-  "items": []
+  "items": [
+    {
+      "id": "euthyna",
+      "enabled": true,
+      "source": "research-findings.md (résumé, dates + mode) ✅; experience.md (verticals, internal tools, standards, agentic work) 🗒️",
+      "role": "Full-Stack Developer",
+      "org": "Euthyna (Terra Instinct)",
+      "orgUrl": "https://euthyna.ai",
+      "product": "Euthyna",
+      "location": "London, UK",
+      "mode": "remote",
+      "start": "2025-09",
+      "end": "",
+      "summary": "AI sustainability reporting for a London climate-tech firm: climate risk, GHG calculations, disclosure gap analysis and transition planning, plus the internal tools across Terra Real Estate, Asset Intelligence and Survey Automation.",
+      "highlights": [
+        {
+          "text": "Built LLM-driven, structured ESG workflows, including disclosure gap analysis against ISSB, TCFD and CSRD (ESRS), and estimation pipelines.",
+          "proofDemo": "esg-gap-checker"
+        },
+        {
+          "text": "Built AI document and data pipelines that extract sustainability and corporate-entity data at scale, feeding GHG boundary-setting and ownership extraction.",
+          "proofDemo": "ownership-extractor"
+        },
+        {
+          "text": "Engineered the platform core: workflow orchestration, background processing, RBAC and transactional audit logging.",
+          "proofDemo": "rbac-audit-lab"
+        },
+        {
+          "text": "Set org standards for Express, NestJS and React (routes → controller → service → repository, Zod, CASL, Drizzle, React Query) behind a multi-workspace React + Vite frontend for the CRM, client portal, PM and market intelligence.",
+          "proofDemo": "layered-api-lab"
+        },
+        {
+          "text": "Runs a multi-agent Claude Code pipeline for autonomous coding.",
+          "proofDemo": "agent-orchestra"
+        }
+      ],
+      "stack": ["TypeScript", "React", "Vite", "NestJS", "Express", "PostgreSQL", "Drizzle ORM", "Zod", "CASL", "React Query", "Claude Code"]
+    },
+    {
+      "id": "piron-labs",
+      "enabled": true,
+      "source": "research-findings.md (résumé) ✅",
+      "role": "Associate Software Engineer",
+      "org": "Piron Labs (Pentaloop)",
+      "product": "Kickstart HQ",
+      "location": "Lahore, Pakistan",
+      "mode": "on-site",
+      "start": "2025-06",
+      "end": "2025-08",
+      "summary": "Kickstart HQ, a field-service management product covering scheduling, dispatching, invoicing, technicians and payments.",
+      "highlights": [
+        {
+          "text": "Cut response time from 27s to 3.5s with webpack optimisation, code splitting and compression.",
+          "proofDemo": "web-perf-lab"
+        },
+        {
+          "text": "Added lazy loading and removed redundant API calls across the scheduling and dispatch flows.",
+          "proofDemo": "dispatch-board"
+        }
+      ],
+      "stack": ["React", "webpack", "Node.js"],
+      "metric": { "from": "27s", "to": "3.5s", "label": "response time" }
+    },
+    {
+      "id": "webox-systems",
+      "enabled": true,
+      "source": "research-findings.md (résumé) ✅; sequential, not concurrent with Euthyna",
+      "role": "Full-Stack Developer",
+      "org": "Webox Systems",
+      "product": "VoodVR",
+      "location": "Lahore, Pakistan",
+      "mode": "hybrid",
+      "start": "2024-06",
+      "end": "2025-06",
+      "summary": "VoodVR, an AI VR video platform: dashboards, profiles and creator flows, from payments to deployment.",
+      "highlights": [
+        {
+          "text": "Integrated Stripe Connect for creator payouts, subscriptions and webhook-driven billing.",
+          "proofDemo": "stripe-connect-flow"
+        },
+        {
+          "text": "Shipped real-time chat on Stream Chat.",
+          "proofDemo": "live-chat"
+        },
+        {
+          "text": "Built dashboards, profile and creator flows in React and Node, then tested them and deployed to AWS.",
+          "proofDemo": "ci-pipeline"
+        }
+      ],
+      "stack": ["React", "Node.js", "Stripe Connect", "Stream Chat", "AWS"]
+    },
+    {
+      "id": "fcit-research",
+      "enabled": true,
+      "source": "experience.md + publications.md ✅. Role title TODO; start = data_fetcher_mobile repo creation, end = last push of data_preprocessing_scripts (research-findings.md)",
+      "role": "Co-author, human activity recognition research",
+      "org": "Faculty of Computing & IT, University of the Punjab",
+      "location": "Lahore, Pakistan",
+      "start": "2024-12",
+      "end": "2025-09",
+      "summary": "Wearable-sensor human activity recognition, published in Springer's Multimedia Tools and Applications (2026).",
+      "highlights": [
+        {
+          "text": "Built MotionIQ: an Android app that streams phone IMU data over Wi-Fi into RabbitMQ, drained by a Java consumer.",
+          "proofDemo": "rabbitmq-sim"
+        },
+        {
+          "text": "Wrote the Python preprocessing pipeline: name standardisation, atomic 5-second windows and fall segmentation into Fall and ADL datasets.",
+          "proofDemo": "sensor-pipeline"
+        },
+        {
+          "text": "Second of five authors on HumCareADL and HyMCL-Net, a hybrid CNN-LSTM for activity recognition.",
+          "proofDemo": "har-live"
+        }
+      ],
+      "stack": ["Android", "Java", "RabbitMQ", "Python", "pandas", "NumPy"]
+    }
+  ]
 }
