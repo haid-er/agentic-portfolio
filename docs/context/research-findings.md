@@ -51,3 +51,7 @@ PUCon '25 Robotics head · BYTE CAMP CP talk · 365-day LeetCode badge · PUCon 
 
 ## Private repos
 28 private repos exist (e.g. ai-lawyer-*, python-rag-service, mcp-client, ai-infra, miniguard-ai). Use them only to understand skills; never publish code or links. Any project derived from them is seeded with `enabled: false`.
+
+## Owner confirmations (2026-09-25)
+- Malik confirms his only paper is HumCareADL (DOI 10.1007/s11042-026-21905-3); the fall-detection papers are not his.
+- LinkedIn (https://www.linkedin.com/in/haid-er/) is a valid source. Public pages are often login-walled; use what is reachable, and never invent facts.

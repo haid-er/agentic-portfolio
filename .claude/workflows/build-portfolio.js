@@ -39,7 +39,7 @@ const RULES = `TEAM RULES:
 // ---------------------------------------------------------------------------
 const SITE_MODULES = [
   { key: 'shell', title: 'Layout shell & navigation', paths: ['components/layout/**', 'app/not-found.tsx', 'app/error.tsx'],
-    brief: 'Header with responsive nav + mobile menu, footer with socials, theme toggle (no flash), skip-link, scroll-spy, command palette (Ctrl/Cmd+K) to jump to sections and demos. Nav derives from enabled sections.' },
+    brief: 'Header with responsive nav + mobile menu, footer with socials, the signature two-theme switcher from DESIGN.md (no flash, persisted), skip-link, scroll-spy, command palette (Ctrl/Cmd+K) to jump to sections and demos. Nav derives from enabled sections.' },
   { key: 'hero-about', title: 'Hero, About & live GitHub activity', paths: ['components/sections/Hero.tsx', 'components/sections/About.tsx', 'components/sections/GitHubActivity.tsx', 'app/api/github/**'],
     brief: 'Signature hero per DESIGN.md (the one memorable moment of the site). About with bio, pillars, motto, languages. GitHub activity widget via public REST API for haid-er, cached with ISR (revalidate 6h), graceful fallback.' },
   { key: 'skills-experience', title: 'Skills & Experience', paths: ['components/sections/Skills.tsx', 'components/sections/Experience.tsx'],
@@ -174,15 +174,17 @@ const concepts = (await parallel(ANGLES.map((angle, i) => () => agent(
   `You are designer #${i + 1} on a 3-person panel. ${CONTEXT}
 Create ONE distinctive visual concept for Malik's portfolio from this angle: ${angle}.
 Obey the banned list in BRIEF section 3. Deliver design/concept-${i + 1}/index.html: a single static HTML file (inline CSS, Google Fonts allowed)
-mocking the homepage hero, one section, a skill->demo chip row, a playground card and the mobile nav — in BOTH light and dark (toggle).
-Include a :root token block (color, type scale, radius, spacing, motion) and a one-paragraph rationale in an HTML comment.
+mocking the homepage hero, one section, a skill->demo chip row, a playground card and the mobile nav — in BOTH of your two named themes
+(two surprising worlds, NOT light/dark; one reads light, one dark; see BRIEF section 3) with the theme-switch transition working.
+Include token blocks per theme (color, texture, type scale, radius, spacing, motion) and a one-paragraph rationale in an HTML comment.
 Take Playwright screenshots (Chromium preinstalled at /opt/pw-browsers; never run "playwright install") at 390px and 1280px into the same folder.`,
   { label: `designer:${i + 1}`, phase: 'Design', schema: CONCEPT_SCHEMA })))).filter(Boolean)
 
 const judged = await agent(`You are the design director. ${CONTEXT}
 Judge these concepts by opening their screenshots and HTML: ${JSON.stringify(concepts)}.
 Score each 1-10 on: memorability, fit to Malik's story, readability/accessibility (check contrast), mobile quality, feasibility with CSS/SVG/canvas only.
-Pick a winner, graft the best ideas from the runners-up, then write DESIGN.md at the repo root: tokens (light + dark), typography (Google Fonts),
+Pick a winner, graft the best ideas from the runners-up, then write DESIGN.md at the repo root: the two named themes with full tokens each,
+the signature theme-switch interaction, typography (Google Fonts),
 layout grid, component styling rules, iconography, motion rules, the single signature hero moment, playground card style, do/don't list.`,
   { label: 'design-director', phase: 'Design', schema: JUDGE_SCHEMA })
 log(`Design winner: ${judged?.winner}`)
@@ -199,7 +201,7 @@ Scaffold the foundation so ${MODULES.length} builders can work in parallel. Impl
 3. lib/content/index.ts: typed validated getters (static JSON import; invalid content fails the build) + COLLECTIONS map reused by admin. Seed content/*.json with minimal valid placeholders (the Content agent fills real data next).
 4. lib/demos/registry.ts: metadata for every demo below {slug, title, summary, pillar, skills[], module} + next/dynamic loader per slug (ssr:false where browser APIs are used).
 ${demoTable}
-5. components/ui/** design-system primitives from DESIGN.md; app/globals.css tokens light/dark; fonts via next/font.
+5. components/ui/** design-system primitives from DESIGN.md; app/globals.css tokens for the two named themes (data-theme attribute, no-flash script, prefers-color-scheme picks default); fonts via next/font.
 6. app/layout.tsx + app/page.tsx rendering sections by order/visibility from content via a section map.
 7. lib/ai/index.ts: STUB of the AI gateway API (types + signatures) the ai-gateway builder will implement; demo builders code against it.
 8. STUB every owned file so the app typechecks and builds NOW:
@@ -271,7 +273,7 @@ ${requests.length ? requests.join('\n') : '(none)'}
 ${extra ? `2. Also resolve:\n${extra}` : ''}
 3. npm run typecheck, npm run lint, npm run build — fix every error at its root cause.
 4. Write/extend Playwright e2e tests in e2e/ (Chromium at /opt/pw-browsers; never "playwright install") and run them against the production server
-   at 360px and 1280px, both themes: /, every /projects/[slug], /playground, EVERY /playground/[slug] (demo renders + basic interaction),
+   at 360px and 1280px, in both named themes: /, every /projects/[slug], /playground, EVERY /playground/[slug] (demo renders + basic interaction),
    /resume, /admin/login, admin login -> edit one field -> local save writes content -> revert. Fail on console errors, horizontal overflow,
    broken internal links, a11y violations (add @axe-core/playwright).
 5. AI routes: if GROQ_API_KEY/GEMINI_API_KEY are set, make ONE tiny real call per provider to prove the router works; DeepSeek at most one
@@ -312,11 +314,12 @@ let deployed = null
 if (deploy && qa?.green) {
   phase('Deploy')
   deployed = await agent(`You are the RELEASE ENGINEER. Follow BRIEF section 6 exactly.
-Use VERCEL_TOKEN with the Vercel REST API or "npx vercel --token" (never print secrets). Create/link project "malik-haider-portfolio" (framework nextjs,
-production branch main, linked to GitHub repo haid-er/agentic-portfolio if the Vercel GitHub integration allows; otherwise deploy via CLI).
+Use VERCEL_TOKEN with the Vercel REST API (never print secrets). Target the EXISTING project "agentic-portfolio"
+(https://malik-haider-portfolio.vercel.app, Git-connected to haid-er/agentic-portfolio). Set its production branch to main and framework nextjs.
 Set env vars: ADMIN_PASSWORD from $ADMIN_PASSWORD, ADMIN_SECRET = new random 48 bytes, GITHUB_TOKEN from $GITHUB_FINE_GRAIN_PERMISSION_TOKEN,
-GITHUB_REPO=haid-er/agentic-portfolio, GITHUB_BRANCH=main, GROQ_API_KEY, GEMINI_API_KEY, DEEPSEEK_API_KEY (if present). Deploy production.
-Smoke-test the live URL with Playwright at 360px and 1280px (home, playground, 3 demos incl. one AI demo, admin login page). Do NOT touch any other Vercel project or domain.`,
+GITHUB_REPO=haid-er/agentic-portfolio, GITHUB_BRANCH=main, GROQ_API_KEY, GEMINI_API_KEY, DEEPSEEK_API_KEY (if present), for production and preview.
+Do NOT deploy yet: the lead merges the PR into main, which triggers the production deploy. Return the preview URL of the session branch if one exists.
+Smoke-test the preview URL (if any) with Playwright at 360px and 1280px (home, playground, 3 demos incl. one AI demo, admin login page). Do NOT touch any other Vercel project or domain.`,
     { label: 'release', phase: 'Deploy', schema: DEPLOY_SCHEMA })
 } else if (deploy) {
   log('Skipping deploy: QA is not green')
