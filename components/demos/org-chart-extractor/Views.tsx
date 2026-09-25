@@ -18,7 +18,7 @@ export function OutlineView({ people, selected, onSelect }: { people: Person[]; 
   const toggle = (id: string) => setClosed((s) => { const n = new Set(s); if (n.has(id)) n.delete(id); else n.add(id); return n })
 
   const branch = (list: Person[], level: number) => (
-    <ul className={cx('m-0 p-0 list-none grid gap-1', level > 0 && 'ml-3 pl-3 border-l border-rule')}>
+    <ul className={cx('m-0 p-0 list-none grid grid-cols-1 gap-1', level > 0 && 'ml-3 pl-3 border-l border-rule')}>
       {list.map((p) => {
         const cs = kids.get(p.id) ?? []
         const open = !closed.has(p.id)
@@ -62,7 +62,7 @@ export function OutlineView({ people, selected, onSelect }: { people: Person[]; 
 
 export function TableView({ people, onChange, onSelect }: { people: Person[]; onChange: (id: string, patch: Partial<Person>) => void; onSelect: (id: string) => void }) {
   return (
-    <TableWrap label="Organisation table (editable)">
+    <TableWrap label="Organisation table (editable)" className="relative">
       <Table className="min-w-[720px]">
         <thead>
           <tr><Th>Name</Th><Th>Title</Th><Th>Department</Th><Th>Reports to</Th><Th><span className="sr-only">Select</span></Th></tr>

@@ -4,7 +4,7 @@
  * control consolidation of scope 1+2 emissions (GHG Protocol Corporate Standard, chapter 3).
  * Rule reader runs offline; the AI path goes through the lib/ai gateway.
  */
-import { useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import {
   Badge, Button, DemoPanel, DemoToolbar, EmptyState, ErrorState, Loading, Segmented, Textarea, useToast,
 } from '@/components/ui'
@@ -21,7 +21,11 @@ import { EntityTable, LinkTable } from './Tables'
 export { notes } from './notes'
 
 const MAX_CHARS = 6000
-const APPROACHES = (['equity', 'financial', 'operational'] as const).map((value) => ({ value, label: APPROACH_LABEL[value] }))
+const APPROACHES = [
+  { value: 'equity', label: 'Equity' },
+  { value: 'financial', label: 'Fin. control' },
+  { value: 'operational', label: 'Op. control' },
+] as const
 
 type Source = { kind: 'rules'; hits: number } | { kind: 'ai'; meta: AiMeta } | { kind: 'fallback'; reason: string; hits: number }
 
@@ -40,6 +44,13 @@ export default function Demo({ slug }: DemoProps) {
   const [busy, setBusy] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const ctrl = useRef<AbortController | null>(null)
+  const graphBox = useRef<HTMLDivElement | null>(null)
+
+  // On phones the graph scrolls sideways: start centred on the reporting entity's column.
+  useEffect(() => {
+    const el = graphBox.current
+    if (el) el.scrollLeft = Math.max(0, (el.scrollWidth - el.clientWidth) / 2)
+  }, [version])
 
   const result = useMemo(() => (group ? consolidate(group) : null), [group])
   const tooLong = text.length > MAX_CHARS
@@ -114,7 +125,7 @@ export default function Demo({ slug }: DemoProps) {
   return (
     <div className="grid gap-4 min-w-0">
       <DemoPanel title="1 · Describe the group" meta={`${text.length.toLocaleString('en-GB')} / ${MAX_CHARS.toLocaleString('en-GB')} chars`}>
-        <div className="grid gap-3">
+        <div className="grid gap-3 min-w-0">
           <div className="flex flex-wrap gap-2" role="group" aria-label="Load a fictional sample">
             {SAMPLES.map((s) => (
               <Button key={s.id} size="sm" variant="secondary" onClick={() => { setText(s.text); setError(null) }}>{s.label}</Button>
@@ -155,7 +166,7 @@ export default function Demo({ slug }: DemoProps) {
             meta={<span>tCO2e, scope 1+2</span>}
             actions={<Button size="sm" variant="secondary" icon="download" onClick={exportJson}>JSON</Button>}
           >
-            <div className="grid gap-4">
+            <div className="grid gap-4 min-w-0">
               <Segmented label="Consolidation approach" options={APPROACHES} value={approach} onChange={setApproach} />
               <Totals result={result} approach={approach} onPick={setApproach} />
               {result.missingEmissions.length ? (
@@ -169,7 +180,7 @@ export default function Demo({ slug }: DemoProps) {
           </DemoPanel>
 
           <DemoPanel title="3 · Ownership graph" meta="tap an entity" bodyClassName="p-0">
-            <div className="scroll-x p-3" role="region" aria-label="Ownership graph (scrolls sideways on small screens)" tabIndex={0}>
+            <div ref={graphBox} className="scroll-x p-3" role="region" aria-label="Ownership graph (scrolls sideways on small screens)" tabIndex={0}>
               <OwnershipGraph group={group} result={result} approach={approach} selected={selected} onSelect={setSelected} />
             </div>
             <Legend />

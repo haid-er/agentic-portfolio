@@ -195,7 +195,7 @@ export default function Demo({ slug }: DemoProps) {
   return (
     <div className="grid gap-4 min-w-0">
       <DemoPanel title="1 · Excerpt" meta={`${text.length.toLocaleString('en-GB')} / ${MAX_CHARS.toLocaleString('en-GB')} chars`}>
-        <div className="grid gap-3">
+        <div className="grid gap-3 min-w-0">
           <div className="flex flex-wrap gap-2" role="group" aria-label="Load a fictional sample excerpt">
             {SAMPLES.map((s) => (
               <Button key={s.id} size="sm" variant="secondary" onClick={() => { setText(s.text); setFileNote(null) }}>{s.label}</Button>
@@ -273,7 +273,7 @@ export default function Demo({ slug }: DemoProps) {
           </DemoPanel>
 
           <DemoPanel title="3 · Findings and recommendations" meta={`${shown.length} shown`}>
-            <div className="grid gap-3">
+            <div className="grid gap-3 min-w-0">
               <Segmented label="Show" options={FILTERS} value={filter} onChange={setFilter} />
               {shown.length ? (
                 <ol className="grid gap-3 m-0 p-0 list-none">

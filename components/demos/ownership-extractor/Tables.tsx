@@ -113,7 +113,7 @@ export function LinkTable({ group, onChange }: { group: Group; onChange: (g: Gro
 
   return (
     <div className="grid gap-3">
-      <TableWrap label="Ownership links">
+      <TableWrap label="Ownership links" className="relative">
         <Table className="min-w-[620px]">
           <thead>
             <tr><Th>Owner</Th><Th>Owns</Th><Th className="text-right">Equity %</Th><Th>Control</Th><Th><span className="sr-only">Remove</span></Th></tr>

@@ -8,7 +8,7 @@ import {
 } from './model'
 
 const W = 172
-const H = 70
+const H = 80
 const GAP_X = 20
 const GAP_Y = 76
 const PAD = 16
@@ -39,7 +39,6 @@ export function OwnershipGraph({ group, result, approach, selected, onSelect }: 
     const x0 = (vbW - rowW) / 2
     row.forEach((id, ci) => pos.set(id, { x: x0 + ci * (W + GAP_X), y: PAD + ri * (H + GAP_Y) }))
   })
-  const byId = new Map(group.entities.map((e) => [e.id, e]))
 
   const key = (id: string) => (e: KeyboardEvent) => {
     if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onSelect(selected === id ? null : id) }
@@ -50,16 +49,16 @@ export function OwnershipGraph({ group, result, approach, selected, onSelect }: 
     <svg
       viewBox={`0 0 ${vbW} ${vbH}`}
       width="100%"
-      style={{ minWidth: Math.min(vbW, 600), display: 'block' }}
+      style={{ minWidth: Math.min(vbW, 600), maxWidth: vbW, margin: '0 auto', display: 'block' }}
       role="group"
       aria-label={`Ownership graph, ${group.entities.length} entities. Shares shown for the ${approach} approach.`}
       className="font-mono"
     >
       <defs>
-        <marker id="own-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <marker id="own-arrow" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
           <path d="M0 0 L10 5 L0 10 z" style={{ fill: 'var(--ink-2)' }} />
         </marker>
-        <marker id="own-arrow-hot" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <marker id="own-arrow-hot" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="9" markerHeight="9" orient="auto-start-reverse">
           <path d="M0 0 L10 5 L0 10 z" style={{ fill: 'var(--accent)' }} />
         </marker>
       </defs>
@@ -78,8 +77,12 @@ export function OwnershipGraph({ group, result, approach, selected, onSelect }: 
         const counts = edgeCounts(l, approach)
         const hot = selected != null && (l.owned === selected || l.owner === selected)
         const label = `${Number(l.equityPct.toFixed(1))}% · ${CONTROL_SHORT[l.control]}`
-        const lx = (x1 + x2) / 2
-        const ly = down ? my : my - 8
+        // Label sits 65% along the curve (nearer the child) so sibling labels do not collide.
+        const t = 0.65
+        const cy2 = down ? my : my - H * 2
+        const bez = (a0: number, a1: number, a2: number, a3: number) => (1 - t) ** 3 * a0 + 3 * (1 - t) ** 2 * t * a1 + 3 * (1 - t) * t ** 2 * a2 + t ** 3 * a3
+        const lx = bez(x1, x1, x2, x2)
+        const ly = bez(y1, my, cy2, y2)
         const lw = label.length * 6.6 + 10
         return (
           <g key={l.id}>
@@ -134,14 +137,14 @@ export function OwnershipGraph({ group, result, approach, selected, onSelect }: 
               }}
             />
             <text x={10} y={20} fontSize={12} fontWeight={600} style={{ fill: outside ? 'var(--ink-3)' : 'var(--ink)' }}>{clip(e.name, 23)}</text>
-            <text x={10} y={38} fontSize={11} style={{ fill: 'var(--ink-2)' }}>
+            <text x={10} y={40} fontSize={11} style={{ fill: 'var(--ink-2)' }}>
               {isParent ? 'REPORTING · ' : outside ? 'OUTSIDE · ' : ''}{fmtPct(share)}
             </text>
-            <text x={W - 10} y={38} fontSize={10} textAnchor="end" style={{ fill: 'var(--ink-3)' }}>{t}</text>
-            <rect x={10} y={50} width={W - 20} height={6} style={{ fill: 'var(--rule-soft)' }} />
+            <text x={10} y={56} fontSize={10} style={{ fill: 'var(--ink-3)' }}>{t}</text>
+            <rect x={10} y={64} width={W - 20} height={6} style={{ fill: 'var(--rule-soft)' }} />
             <rect
               x={10}
-              y={50}
+              y={64}
               width={W - 20}
               height={6}
               className={cx('motion-safe:transition-transform motion-safe:duration-[var(--dur-med)]')}

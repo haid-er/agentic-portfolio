@@ -37,7 +37,7 @@ export const ChartView = forwardRef<SVGSVGElement, {
       height={printed ? vbH : undefined}
       role={printed ? 'img' : 'group'}
       aria-label={label}
-      style={{ display: 'block', minWidth: printed ? undefined : Math.min(vbW, 560), maxWidth: printed ? '100%' : undefined, height: printed ? 'auto' : undefined, fontFamily: 'var(--ff-body, sans-serif)' }}
+      style={{ display: 'block', minWidth: printed ? undefined : Math.min(vbW, 560), maxWidth: printed ? '100%' : vbW, margin: '0 auto', height: printed ? 'auto' : undefined, fontFamily: 'var(--ff-body, sans-serif)' }}
     >
       <rect width={vbW} height={vbH} style={{ fill: printed ? 'var(--surface)' : 'transparent' }} />
       {nodes.map(({ person }) => {
