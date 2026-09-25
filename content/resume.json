@@ -1,8 +1,19 @@
 {
   "enabled": true,
-  "pdfUrl": "",
-  "summary": "",
-  "expertise": [],
-  "technologies": [],
+  "pdfUrl": "/uploads/resume.pdf",
+  "summary": "Full-Stack Developer with 3+ years of experience building scalable applications, AI-powered systems, and production-grade backend platforms.",
+  "expertise": [
+    "Full-Stack Product Engineering",
+    "Backend & Platform Architecture",
+    "AI Systems & Autonomous Agents",
+    "RAG & Vector Search",
+    "Cloud Deployment & Production Delivery"
+  ],
+  "technologies": [
+    "React", "Next.js", "Node.js", "NestJS", "TypeScript", "Python",
+    "PostgreSQL", "MongoDB", "MySQL", "Pinecone", "BullMQ",
+    "OpenAI", "Anthropic", "Langfuse",
+    "AWS", "Azure", "Hostinger", "Vercel", "Git"
+  ],
   "updated": ""
 }

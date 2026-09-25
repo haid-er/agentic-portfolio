@@ -1,3 +1,574 @@
 {
-  "items": []
+  "items": [
+    {
+      "id": "euthyna-esg-platform",
+      "slug": "euthyna-esg-platform",
+      "enabled": true,
+      "source": "experience.md + projects.md 🗒️; research-findings.md (résumé) ✅. Employer codebase: no repo link.",
+      "title": "Euthyna ESG platform",
+      "summary": "AI sustainability-reporting SaaS: upload a report and get a gap analysis against ISSB, TCFD and CSRD (ESRS), plus GHG boundary-setting and ownership extraction.",
+      "story": [
+        "Euthyna turns sustainability disclosures into structured data. A report goes in and comes back as a gap analysis against ISSB, TCFD and CSRD (ESRS), with compliance checks and recommendations.",
+        "The GHG side needs survey flows to collect sustainability data, organisational and operational boundary-setting in the GHG Protocol style, and ownership extraction, which maps equity and control relationships for consolidation.",
+        "Under that sit LLM-driven estimation pipelines, background processing, RBAC and transactional audit logging. The org-standard stack is React + Vite, NestJS/Express, PostgreSQL, Drizzle, Zod, CASL and React Query."
+      ],
+      "role": "Full-Stack Developer",
+      "pillar": "esg",
+      "tags": [
+        "ESG",
+        "GHG accounting",
+        "LLM pipelines",
+        "Enterprise SaaS"
+      ],
+      "stack": [
+        "React",
+        "Vite",
+        "NestJS",
+        "Express",
+        "PostgreSQL",
+        "Drizzle ORM",
+        "Zod",
+        "CASL",
+        "React Query"
+      ],
+      "start": "2025-09",
+      "links": {
+        "live": "https://euthyna.ai"
+      },
+      "private": true,
+      "featured": true,
+      "demoSlugs": [
+        "esg-gap-checker",
+        "ownership-extractor",
+        "ghg-calculator",
+        "rbac-audit-lab"
+      ]
+    },
+    {
+      "id": "terra-internal-tools",
+      "slug": "terra-internal-tools",
+      "enabled": true,
+      "source": "experience.md + projects.md 🗒️. Impact metrics TODO.",
+      "title": "Terra Instinct internal tools",
+      "summary": "A custom CRM that replaces the outreach stack through a Lemlist integration, plus project-management and finance tools, all inside one multi-workspace React + Vite frontend.",
+      "story": [
+        "One enterprise frontend with separate workspaces for the CRM, client portal, project management and market intelligence, sharing one architecture, testing strategy and set of contribution guidelines.",
+        "The CRM replaces the existing outreach stack through a Lemlist integration. The project-management and finance tools handle internal operations."
+      ],
+      "role": "Full-Stack Developer",
+      "pillar": "fullstack",
+      "tags": [
+        "CRM",
+        "Internal tools",
+        "Multi-workspace frontend"
+      ],
+      "stack": [
+        "React",
+        "Vite",
+        "React Query",
+        "NestJS",
+        "Express",
+        "PostgreSQL",
+        "Lemlist API"
+      ],
+      "start": "2025-09",
+      "links": {},
+      "private": true,
+      "featured": false,
+      "demoSlugs": [
+        "data-grid",
+        "kanban-board",
+        "layered-api-lab"
+      ]
+    },
+    {
+      "id": "motioniq",
+      "slug": "motioniq",
+      "enabled": true,
+      "source": "projects.md B (public repos data_fetcher_mobile, data_preprocessing_scripts) ✅. Link to HumCareADL is inferred ⚠️, so not claimed. Activity/participant counts omitted (conflict).",
+      "title": "MotionIQ",
+      "summary": "A human-activity-recognition data system. An Android app streams phone IMU data over Wi-Fi into RabbitMQ, a Java consumer drains the queues, and a Python pipeline cuts atomic 5-second windows.",
+      "story": [
+        "The mobile app is simple on purpose: set the server address and port, pick the sensors, press start. Readings stream over Wi-Fi to a RabbitMQ broker, and a Java consumer processes the queues.",
+        "The preprocessing pipeline runs in 8 steps. It standardises subject and activity names, restructures the recordings, converts them to atomic 5-second JSON windows, exports a raw CSV dataset and segments falls from daily activities.",
+        "Around the pipeline sit fixer scripts for sync and event renaming, plots comparing users, sensors and subjects, gravity calculation from the IMUs, and verification tools such as a sensor-rate counter."
+      ],
+      "role": "Built the data-collection app and preprocessing pipeline",
+      "pillar": "realtime",
+      "tags": [
+        "IoT",
+        "Sensors",
+        "Message queues",
+        "HAR"
+      ],
+      "stack": [
+        "Android",
+        "Java",
+        "RabbitMQ",
+        "Python",
+        "Jupyter",
+        "pandas",
+        "NumPy"
+      ],
+      "start": "2024-12",
+      "end": "2025-09",
+      "links": {
+        "repo": "https://github.com/haid-er/data_fetcher_mobile"
+      },
+      "private": false,
+      "featured": true,
+      "demoSlugs": [
+        "rabbitmq-sim",
+        "sensor-pipeline",
+        "live-telemetry",
+        "har-live"
+      ]
+    },
+    {
+      "id": "kickstart-hq",
+      "slug": "kickstart-hq",
+      "enabled": true,
+      "source": "research-findings.md (résumé) ✅",
+      "title": "Kickstart HQ",
+      "summary": "Field-service management: scheduling, dispatching, invoicing, technicians and payments. Response time went from 27s to 3.5s.",
+      "story": [
+        "Kickstart HQ runs field-service businesses end to end, from scheduling and dispatching technicians to invoicing and payments.",
+        "The work was performance. webpack optimisation, code splitting and compression, plus lazy loading and fewer API calls, took response time from 27s to 3.5s."
+      ],
+      "role": "Associate Software Engineer, Piron Labs",
+      "pillar": "fullstack",
+      "tags": [
+        "Performance",
+        "Field service",
+        "Product engineering"
+      ],
+      "stack": [
+        "React",
+        "webpack",
+        "Node.js"
+      ],
+      "start": "2025-06",
+      "end": "2025-08",
+      "outcome": "Response time 27s → 3.5s",
+      "links": {
+        "live": "https://kickstarthq.com"
+      },
+      "private": true,
+      "featured": true,
+      "demoSlugs": [
+        "web-perf-lab",
+        "dispatch-board"
+      ]
+    },
+    {
+      "id": "voodvr",
+      "slug": "voodvr",
+      "enabled": true,
+      "source": "research-findings.md (résumé) ✅; = the 'payment gateways + live chat + AI tools' app (medium-high confidence)",
+      "title": "VoodVR",
+      "summary": "AI VR video platform: creator dashboards and profiles, Stripe Connect payouts, subscriptions, webhook billing and real-time chat.",
+      "story": [
+        "VoodVR is an AI VR video platform. The product work covered dashboards, profiles and creator flows in React and Node.",
+        "Money moves through Stripe Connect, with subscriptions and webhook-driven billing. Stream Chat powers real-time conversation. The platform is tested and deployed on AWS."
+      ],
+      "role": "Full-Stack Developer, Webox Systems",
+      "pillar": "fullstack",
+      "tags": [
+        "Payments",
+        "Real-time chat",
+        "AI platform"
+      ],
+      "stack": [
+        "React",
+        "Node.js",
+        "Stripe Connect",
+        "Stream Chat",
+        "AWS"
+      ],
+      "start": "2024-06",
+      "end": "2025-06",
+      "links": {
+        "live": "https://voodvr.co"
+      },
+      "private": true,
+      "featured": true,
+      "demoSlugs": [
+        "stripe-connect-flow",
+        "live-chat",
+        "ci-pipeline"
+      ]
+    },
+    {
+      "id": "structure-fetcher",
+      "slug": "structure-fetcher",
+      "enabled": true,
+      "source": "projects.md C (public repos) + research-findings.md (live URL, dates) ✅",
+      "title": "Structure Fetcher",
+      "summary": "Upload an org chart as an image or PDF and get the hierarchy back as editable JSON, extracted by Azure OpenAI or Groq vision models.",
+      "story": [
+        "The Express API sends uploaded charts to Azure OpenAI or Groq, validates the hierarchy that comes back, stores it in MongoDB and keeps files on Cloudinary. Winston logs rotate daily.",
+        "The React + Vite frontend offers drag-and-drop upload, an interactive tree view and a table view, inline edit, add and delete of entities, saving to the backend, and JSON export."
+      ],
+      "pillar": "ai",
+      "tags": [
+        "Document AI",
+        "Vision LLMs",
+        "REST API"
+      ],
+      "stack": [
+        "Node.js",
+        "Express",
+        "MongoDB",
+        "Azure OpenAI",
+        "Groq",
+        "Cloudinary",
+        "Winston",
+        "React",
+        "Vite"
+      ],
+      "start": "2025-06",
+      "end": "2025-08",
+      "links": {
+        "live": "https://structure-fetcher.vercel.app",
+        "repo": "https://github.com/haid-er/structure-fetch-express"
+      },
+      "private": false,
+      "featured": true,
+      "demoSlugs": [
+        "org-chart-extractor",
+        "layered-api-lab"
+      ]
+    },
+    {
+      "id": "ai-lawyer",
+      "slug": "ai-lawyer",
+      "enabled": true,
+      "source": "research-findings.md (résumé) ✅. Repo is PRIVATE: never link or quote it.",
+      "title": "AI Lawyer",
+      "summary": "Legal Q&A assistant: retrieval-augmented answers over legal material, built on OpenAI and Pinecone.",
+      "story": [
+        "Legal questions are answered from retrieved passages instead of the model's memory. Pinecone holds the embeddings and OpenAI writes answers grounded in what was retrieved."
+      ],
+      "pillar": "ai",
+      "tags": [
+        "RAG",
+        "Vector search",
+        "LLM"
+      ],
+      "stack": [
+        "OpenAI",
+        "Pinecone"
+      ],
+      "links": {},
+      "private": true,
+      "featured": false,
+      "demoSlugs": [
+        "legal-rag-assistant",
+        "vector-space-explorer",
+        "ask-malik"
+      ]
+    },
+    {
+      "id": "greenheaven",
+      "slug": "greenheaven",
+      "enabled": true,
+      "source": "research-findings.md (live URLs, May 2025) ✅",
+      "title": "GreenHeaven",
+      "summary": "Plant e-commerce storefront with Clerk auth, plus an admin dashboard that tracks expenses and profit.",
+      "story": [
+        "Two React + Vite apps: a storefront that uses Redux for state and Clerk for authentication, and a separate admin panel for the catalogue with an expense and profit tracker."
+      ],
+      "pillar": "fullstack",
+      "tags": [
+        "E-commerce",
+        "Admin dashboard"
+      ],
+      "stack": [
+        "React",
+        "Vite",
+        "Redux",
+        "Clerk"
+      ],
+      "start": "2025-05",
+      "end": "2025-05",
+      "links": {
+        "live": "https://green-heaven-seven.vercel.app",
+        "repo": "https://github.com/haid-er/GreenHeaven-Frontend"
+      },
+      "private": false,
+      "featured": false,
+      "demoSlugs": [
+        "kanban-board",
+        "data-grid"
+      ]
+    },
+    {
+      "id": "fb-automation",
+      "slug": "fb-automation",
+      "enabled": true,
+      "source": "research-findings.md ✅ (Puppeteer marketplace bot, Aug 2025)",
+      "title": "fb-automation",
+      "summary": "Puppeteer bot that fills in and posts Facebook Marketplace listings.",
+      "story": [
+        "Puppeteer drives a browser through a repetitive seller workflow and creates Facebook Marketplace listings."
+      ],
+      "pillar": "fullstack",
+      "tags": [
+        "Browser automation"
+      ],
+      "stack": [
+        "Node.js",
+        "Puppeteer"
+      ],
+      "start": "2025-08",
+      "end": "2025-09",
+      "links": {
+        "repo": "https://github.com/haid-er/fb-automation"
+      },
+      "private": false,
+      "featured": false,
+      "demoSlugs": [
+        "automation-recorder"
+      ]
+    },
+    {
+      "id": "task-vault",
+      "slug": "task-vault",
+      "enabled": true,
+      "source": "projects.md C ✅ (README). Stack TODO.",
+      "title": "Task-Vault",
+      "summary": "Private task manager. Each user has an account and sees only their own tasks, behind a login.",
+      "story": [
+        "Authentication and per-user data isolation on a small scale: tasks are stored per account and only the signed-in owner can read them."
+      ],
+      "pillar": "fullstack",
+      "tags": [
+        "Auth",
+        "CRUD"
+      ],
+      "stack": [],
+      "start": "2024-08",
+      "links": {
+        "repo": "https://github.com/haid-er/Task-Vault"
+      },
+      "private": false,
+      "featured": false,
+      "demoSlugs": [
+        "kanban-board"
+      ]
+    },
+    {
+      "id": "sql-learning",
+      "slug": "sql-learning",
+      "enabled": true,
+      "source": "projects.md C ✅",
+      "title": "SQL-Learning",
+      "summary": "SQL tutorials and LeetCode SQL solutions, kept as a practice log.",
+      "story": [],
+      "pillar": "fundamentals",
+      "tags": [
+        "SQL",
+        "Practice"
+      ],
+      "stack": [
+        "SQL"
+      ],
+      "links": {
+        "repo": "https://github.com/haid-er/SQL-Learning"
+      },
+      "private": false,
+      "featured": false,
+      "demoSlugs": [
+        "sql-playground"
+      ]
+    },
+    {
+      "id": "cricket-game-c",
+      "slug": "cricket-game-c",
+      "enabled": true,
+      "source": "projects.md C ✅ (created 2022-11)",
+      "title": "Cricket Game in C",
+      "summary": "A cricket match simulation written in pure C.",
+      "story": [],
+      "pillar": "fundamentals",
+      "tags": [
+        "C",
+        "Game logic"
+      ],
+      "stack": [
+        "C"
+      ],
+      "start": "2022-11",
+      "links": {
+        "repo": "https://github.com/haid-er/Cricket-Game-C-Language"
+      },
+      "private": false,
+      "featured": false,
+      "demoSlugs": [
+        "cricket-sim"
+      ]
+    },
+    {
+      "id": "c-cpp-foundations",
+      "slug": "c-cpp-foundations",
+      "enabled": true,
+      "source": "projects.md C + research-findings.md (dates, topics) ✅",
+      "title": "C and C++ foundations",
+      "summary": "The first repos: pointers, file handling, dynamic memory and OOP, worked through in C and C++.",
+      "story": [
+        "Coursework-era repos covering programming fundamentals in C (pointers, file handling, dynamic memory, a tic-tac-toe) and fundamentals plus OOP in C++."
+      ],
+      "pillar": "fundamentals",
+      "tags": [
+        "C",
+        "C++",
+        "Coursework"
+      ],
+      "stack": [
+        "C",
+        "C++"
+      ],
+      "start": "2022-08",
+      "end": "2023-01",
+      "links": {
+        "repo": "https://github.com/haid-er/C-Language"
+      },
+      "private": false,
+      "featured": false,
+      "demoSlugs": [
+        "code-judge",
+        "algo-visualizer"
+      ]
+    },
+    {
+      "id": "early-web-builds",
+      "slug": "early-web-builds",
+      "enabled": true,
+      "source": "projects.md C ✅ (Nexcent-Web, Travel-Journal, Glozzom, LoopLAB; learning builds)",
+      "title": "Early web builds",
+      "summary": "Practice builds: Bootstrap multi-page themes, a React component and props exercise deployed on Netlify, and a React + Tailwind travel journal.",
+      "story": [],
+      "pillar": "craft",
+      "tags": [
+        "Learning",
+        "HTML/CSS",
+        "React"
+      ],
+      "stack": [
+        "HTML",
+        "CSS",
+        "Bootstrap",
+        "React",
+        "Tailwind CSS"
+      ],
+      "start": "2022-08",
+      "end": "2024-08",
+      "links": {
+        "repo": "https://github.com/haid-er/Nexcent-Web"
+      },
+      "private": false,
+      "featured": false,
+      "demoSlugs": [
+        "theme-lab"
+      ]
+    },
+    {
+      "id": "autonomous-coding-pipeline",
+      "slug": "autonomous-coding-pipeline",
+      "enabled": false,
+      "verified": false,
+      "source": "experience.md 🗒️ + private-repo metadata only (research-findings.md: ✅ skill, ⚠️ project). Private-derived: seeded disabled, no links.",
+      "title": "Autonomous coding pipeline",
+      "summary": "Multi-agent Claude Code setup that plans, writes and reviews code autonomously.",
+      "story": [],
+      "pillar": "ai",
+      "tags": [
+        "Agents",
+        "Claude Code"
+      ],
+      "stack": [
+        "Claude Code"
+      ],
+      "links": {},
+      "private": true,
+      "featured": false,
+      "demoSlugs": [
+        "agent-orchestra"
+      ]
+    },
+    {
+      "id": "agent-hierarchy-platform",
+      "slug": "agent-hierarchy-platform",
+      "enabled": false,
+      "verified": false,
+      "source": "projects.md A: vision/design stage ⚠️",
+      "title": "Agent-hierarchy platform",
+      "summary": "Design for hierarchical agent orchestration: Temporal workflows, Claude Agent SDK workers, MCP tools, PostgreSQL state and Langfuse tracing.",
+      "story": [],
+      "pillar": "ai",
+      "tags": [
+        "Agents",
+        "Orchestration"
+      ],
+      "stack": [
+        "Temporal",
+        "Claude Agent SDK",
+        "MCP",
+        "PostgreSQL",
+        "Langfuse"
+      ],
+      "links": {},
+      "private": true,
+      "featured": false,
+      "demoSlugs": [
+        "agent-orchestra",
+        "mcp-tool-lab"
+      ]
+    },
+    {
+      "id": "mcp-server-client",
+      "slug": "mcp-server-client",
+      "enabled": false,
+      "verified": false,
+      "source": "private-repo metadata only (Sep 2025): skill ✅, project ⚠️. Never link.",
+      "title": "MCP server and client",
+      "summary": "A Model Context Protocol server and client written in TypeScript.",
+      "story": [],
+      "pillar": "ai",
+      "tags": [
+        "MCP",
+        "Tool calling"
+      ],
+      "stack": [
+        "TypeScript",
+        "MCP"
+      ],
+      "start": "2025-09",
+      "links": {},
+      "private": true,
+      "featured": false,
+      "demoSlugs": [
+        "mcp-tool-lab"
+      ]
+    },
+    {
+      "id": "eyeguard",
+      "slug": "eyeguard",
+      "enabled": false,
+      "verified": false,
+      "source": "LinkedIn feed only ⚠️: attribution as his FYP unconfirmed",
+      "title": "EyeGuard",
+      "summary": "Real-time shoplifting-detection surveillance system.",
+      "story": [],
+      "pillar": "ai",
+      "tags": [
+        "Computer vision"
+      ],
+      "stack": [],
+      "links": {},
+      "private": false,
+      "featured": false,
+      "demoSlugs": []
+    }
+  ]
 }

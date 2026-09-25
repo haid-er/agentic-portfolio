@@ -23,19 +23,31 @@
           "proofDemo": "ownership-extractor"
         },
         {
-          "text": "Engineered the platform core: workflow orchestration, background processing, RBAC and transactional audit logging.",
+          "text": "Engineered the platform core to org standards (routes → controller → service → repository, Zod, CASL, Drizzle): workflow orchestration, background processing, RBAC and transactional audit logging.",
           "proofDemo": "rbac-audit-lab"
         },
         {
-          "text": "Set org standards for Express, NestJS and React (routes → controller → service → repository, Zod, CASL, Drizzle, React Query) behind a multi-workspace React + Vite frontend for the CRM, client portal, PM and market intelligence.",
-          "proofDemo": "layered-api-lab"
+          "text": "Defined the architecture, testing strategy and contribution guidelines of a multi-workspace React + Vite frontend (CRM, client portal, PM, market intelligence), and builds the internal CRM with Lemlist, the project-management tool and the finance tool.",
+          "proofDemo": "data-grid"
         },
         {
           "text": "Runs a multi-agent Claude Code pipeline for autonomous coding.",
           "proofDemo": "agent-orchestra"
         }
       ],
-      "stack": ["TypeScript", "React", "Vite", "NestJS", "Express", "PostgreSQL", "Drizzle ORM", "Zod", "CASL", "React Query", "Claude Code"]
+      "stack": [
+        "TypeScript",
+        "React",
+        "Vite",
+        "NestJS",
+        "Express",
+        "PostgreSQL",
+        "Drizzle ORM",
+        "Zod",
+        "CASL",
+        "React Query",
+        "Claude Code"
+      ]
     },
     {
       "id": "piron-labs",
@@ -59,8 +71,16 @@
           "proofDemo": "dispatch-board"
         }
       ],
-      "stack": ["React", "webpack", "Node.js"],
-      "metric": { "from": "27s", "to": "3.5s", "label": "response time" }
+      "stack": [
+        "React",
+        "webpack",
+        "Node.js"
+      ],
+      "metric": {
+        "from": "27s",
+        "to": "3.5s",
+        "label": "response time"
+      }
     },
     {
       "id": "webox-systems",
@@ -88,7 +108,13 @@
           "proofDemo": "ci-pipeline"
         }
       ],
-      "stack": ["React", "Node.js", "Stripe Connect", "Stream Chat", "AWS"]
+      "stack": [
+        "React",
+        "Node.js",
+        "Stripe Connect",
+        "Stream Chat",
+        "AWS"
+      ]
     },
     {
       "id": "fcit-research",
@@ -114,7 +140,14 @@
           "proofDemo": "har-live"
         }
       ],
-      "stack": ["Android", "Java", "RabbitMQ", "Python", "pandas", "NumPy"]
+      "stack": [
+        "Android",
+        "Java",
+        "RabbitMQ",
+        "Python",
+        "pandas",
+        "NumPy"
+      ]
     }
   ]
 }
