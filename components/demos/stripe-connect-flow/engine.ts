@@ -118,6 +118,7 @@ export interface SimState {
   priceId?: string
   subId?: string
   subCount: number
+  subKey?: string // Idempotency-Key used by the first subscribe call
   pendingRetry: boolean // an invoice is waiting for a Smart Retry
   canceled: boolean
   period: number
@@ -276,7 +277,7 @@ function chargeInvoice(s: SimState, cfg: Config, sub: string, declined: boolean,
  */
 export function subscribe(prev: SimState, cfg: Config, mode: 'first' | 'replay' | 'no-key'): SimState {
   const s = clone(prev)
-  const key = `sub-create-fan-${s.period === 0 ? 1 : s.period}`
+  const key = s.subKey ?? newId(s, 'idem')
   if (mode === 'replay' && s.idem[key]) {
     call(s, 'POST', '/v1/subscriptions', `Idempotent replay: same response as ${s.idem[key]}, nothing charged twice`, key)
     const last = s.api[s.api.length - 1]
@@ -294,7 +295,7 @@ export function subscribe(prev: SimState, cfg: Config, mode: 'first' | 'replay' 
     `${sub}, application_fee_percent=${cfg.feePercent}, transfer_data.destination=${s.accountId ?? 'acct'}`,
     mode === 'first' ? key : undefined,
   )
-  if (mode === 'first') s.idem[key] = c.id
+  if (mode === 'first') { s.idem[key] = c.id; s.subKey = key }
   s.subId = sub
   s.subCount += 1
   emit(s, 'customer.subscription.created', sub, 'status: active', { sub: 'active' })

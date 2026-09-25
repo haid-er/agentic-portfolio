@@ -52,7 +52,7 @@ export default function Demo(_props: DemoProps) {
   const visible = usePageVisible()
   const [viewRef, inView] = useInView<HTMLDivElement>({ rootMargin: '120px' })
   const [rawCfg, setRawCfg] = useLocalStorage<Config>('stripe-connect-flow:config', DEFAULTS)
-  const cfg = safeConfig(rawCfg)
+  const cfg = useMemo(() => safeConfig(rawCfg), [rawCfg])
   const setCfg = (patch: Partial<Config>) => setRawCfg((p) => ({ ...safeConfig(p), ...patch }))
 
   const [sim, setSim] = useState<SimState>(() => initialState())
@@ -130,7 +130,7 @@ export default function Demo(_props: DemoProps) {
                 <Toggle label="Card declines on renewal" checked={cfg.declineRenewal} onChange={(v) => setCfg({ declineRenewal: v })} />
                 <DemoToolbar>
                   <Button size="sm" variant="secondary" icon={auto ? 'pause' : 'play'} onClick={() => setAuto((a) => !a)} aria-pressed={auto}>
-                    {auto ? 'Auto-deliver' : 'Paused'}
+                    Auto-deliver
                   </Button>
                   <Button size="sm" variant="secondary" icon="step" disabled={!due} onClick={() => setSim((s) => deliverNext(s, cfg))}>
                     Deliver next
