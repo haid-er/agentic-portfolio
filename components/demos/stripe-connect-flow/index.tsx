@@ -73,7 +73,7 @@ export default function Demo(_props: DemoProps) {
   const live = auto && visible && inView && !busy && Boolean(due)
   useEffect(() => {
     if (!live) return
-    const t = setTimeout(() => setSim((s) => deliverNext(s, cfg)), reduced ? 300 : 650)
+    const t = setTimeout(() => setSim((s) => deliverNext(s, cfg)), reduced ? 300 : 420)
     return () => clearTimeout(t)
   }, [live, sim, cfg, reduced])
 

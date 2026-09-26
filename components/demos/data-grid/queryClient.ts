@@ -121,7 +121,8 @@ export class QueryClient {
     const inner = this.internals.get(key)!
     if (inner.gcTimer) { clearTimeout(inner.gcTimer); inner.gcTimer = null }
     this.write(key, { observers: s.observers + 1, inactiveSince: null })
-    if (this.isStale(s)) void this.fetch(key, s.status === 'success' ? 'stale on mount' : 'mount')
+    if (s.fetching) { /* already loading: the new observer simply waits for it */ }
+    else if (this.isStale(s)) void this.fetch(key, s.status === 'success' ? 'stale on mount' : 'mount')
     else this.note('hit', label, 'Cache hit: fresh data, no request sent.')
     this.emit()
     return () => {

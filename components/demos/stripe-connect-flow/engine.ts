@@ -387,7 +387,7 @@ export function deliverNext(prev: SimState, cfg: Config): SimState {
   s.attempts.push(attempt)
 
   // at-least-once delivery: sometimes the same event arrives again
-  if (cfg.duplicates && !d.redelivery && rand(s) < 0.35) {
+  if (cfg.duplicates && !d.redelivery && rand(s) < 0.45) {
     s.queue.push({ key: `${ev.id}#dup${s.seq++}`, eventId: ev.id, n: 1, dueAt: s.now + 1 + Math.floor(rand(s) * 3), redelivery: true })
   }
   return s

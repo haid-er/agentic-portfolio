@@ -36,7 +36,7 @@ export function MoneyFlow({ sp, pulse, accountId }: { sp: Split; pulse: number; 
                 i === 0 && pulse > 0 && 'motion-safe:animate-[fade-in_var(--dur-med)_var(--ease-out)]',
               )}
             >
-              <p className="m-0 mono text-ink-3">{p.label} · <span className="normal-case tracking-normal break-all">{p.role}</span></p>
+              <p className="m-0 mono text-ink-3">{p.label} · <span className="normal-case tracking-normal [overflow-wrap:anywhere]">{p.role}</span></p>
               <p className="m-0 display text-3 nums">{p.value}</p>
               <p className="m-0 text-00 text-ink-2">{p.note}</p>
             </div>
