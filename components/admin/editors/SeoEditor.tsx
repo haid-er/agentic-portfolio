@@ -36,6 +36,9 @@ export function SeoEditor() {
         <Group id="analytics" title="Analytics" layer={2}>
           <ToggleField path={['analytics', 'enabled']} label="Vercel Web Analytics" hint="Cookie-free page views. Nothing else is tracked." />
         </Group>
+        <Group id="privacy" title="Never render" layer={3} description="Extra words that must never appear in live feeds (the GitHub activity list), matched at the start of a word, any case. The contract terms (logiccove, vlad, fallnet) are always excluded in code.">
+          <TagsField path={['privacy', 'excluded']} label="Excluded terms" hint="Private client or project names. A repository whose name or description starts a word with one of these is hidden." />
+        </Group>
       </div>
 
       <aside className="grid gap-s4 lg:sticky lg:top-s4" aria-label="Previews">

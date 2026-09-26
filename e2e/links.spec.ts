@@ -1,6 +1,6 @@
 /** Every internal link on every public page resolves, and every #anchor exists. */
 import { expect, test } from '@playwright/test'
-import { DEMO_PAGES, PROJECT_SLUGS } from './helpers'
+import { DEMO_PAGES, demoReady, PROJECT_SLUGS } from './helpers'
 
 test.skip(({ viewport }) => (viewport?.width ?? 0) < 400, 'crawl once (desktop project)')
 test.setTimeout(240_000)
@@ -30,6 +30,8 @@ test('no broken internal links', async ({ page, request, baseURL }) => {
   for (const a of anchors) {
     if (!idsByPath.has(a.path)) {
       await page.goto(a.path)
+      // Demos render client-side: wait for the live demo before reading its ids.
+      if (a.path.startsWith('/playground/')) await demoReady(page)
       idsByPath.set(a.path, new Set(await page.$$eval('[id]', (els) => els.map((e) => e.id))))
     }
     if (!idsByPath.get(a.path)!.has(a.id)) broken.push(`${a.path}#${a.id} (missing anchor) linked from ${a.from}`)
