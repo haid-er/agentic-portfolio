@@ -34,6 +34,9 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react'],
   },
+  // app/fontPreload.ts reads the generated font CSS; ship it with pages that re-render
+  // at runtime (ISR), so their HTML keeps the per-world font preloads.
+  outputFileTracingIncludes: { '/**': ['./.next/static/css/*.css'] },
   // Keep native/server-only deps of in-browser ML libs out of the server bundle.
   serverExternalPackages: ['onnxruntime-node', 'sharp'],
   webpack(config, { isServer }) {

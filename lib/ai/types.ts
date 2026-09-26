@@ -59,11 +59,31 @@ export interface AiUsage {
   outputTokens: number
 }
 
+/** One hop of the router: which provider was tried and how it went. */
+export interface AiRouteStep {
+  provider: AiProvider
+  /** 'ok' or the reason the router moved on (rate_limited, timeout, budget, ...). */
+  outcome: 'ok' | 'skipped' | 'failed'
+  reason?: string
+  ms: number
+}
+
+/** Per-IP limit as seen in the ratelimit-* headers (filled in by the client). */
+export interface AiRateLimit {
+  limit: number
+  remaining: number
+  resetSec: number
+}
+
 export interface AiMeta {
   provider: AiProvider
   model: string
   usage: AiUsage
   latencyMs: number
+  /** Router trail, e.g. groq failed (rate_limited) -> gemini ok. */
+  route?: AiRouteStep[]
+  /** Client-side only: parsed from the ratelimit-* response headers. */
+  rateLimit?: AiRateLimit
 }
 
 export interface AiTextResult extends AiMeta {
@@ -106,10 +126,34 @@ export class AiError extends Error {
 export interface AiStatus {
   /** true when at least one server provider can serve requests. */
   available: boolean
-  providers: Array<{ id: ProviderId; enabled: boolean; configured: boolean; model: string }>
+  providers: Array<{
+    id: ProviderId
+    enabled: boolean
+    configured: boolean
+    model: string
+    /** Vision model (when the provider has one). */
+    visionModel?: string
+    /** 'ready' | 'off' (admin) | 'no-key' | 'cooling' (recent 429/5xx) | 'budget' (DeepSeek budget spent). */
+    state?: AiProviderState
+    /** Seconds until a cooling provider is retried. */
+    retryInSec?: number
+  }>
+  /** true when at least one ready provider accepts images. */
+  vision?: boolean
   browserFallback: boolean
-  limits: { maxTokens: number; maxInputChars: number; perIpPerMinute: number }
+  limits: {
+    maxTokens: number
+    maxInputChars: number
+    perIpPerMinute: number
+    /** Decoded bytes per image (4 MB) and images per request. */
+    maxImageBytes?: number
+    maxImages?: number
+  }
+  /** Remaining DeepSeek tokens on this server instance (only when DeepSeek is enabled). */
+  deepseekBudgetLeft?: number
 }
+
+export type AiProviderState = 'ready' | 'off' | 'no-key' | 'cooling' | 'budget'
 
 /**
  * SSE events of POST /api/ai/chat with {stream:true}:
@@ -129,4 +173,27 @@ export const AI_HEADERS = {
   limit: 'ratelimit-limit',
   remaining: 'ratelimit-remaining',
   reset: 'ratelimit-reset',
+  /** Router trail: "groq:rate_limited>gemini:ok". */
+  route: 'x-ai-route',
+  latency: 'x-ai-latency-ms',
+  inputTokens: 'x-ai-input-tokens',
+  outputTokens: 'x-ai-output-tokens',
 } as const
+
+/** Hard caps shared by client helpers and the server. */
+export const AI_LIMITS = {
+  /** Decoded image size (BRIEF: 4 MB). */
+  maxImageBytes: 4 * 1024 * 1024,
+  maxImages: 4,
+  maxMessages: 40,
+  maxTools: 16,
+  /** Serialized tools / JSON schema budget (developer-authored, still client-sent). */
+  maxSchemaChars: 16_000,
+  /** Vercel rejects request bodies over 4.5 MB. */
+  maxBodyBytes: 4_500_000,
+} as const
+
+/** In-browser fallback model (lib/ai/browser.ts): SmolLM2 135M instruct, int8 ONNX. */
+export const BROWSER_MODEL = 'HuggingFaceTB/SmolLM2-135M-Instruct'
+/** One-time download size to show before the visitor opts in (weights ~137 MB, cached after). */
+export const BROWSER_MODEL_DOWNLOAD = '~140 MB'

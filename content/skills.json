@@ -1,14 +1,741 @@
 {
   "items": [
     {
+      "id": "product-engineering",
+      "enabled": true,
+      "source": "résumé expertise",
+      "name": "Full-stack product engineering",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "dispatch-board",
+        "stripe-connect-flow",
+        "kanban-board"
+      ]
+    },
+    {
       "id": "react",
+      "enabled": true,
+      "source": "GH, PF, résumé, work",
       "name": "React",
       "pillar": "fullstack",
-      "level": "core",
       "demoSlugs": [
-        "kanban-board"
+        "kanban-board",
+        "data-grid"
+      ]
+    },
+    {
+      "id": "nextjs",
+      "enabled": true,
+      "source": "résumé technologies",
+      "name": "Next.js",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "rate-limiter",
+        "layered-api-lab"
+      ]
+    },
+    {
+      "id": "vite",
+      "enabled": true,
+      "source": "repos + Euthyna frontend 🗒️",
+      "name": "Vite",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "react-query",
+      "enabled": true,
+      "source": "Euthyna org standard 🗒️ (the query cache lab re-implements its caching model without the library)",
+      "name": "React Query",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "redux",
+      "enabled": true,
+      "source": "GH (Redux Saga), GreenHeaven, Udemy cert",
+      "name": "Redux / Redux Saga",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "tailwind",
+      "enabled": true,
+      "source": "GH (this site is styled with Tailwind CSS v4, but no demo is about it)",
+      "name": "Tailwind CSS",
+      "pillar": "craft",
+      "demoSlugs": []
+    },
+    {
+      "id": "typescript",
+      "enabled": true,
+      "source": "GH, résumé",
+      "name": "TypeScript",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "layered-api-lab",
+        "mcp-tool-lab"
+      ]
+    },
+    {
+      "id": "javascript",
+      "enabled": true,
+      "source": "GH",
+      "name": "JavaScript",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "web-perf-lab",
+        "algo-visualizer"
+      ]
+    },
+    {
+      "id": "nodejs",
+      "enabled": true,
+      "source": "GH, PF, résumé, IBM cert",
+      "name": "Node.js",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "layered-api-lab"
+      ]
+    },
+    {
+      "id": "express",
+      "enabled": true,
+      "source": "GH, repos, org standard",
+      "name": "Express.js",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "layered-api-lab"
+      ]
+    },
+    {
+      "id": "nestjs",
+      "enabled": true,
+      "source": "PF, résumé, org standard (layered-api-lab shows the same layering without NestJS)",
+      "name": "NestJS",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "rest-apis",
+      "enabled": true,
+      "source": "GH",
+      "name": "REST API design",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "layered-api-lab",
+        "rate-limiter"
+      ]
+    },
+    {
+      "id": "zod",
+      "enabled": true,
+      "source": "org standard 🗒️",
+      "name": "Zod",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "layered-api-lab",
+        "esg-gap-checker"
+      ]
+    },
+    {
+      "id": "casl-rbac",
+      "enabled": true,
+      "source": "org standard 🗒️ + résumé (RBAC); the demo uses a CASL-style evaluator, not @casl/ability",
+      "name": "RBAC & permissions (CASL)",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "rbac-audit-lab"
+      ]
+    },
+    {
+      "id": "audit-logging",
+      "enabled": true,
+      "source": "résumé",
+      "name": "Transactional audit logging",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "rbac-audit-lab"
+      ]
+    },
+    {
+      "id": "logging",
+      "enabled": true,
+      "source": "structure-fetch-express repo",
+      "name": "Structured logging (Winston)",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "layered-api-lab"
+      ]
+    },
+    {
+      "id": "web-performance",
+      "enabled": true,
+      "source": "résumé: 27s → 3.5s",
+      "name": "Web performance (webpack, code splitting)",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "web-perf-lab"
+      ]
+    },
+    {
+      "id": "stripe-connect",
+      "enabled": true,
+      "source": "résumé (VoodVR); the demo is a simulation without Stripe",
+      "name": "Payments & billing webhooks (Stripe Connect)",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "stripe-connect-flow"
+      ]
+    },
+    {
+      "id": "puppeteer",
+      "enabled": true,
+      "source": "fb-automation repo",
+      "name": "Browser automation (Puppeteer)",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "automation-recorder"
+      ]
+    },
+    {
+      "id": "system-design",
+      "enabled": true,
+      "source": "résumé expertise: backend & platform architecture",
+      "name": "System design",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "system-design-canvas"
+      ]
+    },
+    {
+      "id": "aws",
+      "enabled": true,
+      "source": "résumé",
+      "name": "AWS",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "azure",
+      "enabled": true,
+      "source": "résumé + Azure OpenAI repo",
+      "name": "Azure",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "vercel",
+      "enabled": true,
+      "source": "résumé (Vercel, Hostinger), Nexcent-Web (Netlify), repos",
+      "name": "Deployment (Vercel, Netlify, Hostinger)",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "git",
+      "enabled": true,
+      "source": "résumé",
+      "name": "Git & GitHub",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "docker",
+      "enabled": true,
+      "source": "GH learning list",
+      "name": "Docker",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "ci-cd",
+      "enabled": true,
+      "source": "GH learning list; the demo simulates a pipeline, nothing is built",
+      "name": "CI/CD pipelines",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "ci-pipeline"
+      ]
+    },
+    {
+      "id": "postgresql",
+      "enabled": true,
+      "source": "GH, résumé, work (sql-playground runs SQLite, not PostgreSQL)",
+      "name": "PostgreSQL",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "drizzle",
+      "enabled": true,
+      "source": "org standard 🗒️ (sql-playground only prints a Drizzle schema)",
+      "name": "Drizzle ORM",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "sql",
+      "enabled": true,
+      "source": "SQL-Learning repo",
+      "name": "SQL",
+      "pillar": "fundamentals",
+      "demoSlugs": [
+        "sql-playground"
+      ]
+    },
+    {
+      "id": "mysql",
+      "enabled": true,
+      "source": "old site technologies",
+      "name": "MySQL",
+      "pillar": "fundamentals",
+      "demoSlugs": []
+    },
+    {
+      "id": "mongodb",
+      "enabled": true,
+      "source": "GH, résumé, structure-fetch-express",
+      "name": "MongoDB",
+      "pillar": "fullstack",
+      "demoSlugs": []
+    },
+    {
+      "id": "llm-integration",
+      "enabled": true,
+      "source": "PF, résumé, Euthyna",
+      "name": "LLM integration & structured output",
+      "pillar": "ai",
+      "demoSlugs": [
+        "esg-gap-checker",
+        "prompt-cost-lab",
+        "ask-malik"
+      ]
+    },
+    {
+      "id": "openai",
+      "enabled": true,
+      "source": "GH, résumé (the gateway calls providers through the OpenAI-compatible chat API)",
+      "name": "OpenAI API",
+      "pillar": "ai",
+      "demoSlugs": [
+        "legal-rag-assistant"
+      ]
+    },
+    {
+      "id": "anthropic",
+      "enabled": true,
+      "source": "résumé",
+      "name": "Anthropic API",
+      "pillar": "ai",
+      "demoSlugs": []
+    },
+    {
+      "id": "groq",
+      "enabled": true,
+      "source": "GH, structure-fetch-express; Groq is the first provider in this site's AI gateway",
+      "name": "Groq API",
+      "pillar": "ai",
+      "demoSlugs": [
+        "org-chart-extractor",
+        "legal-rag-assistant"
+      ]
+    },
+    {
+      "id": "azure-openai",
+      "enabled": true,
+      "source": "structure-fetch-express",
+      "name": "Azure OpenAI",
+      "pillar": "ai",
+      "demoSlugs": []
+    },
+    {
+      "id": "document-ai",
+      "enabled": true,
+      "source": "Structure Fetcher + résumé (AI document pipelines)",
+      "name": "Document & entity extraction",
+      "pillar": "ai",
+      "demoSlugs": [
+        "org-chart-extractor",
+        "ownership-extractor"
+      ]
+    },
+    {
+      "id": "rag",
+      "enabled": true,
+      "source": "résumé expertise",
+      "name": "RAG",
+      "pillar": "ai",
+      "demoSlugs": [
+        "legal-rag-assistant",
+        "ask-malik"
+      ]
+    },
+    {
+      "id": "pinecone",
+      "enabled": true,
+      "source": "GH, résumé (Pinecone in production; the demos search vectors in the browser)",
+      "name": "Vector search (Pinecone)",
+      "pillar": "ai",
+      "demoSlugs": [
+        "vector-space-explorer",
+        "legal-rag-assistant"
+      ]
+    },
+    {
+      "id": "claude-code",
+      "enabled": true,
+      "source": "experience.md 🗒️",
+      "name": "Multi-agent orchestration (Claude Code)",
+      "pillar": "ai",
+      "demoSlugs": [
+        "agent-orchestra"
+      ]
+    },
+    {
+      "id": "claude-agent-sdk",
+      "enabled": true,
+      "source": "experience.md 🗒️",
+      "name": "Claude Agent SDK",
+      "pillar": "ai",
+      "demoSlugs": []
+    },
+    {
+      "id": "mcp",
+      "enabled": true,
+      "source": "experience.md 🗒️ + private-repo metadata (skill only)",
+      "name": "Model Context Protocol (MCP)",
+      "pillar": "ai",
+      "demoSlugs": [
+        "mcp-tool-lab"
+      ]
+    },
+    {
+      "id": "langfuse",
+      "enabled": true,
+      "source": "experience.md 🗒️, old site",
+      "name": "Langfuse",
+      "pillar": "ai",
+      "demoSlugs": []
+    },
+    {
+      "id": "temporal",
+      "enabled": true,
+      "source": "experience.md 🗒️",
+      "name": "Temporal",
+      "pillar": "ai",
+      "demoSlugs": []
+    },
+    {
+      "id": "machine-learning",
+      "enabled": true,
+      "source": "GH, DeepLearning.AI cert; har-live runs TensorFlow.js, neural-playground is a hand-written network",
+      "name": "Machine learning (TensorFlow, scikit-learn)",
+      "pillar": "ai",
+      "demoSlugs": [
+        "har-live",
+        "neural-playground"
+      ]
+    },
+    {
+      "id": "cnn-lstm",
+      "enabled": true,
+      "source": "publication",
+      "name": "CNN-LSTM time-series models",
+      "pillar": "ai",
+      "demoSlugs": [
+        "har-live"
+      ]
+    },
+    {
+      "id": "python",
+      "enabled": true,
+      "source": "GH, résumé, preprocessing repo (sensor-pipeline re-implements the Python steps in TypeScript)",
+      "name": "Python",
+      "pillar": "ai",
+      "demoSlugs": []
+    },
+    {
+      "id": "pandas-numpy",
+      "enabled": true,
+      "source": "GH, preprocessing repo",
+      "name": "pandas & NumPy",
+      "pillar": "ai",
+      "demoSlugs": []
+    },
+    {
+      "id": "har",
+      "enabled": true,
+      "source": "publication",
+      "name": "Human activity recognition",
+      "pillar": "realtime",
+      "demoSlugs": [
+        "har-live",
+        "sensor-pipeline"
+      ]
+    },
+    {
+      "id": "sensor-preprocessing",
+      "enabled": true,
+      "source": "data_preprocessing_scripts",
+      "name": "Sensor-data preprocessing & segmentation",
+      "pillar": "realtime",
+      "demoSlugs": [
+        "sensor-pipeline"
+      ]
+    },
+    {
+      "id": "rabbitmq",
+      "enabled": true,
+      "source": "GH, MotionIQ; the demo simulates a broker in the browser",
+      "name": "Message queues (RabbitMQ)",
+      "pillar": "realtime",
+      "demoSlugs": [
+        "rabbitmq-sim"
+      ]
+    },
+    {
+      "id": "bullmq",
+      "enabled": true,
+      "source": "résumé technologies + background processing; the demo simulates a queue without Redis",
+      "name": "Background jobs (BullMQ)",
+      "pillar": "realtime",
+      "demoSlugs": [
+        "bullmq-jobs"
+      ]
+    },
+    {
+      "id": "android-streaming",
+      "enabled": true,
+      "source": "data_fetcher_mobile",
+      "name": "Android sensor streaming",
+      "pillar": "realtime",
+      "demoSlugs": []
+    },
+    {
+      "id": "java",
+      "enabled": true,
+      "source": "GH, MotionIQ consumer",
+      "name": "Java",
+      "pillar": "realtime",
+      "demoSlugs": []
+    },
+    {
+      "id": "realtime-chat",
+      "enabled": true,
+      "source": "résumé (VoodVR)",
+      "name": "Real-time chat (Stream Chat)",
+      "pillar": "realtime",
+      "demoSlugs": [
+        "live-chat"
+      ]
+    },
+    {
+      "id": "esg-reporting",
+      "enabled": true,
+      "source": "research-findings (Euthyna role: disclosure gap analysis)",
+      "name": "ESG disclosure gap analysis",
+      "pillar": "esg",
+      "demoSlugs": [
+        "esg-gap-checker"
+      ]
+    },
+    {
+      "id": "ghg-accounting",
+      "enabled": true,
+      "source": "experience.md 🗒️, résumé",
+      "name": "GHG accounting & boundary-setting",
+      "pillar": "esg",
+      "demoSlugs": [
+        "ghg-calculator",
+        "ownership-extractor"
+      ]
+    },
+    {
+      "id": "decarbonisation",
+      "enabled": true,
+      "source": "Terra Real Estate / Asset Intelligence verticals 🗒️",
+      "name": "Real-estate decarbonisation",
+      "pillar": "esg",
+      "demoSlugs": [
+        "grid-carbon-live",
+        "solar-pv-estimator"
+      ]
+    },
+    {
+      "id": "dsa",
+      "enabled": true,
+      "source": "BS IT, LeetCode SQL",
+      "name": "Data structures & algorithms",
+      "pillar": "fundamentals",
+      "demoSlugs": [
+        "algo-visualizer",
+        "code-judge"
+      ]
+    },
+    {
+      "id": "c-cpp",
+      "enabled": true,
+      "source": "repos (code-judge solutions are JavaScript; cricket-sim is a TypeScript port of a C-style engine)",
+      "name": "C / C++",
+      "pillar": "fundamentals",
+      "demoSlugs": [
+        "cricket-sim"
+      ]
+    },
+    {
+      "id": "graphic-design",
+      "enabled": true,
+      "source": "GH hobby + Best Graphic Designer credit",
+      "name": "Graphic design",
+      "pillar": "craft",
+      "demoSlugs": [
+        "design-studio"
+      ]
+    },
+    {
+      "id": "figma",
+      "enabled": true,
+      "source": "GH tools",
+      "name": "Figma",
+      "pillar": "craft",
+      "demoSlugs": []
+    },
+    {
+      "id": "ui-libraries",
+      "enabled": true,
+      "source": "GH",
+      "name": "Component libraries (MUI, Ant Design, Bootstrap, Magic UI)",
+      "pillar": "craft",
+      "demoSlugs": []
+    },
+    {
+      "id": "competitive-programming",
+      "enabled": false,
+      "verified": false,
+      "source": "LinkedIn only ⚠️",
+      "name": "Competitive programming",
+      "pillar": "fundamentals",
+      "demoSlugs": [
+        "code-judge",
+        "algo-visualizer"
+      ]
+    },
+    {
+      "id": "public-speaking",
+      "enabled": false,
+      "verified": false,
+      "source": "LinkedIn only ⚠️ (BYTE CAMP)",
+      "name": "Public speaking (CP talks)",
+      "pillar": "craft",
+      "demoSlugs": []
+    },
+    {
+      "id": "event-leadership",
+      "enabled": false,
+      "verified": false,
+      "source": "LinkedIn only ⚠️ (PUCon '25)",
+      "name": "Event leadership (robotics competition)",
+      "pillar": "realtime",
+      "demoSlugs": []
+    },
+    {
+      "id": "geolocation-maps",
+      "enabled": true,
+      "name": "Geolocation & maps APIs",
+      "pillar": "fullstack",
+      "demoSlugs": [
+        "solar-pv-estimator"
       ],
-      "enabled": true
+      "source": "research-findings: earlier geolocation workout-mapping build"
+    },
+    {
+      "id": "testing",
+      "enabled": true,
+      "name": "Testing & benchmarking (incl. ORM vs raw SQL)",
+      "pillar": "fullstack",
+      "demoSlugs": [],
+      "source": "research-findings (Webox testing, TypeScript testing sandbox, ORM-vs-raw-SQL benchmark); experience.md (Euthyna frontend testing strategy)"
+    },
+    {
+      "id": "sequelize",
+      "enabled": true,
+      "name": "Sequelize",
+      "pillar": "fullstack",
+      "demoSlugs": [],
+      "source": "GH"
+    },
+    {
+      "id": "firebase",
+      "enabled": true,
+      "name": "Firebase",
+      "pillar": "fullstack",
+      "demoSlugs": [],
+      "source": "GH"
+    },
+    {
+      "id": "cloudinary",
+      "enabled": true,
+      "name": "Cloudinary file storage",
+      "pillar": "fullstack",
+      "demoSlugs": [],
+      "source": "structure-fetch-express repo"
+    },
+    {
+      "id": "clerk",
+      "enabled": true,
+      "name": "Clerk authentication",
+      "pillar": "fullstack",
+      "demoSlugs": [],
+      "source": "research-findings (GreenHeaven)"
+    },
+    {
+      "id": "lemlist",
+      "enabled": true,
+      "name": "Lemlist / CRM integration",
+      "pillar": "fullstack",
+      "demoSlugs": [],
+      "source": "experience.md 🗒️ (Terra internal CRM)"
+    },
+    {
+      "id": "react-native",
+      "enabled": true,
+      "name": "React Native (learning)",
+      "pillar": "fullstack",
+      "demoSlugs": [],
+      "source": "profile.md learning list 🗒️"
+    },
+    {
+      "id": "android",
+      "enabled": true,
+      "name": "Android app development",
+      "pillar": "realtime",
+      "demoSlugs": [],
+      "source": "data_fetcher_mobile repo"
+    },
+    {
+      "id": "linux",
+      "enabled": true,
+      "name": "Linux",
+      "pillar": "fullstack",
+      "demoSlugs": [],
+      "source": "GH"
+    },
+    {
+      "id": "postman",
+      "enabled": true,
+      "name": "Postman",
+      "pillar": "fullstack",
+      "demoSlugs": [],
+      "source": "skills.md tools"
+    },
+    {
+      "id": "jupyter",
+      "enabled": true,
+      "name": "Jupyter notebooks",
+      "pillar": "ai",
+      "demoSlugs": [],
+      "source": "data_preprocessing_scripts (Jupyter Notebook)"
     }
   ]
 }

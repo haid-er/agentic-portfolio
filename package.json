@@ -8,11 +8,15 @@
   },
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm run copy:sqljs",
     "build": "next build",
     "start": "next start",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit -p .",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "copy:sqljs": "node -e \"const fs=require('fs');fs.mkdirSync('public/demos/sql-playground',{recursive:true});fs.copyFileSync('node_modules/sql.js/dist/sql-wasm.wasm','public/demos/sql-playground/sql-wasm.wasm')\"",
+    "postinstall": "npm run copy:sqljs",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@axe-core/playwright": "^4.13.0",
@@ -27,7 +31,8 @@
     "eslint-config-next": "^15.5.26",
     "postcss": "^8.5.28",
     "tailwindcss": "^4.3.3",
-    "typescript": "^5.9.3"
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
   },
   "dependencies": {
     "@huggingface/transformers": "^4.3.0",
@@ -39,7 +44,7 @@
     "react": "^19.3.0",
     "react-dom": "^19.3.0",
     "server-only": "^0.0.1",
-    "sql.js": "^1.14.2",
+    "sql.js": "1.14.2",
     "zod": "^4.6.5"
   }
 }

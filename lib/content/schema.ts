@@ -11,6 +11,7 @@
  */
 import { z } from 'zod'
 import { DEMO_SLUGS } from '@/lib/demos/slugs'
+import { THEME_KEYS } from '@/lib/theme/keys'
 
 /* ------------------------------------------------------------------ */
 /* primitives                                                          */
@@ -27,6 +28,26 @@ export const Href = z
 export const PartialDate = z
   .string()
   .refine((v) => v === '' || /^\d{4}(-\d{2}(-\d{2})?)?$/.test(v), { message: 'Use YYYY, YYYY-MM or YYYY-MM-DD' })
+
+/**
+ * Array of items whose `key` values must be unique (ids, slugs). Applied to every
+ * list collection's `items` and to `site.socials`, so the build and the admin save
+ * route reject duplicates as well as the admin form.
+ */
+function uniqueList<T extends z.ZodTypeAny>(item: T, keys: string[] = ['id']) {
+  return z.array(item).superRefine((items, ctx) => {
+    for (const key of keys) {
+      const seen = new Map<string, number>()
+      ;(items as Record<string, unknown>[]).forEach((it, i) => {
+        const v = it?.[key]
+        if (typeof v !== 'string' || v === '') return
+        if (seen.has(v)) {
+          ctx.addIssue({ code: 'custom', path: [i, key], message: `Duplicate ${key} "${v}" (also item ${seen.get(v)! + 1})` })
+        } else seen.set(v, i)
+      })
+    }
+  })
+}
 
 export const Slug = z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/, 'lowercase-kebab-case')
 
@@ -124,6 +145,11 @@ export const Hero = z.object({
   plateNote: z.string(),
   /** Show the live UK grid-carbon reading under the core plate. */
   showGridReading: z.boolean(),
+  /**
+   * Ordered core-sample layers, as "collection:id" refs (e.g. "experience:euthyna").
+   * Empty or omitted = derived from content.
+   */
+  plateLayers: z.array(z.string().regex(/^(experience|project|education|research):[a-z0-9-]+$/, 'Use collection:id, e.g. experience:euthyna')).optional(),
 })
 export type Hero = z.infer<typeof Hero>
 
@@ -158,7 +184,7 @@ export const Site = z.object({
   hero: Hero,
   about: About,
   contact: Contact,
-  socials: z.array(Social),
+  socials: uniqueList(Social),
   /** Order = render order. Hidden when enabled:false. */
   sections: z.array(Section),
   seo: Seo,
@@ -171,6 +197,11 @@ export const Site = z.object({
     strapline: z.string(),
     colophon: z.string(),
   }),
+  /**
+   * Extra "never render" terms (matched at the start of a word, case-insensitive)
+   * on top of the fixed contract terms kept in code.
+   */
+  privacy: z.object({ excluded: z.array(z.string()).default([]) }).optional(),
 })
 export type Site = z.infer<typeof Site>
 
@@ -178,7 +209,7 @@ export type Site = z.infer<typeof Site>
 /* theme (content/theme.json, DESIGN.md 2.4)                           */
 /* ------------------------------------------------------------------ */
 
-export const THEME_KEYS = ['almanac', 'strata'] as const
+export { THEME_KEYS }
 export const ThemeKey = z.enum(THEME_KEYS)
 export type ThemeKey = z.infer<typeof ThemeKey>
 
@@ -204,14 +235,20 @@ export type Theme = z.infer<typeof Theme>
 export const Skill = ItemBase.extend({
   name: z.string().min(1),
   pillar: Pillar,
-  /** Self-assessed band; never a percentage. */
-  level: z.enum(['core', 'working', 'exploring']),
-  /** Every skill maps to >= 1 demo (DESIGN.md 6.3). */
-  demoSlugs: z.array(DemoSlug).min(1),
+  /**
+   * Editorial band (not from any source: docs/context gives no proficiency levels).
+   * Optional and never shown on the public site; kept only as an admin sorting aid.
+   */
+  level: z.enum(['core', 'working', 'exploring']).optional(),
+  /**
+   * Demos that prove the skill (DESIGN.md 6.3). May be empty: the skill is then
+   * listed as "no demo yet" and is never linked or counted as proven.
+   */
+  demoSlugs: z.array(DemoSlug),
   keywords: z.array(z.string()).optional(),
 })
 export type Skill = z.infer<typeof Skill>
-export const Skills = z.object({ items: z.array(Skill) })
+export const Skills = z.object({ items: uniqueList(Skill) })
 
 /* ------------------------------------------------------------------ */
 /* experience                                                          */
@@ -241,7 +278,7 @@ export const ExperienceItem = ItemBase.extend({
   metric: z.object({ from: z.string(), to: z.string(), label: z.string() }).optional(),
 })
 export type ExperienceItem = z.infer<typeof ExperienceItem>
-export const Experience = z.object({ items: z.array(ExperienceItem) })
+export const Experience = z.object({ items: uniqueList(ExperienceItem) })
 
 /* ------------------------------------------------------------------ */
 /* projects                                                            */
@@ -258,6 +295,10 @@ export const Project = ItemBase.extend({
   stack: z.array(z.string()),
   start: PartialDate.optional(),
   end: PartialDate.optional(),
+  /** Still running: shows "– Present" instead of an end date. */
+  ongoing: z.boolean().optional(),
+  /** Coursework or practice build: listed under "Learning builds", after the real work. */
+  learning: z.boolean().optional(),
   outcome: z.string().optional(),
   links: z.object({ live: Href.optional(), repo: Href.optional() }),
   /** Private repo: the repo link is never rendered and never quoted. */
@@ -267,7 +308,7 @@ export const Project = ItemBase.extend({
   image: z.string().optional(),
 })
 export type Project = z.infer<typeof Project>
-export const Projects = z.object({ items: z.array(Project) })
+export const Projects = z.object({ items: uniqueList(Project, ['id', 'slug']) })
 
 /* ------------------------------------------------------------------ */
 /* research                                                            */
@@ -299,7 +340,7 @@ export const ResearchItem = ItemBase.extend({
 })
 export type ResearchItem = z.infer<typeof ResearchItem>
 export const Research = z.object({
-  items: z.array(ResearchItem),
+  items: uniqueList(ResearchItem),
   /** Neighbouring pipeline (MotionIQ) steps shown next to the paper. */
   pipeline: z.object({
     enabled: z.boolean(),
@@ -326,7 +367,7 @@ export const EducationItem = ItemBase.extend({
   demoSlugs: z.array(DemoSlug).optional(),
 })
 export type EducationItem = z.infer<typeof EducationItem>
-export const Education = z.object({ items: z.array(EducationItem) })
+export const Education = z.object({ items: uniqueList(EducationItem) })
 
 export const Certification = ItemBase.extend({
   name: z.string().min(1),
@@ -337,7 +378,7 @@ export const Certification = ItemBase.extend({
   demoSlugs: z.array(DemoSlug).optional(),
 })
 export type Certification = z.infer<typeof Certification>
-export const Certifications = z.object({ items: z.array(Certification) })
+export const Certifications = z.object({ items: uniqueList(Certification) })
 
 export const Achievement = ItemBase.extend({
   title: z.string().min(1),
@@ -350,7 +391,7 @@ export const Achievement = ItemBase.extend({
   demoSlugs: z.array(DemoSlug).optional(),
 })
 export type Achievement = z.infer<typeof Achievement>
-export const Achievements = z.object({ items: z.array(Achievement) })
+export const Achievements = z.object({ items: uniqueList(Achievement) })
 
 /* ------------------------------------------------------------------ */
 /* services / testimonials / resume                                    */
@@ -364,7 +405,7 @@ export const Service = ItemBase.extend({
   demoSlugs: z.array(DemoSlug),
 })
 export type Service = z.infer<typeof Service>
-export const Services = z.object({ items: z.array(Service) })
+export const Services = z.object({ items: uniqueList(Service) })
 
 export const Testimonial = ItemBase.extend({
   quote: z.string().min(1),
@@ -374,7 +415,7 @@ export const Testimonial = ItemBase.extend({
   url: Href.optional(),
 })
 export type Testimonial = z.infer<typeof Testimonial>
-export const Testimonials = z.object({ items: z.array(Testimonial) })
+export const Testimonials = z.object({ items: uniqueList(Testimonial) })
 
 export const Resume = z.object({
   enabled: z.boolean(),
@@ -398,6 +439,12 @@ export const PlaygroundDemo = z.object({
   title: z.string().optional(),
   summary: z.string().optional(),
   mirrors: z.string().optional(),
+  /** Replaces the registry's skill tags ("Also exercises"). Empty = registry tags. */
+  skills: z.array(z.string().min(1)).optional(),
+  /** Non-empty = "best on desktop" with this reason; empty = the registry's phone note. */
+  mobileNote: z.string().optional(),
+  /** Replaces the "Honest limits" list on the demo page. Empty = the demo's own notes. */
+  limits: z.array(z.string().min(1)).optional(),
 })
 export type PlaygroundDemo = z.infer<typeof PlaygroundDemo>
 
@@ -405,7 +452,7 @@ export const Playground = z.object({
   intro: z.string(),
   /** Homepage featured specimen card (DESIGN.md 10). */
   featured: DemoSlug,
-  demos: z.array(PlaygroundDemo),
+  demos: uniqueList(PlaygroundDemo, ['slug']),
 })
 export type Playground = z.infer<typeof Playground>
 
@@ -419,7 +466,9 @@ export type ProviderId = z.infer<typeof ProviderId>
 
 export const ProviderConfig = z.object({
   enabled: z.boolean(),
+  /** May list comma-separated alternates tried in order. */
   model: z.string().min(1),
+  /** May list comma-separated alternates tried in order. */
   visionModel: z.string().optional(),
 })
 

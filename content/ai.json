@@ -2,17 +2,17 @@
   "providers": {
     "groq": {
       "enabled": true,
-      "model": "llama-3.3-70b-versatile",
-      "visionModel": "meta-llama/llama-4-scout-17b-16e-instruct"
+      "model": "openai/gpt-oss-120b",
+      "visionModel": "qwen/qwen3.8-27b"
     },
     "gemini": {
       "enabled": true,
-      "model": "gemini-2.5-flash",
-      "visionModel": "gemini-2.5-flash"
+      "model": "gemini-3.8-flash, gemini-3.5-flash-lite",
+      "visionModel": "gemini-3.5-flash-lite, gemini-3.8-flash"
     },
     "deepseek": {
       "enabled": false,
-      "model": "deepseek-chat"
+      "model": "deepseek-flash"
     }
   },
   "maxTokens": 800,

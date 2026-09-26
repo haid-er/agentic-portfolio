@@ -1,0 +1,80 @@
+/*
+ * /resume: the proof sheet on screen, plain paper in print.
+ * Scoped to `.resume-page` so nothing leaks into other routes even though
+ * App Router keeps route CSS loaded after client navigation.
+ */
+
+/* ---------- screen: a sheet pinned to the press bed ---------- */
+.resume-sheet {
+  position: relative;
+  isolation: isolate;
+}
+
+/* Crop marks at the four corners (decorative, the printer's nod). */
+.resume-sheet .crop {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  pointer-events: none;
+  border-color: var(--ink-3);
+  border-style: solid;
+  border-width: 0;
+}
+.resume-sheet .crop-tl { top: -10px; left: -10px; border-top-width: 1px; border-left-width: 1px; }
+.resume-sheet .crop-tr { top: -10px; right: -10px; border-top-width: 1px; border-right-width: 1px; }
+.resume-sheet .crop-bl { bottom: -10px; left: -10px; border-bottom-width: 1px; border-left-width: 1px; }
+.resume-sheet .crop-br { bottom: -10px; right: -10px; border-bottom-width: 1px; border-right-width: 1px; }
+
+/* The sheet prints in once, like the hero layers. */
+@media (prefers-reduced-motion: no-preference) {
+  /* `backwards`, not `both`: a retained clip-path would cut off the card shadow. */
+  .resume-sheet-body { animation: print-in var(--dur-slow) var(--ease-out) backwards; }
+  [data-theme="strata"] .resume-sheet-body { animation-name: settle; }
+}
+
+/* ---------- print: black ink on white paper ---------- */
+@page {
+  size: A4;
+  margin: 14mm 14mm 16mm;
+}
+
+@media print {
+  /* Only the sheet prints: hide the site chrome (header, folio bar, footer, toasts). */
+  html:has(.resume-page) body > *:not(main) { display: none !important; }
+  html:has(.resume-page) main { padding: 0 !important; }
+
+  .resume-page {
+    --bg: white; --bg-2: white; --surface: white;
+    --ink: black; --ink-2: #222; --ink-3: #444;
+    --accent: black; --accent-ink: black; --accent-2: #444;
+    --rule: #999; --rule-soft: #ccc;
+    --shadow-card: none; --shadow-pop: none;
+    background: white !important;
+    color: black;
+    font-size: 10pt;
+    padding: 0 !important;
+    max-width: none !important;
+  }
+  .resume-page .no-print { display: none !important; }
+
+  .resume-sheet, .resume-sheet-body {
+    animation: none !important;
+    box-shadow: none !important;
+    border: 0 !important;
+    padding: 0 !important;
+    background: white !important;
+  }
+  .resume-sheet .crop { display: none; }
+
+  .resume-page a { color: inherit; text-decoration: none; }
+  .resume-page h1 { font-size: 24pt; }
+  .resume-page h2 { font-size: 9pt; }
+  .resume-page h3 { font-size: 11pt; }
+  .resume-page .text-1, .resume-page p, .resume-page li { font-size: 9.5pt; line-height: 1.4; }
+
+  .resume-block, .resume-entry { break-inside: avoid; page-break-inside: avoid; }
+  .resume-page h2 { break-after: avoid; page-break-after: avoid; }
+
+  /* Tags print as a comma-free inline list with hairlines. */
+  .resume-page .resume-tags > * { border-color: #bbb !important; padding: 0 4px !important; }
+}

@@ -4,7 +4,7 @@ import { cx } from '@/lib/utils'
 
 export function TableWrap({ label, children, className }: { label: string; children: ReactNode; className?: string }) {
   return (
-    <div role="region" aria-label={label} tabIndex={0} className={cx('scroll-x', className)}>
+    <div role="region" aria-label={label} tabIndex={0} className={cx('relative scroll-x', className)}>
       {children}
     </div>
   )

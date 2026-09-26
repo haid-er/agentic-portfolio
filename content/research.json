@@ -1,9 +1,57 @@
 {
-  "items": [],
+  "items": [
+    {
+      "id": "humcareadl",
+      "enabled": true,
+      "source": "publications.md + Crossref (2nd author confirmed) ✅. Participant/activity counts ⚠️ conflict, deliberately omitted. BibTeX omitted: it would list co-author names.",
+      "title": "HumCareADL: A diverse multimodal dataset and HyMCL-Net for robust human activity recognition",
+      "venue": "Multimedia Tools and Applications (Springer)",
+      "volume": "85 (9)",
+      "article": "731",
+      "year": "2026",
+      "doi": "10.1007/s11042-026-21905-3",
+      "url": "https://link.springer.com/article/10.1007/s11042-026-21905-3",
+      "authorPosition": 2,
+      "authorCount": 5,
+      "abstract": "Earlier wearable-IMU activity datasets suffer from narrow demographics, low sampling rates and small cohorts. HumCareADL is a diverse multimodal dataset that spans age groups and contexts. HyMCL-Net is a hybrid multi-branch CNN-LSTM in which convolutions learn spatial features and LSTMs learn temporal dependencies.",
+      "results": [
+        {
+          "label": "HumCareADL",
+          "value": 85.27,
+          "unit": "%"
+        },
+        {
+          "label": "CogAge",
+          "value": 81.83,
+          "unit": "%"
+        },
+        {
+          "label": "WISDM",
+          "value": 98.52,
+          "unit": "%"
+        }
+      ],
+      "resultsCaption": "Average accuracy as reported in the paper",
+      "demoSlugs": [
+        "har-live",
+        "neural-playground"
+      ]
+    }
+  ],
   "pipeline": {
-    "enabled": false,
-    "title": "",
-    "note": "",
-    "steps": []
+    "enabled": true,
+    "title": "MotionIQ, the neighbouring pipeline",
+    "note": "The data-collection and preprocessing system built during the research: phone sensors stream to RabbitMQ, then Python scripts turn raw streams into atomic windows. It is shown next to the paper, not as the paper's own pipeline.",
+    "steps": [
+      "Standardise subject names",
+      "Standardise activity names",
+      "Delete trailing row",
+      "Structure the data",
+      "Convert to atomic 5-second windows",
+      "Rename and export CSV (raw dataset)",
+      "Remove unwanted files (final ADL dataset)",
+      "Fall segmentation (Fall + ADL datasets)"
+    ],
+    "demoSlug": "sensor-pipeline"
   }
 }

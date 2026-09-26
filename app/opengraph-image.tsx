@@ -1,20 +1,33 @@
-/** Dynamic OG image in the Almanac style. STUB — owner: seo-theme. */
-import { ImageResponse } from 'next/og'
-import { getProfile } from '@/lib/content'
+/**
+ * Site share card (1200×630), printed in Almanac. Owner: seo-theme.
+ * Everything on it comes from content: name, role, kicker, masthead strip and
+ * the core-sample layers. An admin-uploaded `seo.ogImage` (PNG/JPEG) replaces it.
+ */
+import { readFile } from 'node:fs/promises'
+import path from 'node:path'
+import { getProfile, getSeo } from '@/lib/content'
+import { OG_IMAGE_SIZE, renderOgImage } from '@/lib/seo/og'
+import { siteOgCard } from '@/lib/seo/og-data'
 
-export const alt = 'Portfolio'
-export const size = { width: 1200, height: 630 }
+export const alt = `${getProfile().name}: ${getProfile().headline || getSeo().title}`
+export const size = OG_IMAGE_SIZE
 export const contentType = 'image/png'
 
-export default function OgImage() {
-  const p = getProfile()
-  return new ImageResponse(
-    (
-      <div style={{ width: '100%', height: '100%', display: 'flex', flexDirection: 'column', justifyContent: 'center', padding: 80, background: '#F2EADB', color: '#1D2B22' }}>
-        <div style={{ fontSize: 96, fontWeight: 700 }}>{p.name}</div>
-        <div style={{ fontSize: 40, color: '#1F6B47' }}>{p.headline}</div>
-      </div>
-    ),
-    size,
-  )
+/** A site-relative upload becomes a data URI (the renderer cannot fetch its own host at build time). */
+async function resolveBackdrop(src?: string): Promise<string | undefined> {
+  if (!src) return undefined
+  if (/^https?:\/\//.test(src)) return src
+  if (!src.startsWith('/') || src.includes('..')) return undefined
+  try {
+    const file = await readFile(path.join(process.cwd(), 'public', src.split('?')[0]))
+    const type = /\.png$/i.test(src.split('?')[0]) ? 'image/png' : 'image/jpeg'
+    return `data:${type};base64,${file.toString('base64')}`
+  } catch {
+    return undefined
+  }
+}
+
+export default async function OgImage() {
+  const card = siteOgCard()
+  return renderOgImage({ ...card, backdrop: await resolveBackdrop(card.backdrop) })
 }

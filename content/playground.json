@@ -1,5 +1,5 @@
 {
-  "intro": "",
+  "intro": "Working proofs, not screenshots. Each one mirrors real work from the record: a queue from the sensor pipeline, a gap check from the ESG platform, a payment flow from VoodVR. Most run entirely in the browser. The AI ones use free providers and stop politely when the quota runs out.",
   "featured": "har-live",
   "demos": [
     {

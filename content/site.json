@@ -3,83 +3,171 @@
     "name": "Malik Haider Ali",
     "headline": "Full-Stack Engineer",
     "tagline": "Building scalable web platforms, AI-powered systems, and autonomous workflows.",
-    "shortBio": "",
+    "shortBio": "Full-stack engineer building ESG and AI platforms at Euthyna (Terra Instinct): Node.js, NestJS, React and PostgreSQL underneath, LLM pipelines and agents on top. Co-author of a Springer paper on wearable-sensor activity recognition, and builder of MotionIQ, an Android-to-RabbitMQ sensor pipeline.",
     "location": "Lahore, Pakistan",
     "email": "malikhaiderali33@gmail.com",
+    "phone": "+92 336 0747027",
     "motto": "Code with purpose, build with passion, learn without limits.",
     "pillars": [
       {
         "id": "fullstack",
         "title": "Full-stack web",
-        "summary": ""
+        "summary": "PERN and MERN at production scale: layered Express and NestJS APIs, React + Vite workspaces, Stripe Connect, and a 27s → 3.5s speed-up."
       },
       {
         "id": "ai",
         "title": "AI systems & agents",
-        "summary": ""
+        "summary": "LLM pipelines that return validated JSON, RAG and vector search, MCP tools and multi-agent Claude Code workflows."
       },
       {
         "id": "realtime",
         "title": "Sensors & real-time",
-        "summary": ""
+        "summary": "Phone IMU streams over Wi-Fi into RabbitMQ, Java consumers, background job queues and live chat."
       },
       {
         "id": "esg",
         "title": "ESG & climate",
-        "summary": ""
+        "summary": "Disclosure gap analysis, GHG calculations, boundary-setting and ownership extraction for a London climate-tech firm."
       },
       {
         "id": "fundamentals",
         "title": "CS fundamentals",
-        "summary": ""
+        "summary": "BS Information Technology at PUCIT (CGPA 3.63), C and C++ roots, SQL practice and algorithms."
       },
       {
         "id": "craft",
         "title": "Design & craft",
-        "summary": ""
+        "summary": "Graphic design as a second discipline, with a Best Graphic Designer credit at PUCIT. This site's two printed worlds come from it."
       }
     ],
-    "languages": [],
-    "interests": []
+    "languages": [
+      {
+        "name": "English",
+        "level": "Proficient"
+      },
+      {
+        "name": "Urdu",
+        "level": "Native"
+      }
+    ],
+    "interests": [
+      "Full-stack web development (React + Express)",
+      "Machine learning for sensor-based activity recognition",
+      "Real-time data streaming and IoT",
+      "AI-powered app integration (OpenAI, Groq)",
+      "Web 3.0, blockchain and the metaverse (exploring)",
+      "Graphic design"
+    ]
   },
   "hero": {
-    "kicker": [],
-    "role": "",
-    "lede": "",
+    "kicker": [
+      "Full-stack",
+      "AI systems",
+      "Sensors & queues",
+      "ESG"
+    ],
+    "role": "Full-stack engineer who proves it with *working* tools.",
+    "lede": "Malik Haider Ali builds scalable web platforms, AI-powered systems and autonomous workflows. Right now that means ESG and GHG reporting at Euthyna. Before it came a 27s → 3.5s speed-up at Piron Labs, creator payments at Webox Systems, MotionIQ, a phone-to-RabbitMQ sensor pipeline, and co-authorship of a Springer paper. Each claim on this page links to a demo that runs in the browser, or says plainly that none exists yet.",
     "ctas": [
       {
         "label": "Open the playground",
         "href": "/playground",
         "variant": "primary"
+      },
+      {
+        "label": "Get in touch",
+        "href": "#contact",
+        "variant": "secondary"
+      },
+      {
+        "label": "Résumé",
+        "href": "/resume",
+        "variant": "secondary"
       }
     ],
     "plateTitle": "Plate 1 · Core sample of a career",
     "plateNote": "newest on top",
-    "showGridReading": true
+    "showGridReading": true,
+    "plateLayers": [
+      "research:humcareadl",
+      "experience:euthyna",
+      "experience:piron-labs",
+      "project:motioniq",
+      "experience:webox-systems",
+      "project:c-cpp-foundations",
+      "education:pucit-bs-it"
+    ]
   },
   "about": {
-    "body": []
+    "body": [
+      "PUCIT in 2021, first repos in C and C++ in 2022, then Express APIs, React frontends and PostgreSQL schemas: student PERN projects that turned into production work.",
+      "Production came in three steps. At Webox Systems, VoodVR needed Stripe Connect payouts, subscriptions and real-time chat. At Piron Labs, Kickstart HQ needed speed, and response time fell from 27s to 3.5s. Since September 2025, Euthyna has needed AI for sustainability reporting: disclosure gap analysis, GHG calculations, climate risk and transition planning, and ownership structures turned into GHG boundaries.",
+      "Research runs alongside. MotionIQ streams phone sensors over Wi-Fi into RabbitMQ for activity-recognition data, and he is second author of HumCareADL in Springer's Multimedia Tools and Applications. Graphic design is the second discipline, which is why this portfolio is printed rather than templated.",
+      "Motto: code with purpose, build with passion, learn without limits."
+    ]
   },
   "contact": {
-    "blurb": "",
-    "formEnabled": false
+    "blurb": "Hiring for full-stack, AI or platform work, or want to talk ESG data, sensor pipelines or agents? Email is fastest.",
+    "formEnabled": true
   },
   "socials": [
     {
       "id": "github",
+      "enabled": true,
       "label": "GitHub",
       "url": "https://github.com/haid-er",
       "handle": "haid-er",
-      "icon": "Github",
-      "enabled": true
+      "icon": "github"
     },
     {
       "id": "linkedin",
+      "enabled": true,
       "label": "LinkedIn",
       "url": "https://www.linkedin.com/in/haid-er/",
       "handle": "in/haid-er",
-      "icon": "Linkedin",
-      "enabled": true
+      "icon": "linkedin"
+    },
+    {
+      "id": "email",
+      "enabled": true,
+      "label": "Email",
+      "url": "mailto:malikhaiderali33@gmail.com",
+      "handle": "malikhaiderali33@gmail.com",
+      "icon": "mail"
+    },
+    {
+      "id": "x",
+      "enabled": true,
+      "label": "X",
+      "url": "https://twitter.com/itzhaidermalik",
+      "handle": "@itzhaidermalik",
+      "icon": "x"
+    },
+    {
+      "id": "springer",
+      "enabled": true,
+      "label": "Springer paper",
+      "url": "https://link.springer.com/article/10.1007/s11042-026-21905-3",
+      "handle": "HumCareADL",
+      "icon": "doc"
+    },
+    {
+      "id": "facebook",
+      "enabled": false,
+      "source": "✅ verified, but personal; enable in admin if wanted",
+      "label": "Facebook",
+      "url": "https://www.facebook.com/haiderfb1",
+      "handle": "haiderfb1",
+      "icon": "facebook"
+    },
+    {
+      "id": "instagram",
+      "enabled": false,
+      "source": "✅ verified, but personal; enable in admin if wanted",
+      "label": "Instagram",
+      "url": "https://www.instagram.com/haiderfb1",
+      "handle": "haiderfb1",
+      "icon": "instagram"
     }
   ],
   "sections": [
@@ -109,7 +197,8 @@
     {
       "id": "projects",
       "enabled": true,
-      "title": "Projects"
+      "title": "Projects",
+      "navLabel": "Projects"
     },
     {
       "id": "research",
@@ -138,7 +227,7 @@
     },
     {
       "id": "services",
-      "enabled": true,
+      "enabled": false,
       "title": "Services"
     },
     {
@@ -159,18 +248,39 @@
     {
       "id": "contact",
       "enabled": true,
-      "title": "Contact"
+      "title": "Contact",
+      "navLabel": "Contact"
     }
   ],
   "seo": {
     "title": "Malik Haider Ali — Full-Stack Engineer",
     "titleTemplate": "%s · Malik Haider Ali",
-    "description": "Malik Haider Ali is a Full-Stack Engineer building scalable web platforms, AI-powered systems, and autonomous workflows.",
-    "keywords": [],
+    "description": "Malik Haider Ali (haid-er) is a Full-Stack Engineer in Lahore building scalable web platforms, AI-powered systems and autonomous workflows: Node.js, NestJS, React, LLM integrations and ESG reporting at Euthyna. Every skill links to a working demo.",
+    "keywords": [
+      "Malik Haider Ali",
+      "haid-er",
+      "full-stack engineer",
+      "Lahore",
+      "Node.js",
+      "NestJS",
+      "React",
+      "PostgreSQL",
+      "LLM integration",
+      "RAG",
+      "MCP",
+      "ESG reporting",
+      "GHG accounting",
+      "human activity recognition",
+      "RabbitMQ",
+      "Euthyna"
+    ],
     "siteUrl": "https://malik-haider-portfolio.vercel.app",
+    "twitterHandle": "@itzhaidermalik",
     "sameAs": [
       "https://github.com/haid-er",
-      "https://www.linkedin.com/in/haid-er/"
+      "https://www.linkedin.com/in/haid-er/",
+      "https://twitter.com/itzhaidermalik",
+      "https://malikhaider.vercel.app/"
     ]
   },
   "analytics": {

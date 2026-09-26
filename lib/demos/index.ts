@@ -23,7 +23,9 @@ function merge(meta: DemoMeta): Demo {
     title: o?.title || meta.title,
     summary: o?.summary || meta.summary,
     mirrors: o?.mirrors || meta.mirrors,
-    notes: DEMO_NOTES[meta.slug],
+    skills: o?.skills?.length ? o.skills : meta.skills,
+    mobile: o?.mobileNote?.trim() ? { ok: false, reason: o.mobileNote.trim() } : meta.mobile,
+    notes: o?.limits?.length ? { ...DEMO_NOTES[meta.slug], limits: o.limits } : DEMO_NOTES[meta.slug],
     provenBy: getSkills().filter((s) => s.demoSlugs.includes(meta.slug)).map((s) => s.name),
   }
 }

@@ -4,40 +4,38 @@
  */
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
-import { Analytics } from '@vercel/analytics/next'
 import { Footer, Header, PublicOnly, SkipLink } from '@/components/layout'
+import { ThemeKeeper } from '@/components/layout/ThemeKeeper'
 import { ToastProvider } from '@/components/ui/Toast'
-import { getSite, getTheme } from '@/lib/content'
+import { getTheme } from '@/lib/content'
 import { buildMetadata, jsonLdString, personJsonLd } from '@/lib/seo'
-import { noFlashScript, themeOverridesCss } from '@/lib/theme'
+import { SiteAnalytics } from '@/lib/seo/SiteAnalytics'
+import { noFlashScript, rootViewport, themeOverridesCss } from '@/lib/theme'
+import { fontPreloadScript } from './fontPreload'
 import { fontVariables } from './fonts'
 import './globals.css'
 
 export const metadata: Metadata = buildMetadata()
 
-export const viewport: Viewport = {
-  width: 'device-width',
-  initialScale: 1,
-  viewportFit: 'cover',
-  colorScheme: 'light dark',
-  themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#F2EADB' },
-    { media: '(prefers-color-scheme: dark)', color: '#16110D' },
-  ],
+export function generateViewport(): Viewport {
+  return rootViewport(getTheme())
 }
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const theme = getTheme()
-  const site = getSite()
+  const fontPreload = fontPreloadScript()
   return (
     <html lang="en" data-theme="almanac" className={fontVariables} suppressHydrationWarning>
       <head>
         {/* Runs before paint: picks the world (DESIGN.md 3). */}
         <script dangerouslySetInnerHTML={{ __html: noFlashScript(theme) }} />
+        {/* Then preloads only that world's display + body fonts (no late swap, no CLS). */}
+        {fontPreload ? <script dangerouslySetInnerHTML={{ __html: fontPreload }} /> : null}
         <style id="theme-overrides" dangerouslySetInnerHTML={{ __html: themeOverridesCss(theme) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(personJsonLd()) }} />
       </head>
       <body>
+        <ThemeKeeper />
         <ToastProvider>
           <PublicOnly>
             <SkipLink />
@@ -50,7 +48,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
             <Footer />
           </PublicOnly>
         </ToastProvider>
-        {site.analytics.enabled && process.env.VERCEL ? <Analytics /> : null}
+        <SiteAnalytics />
       </body>
     </html>
   )

@@ -26,7 +26,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
       <div
         aria-live="polite"
         role="status"
-        className="fixed left-4 right-4 md:right-auto z-[var(--z-toast)] bottom-[calc(var(--folio-bar)+16px+env(safe-area-inset-bottom))] lg:bottom-4 flex flex-col gap-2 pointer-events-none"
+        className="fixed left-4 right-4 md:right-auto z-[var(--z-toast)] bottom-[calc(var(--folio-bar)+16px+env(safe-area-inset-bottom))] lg:bottom-[var(--toast-lift,16px)] flex flex-col gap-2 pointer-events-none"
       >
         {items.map((t) => (
           <div
@@ -36,6 +36,8 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               'strata:rounded-pill almanac:[mask:linear-gradient(#000,#000)]',
               t.tone === 'danger' && 'border-danger',
               t.tone === 'ok' && 'border-ok',
+              t.tone === 'warn' && 'border-warn',
+              t.tone === 'accent' && 'border-accent',
             )}
           >
             {t.message}

@@ -1,3 +1,137 @@
 {
-  "items": []
+  "items": [
+    {
+      "id": "euthyna",
+      "enabled": true,
+      "source": "research-findings.md (résumé, dates + mode) ✅; experience.md (verticals, internal tools, standards, agentic work) 🗒️",
+      "role": "Full-Stack Developer",
+      "org": "Euthyna (Terra Instinct)",
+      "orgUrl": "https://euthyna.ai",
+      "product": "Euthyna",
+      "location": "London, UK",
+      "mode": "remote",
+      "start": "2025-09",
+      "end": "",
+      "summary": "AI sustainability reporting for a London climate-tech firm: climate risk, GHG calculations, disclosure gap analysis and transition planning, plus the internal tools across Terra Real Estate, Asset Intelligence and Survey Automation.",
+      "highlights": [
+        {
+          "text": "Built LLM-driven, structured ESG workflows, including disclosure gap analysis and estimation pipelines.",
+          "proofDemo": "esg-gap-checker"
+        },
+        {
+          "text": "Built AI document and data pipelines that extract sustainability and corporate-entity data at scale, feeding GHG boundary-setting and ownership extraction.",
+          "proofDemo": "ownership-extractor"
+        },
+        {
+          "text": "Engineered the platform core to org standards (routes → controller → service → repository, Zod, CASL, Drizzle): workflow orchestration, background processing, RBAC and transactional audit logging.",
+          "proofDemo": "rbac-audit-lab"
+        },
+        {
+          "text": "Defined the architecture, testing strategy and contribution guidelines of a multi-workspace React + Vite frontend (CRM, client portal, PM, market intelligence), and builds the internal CRM with Lemlist, the project-management tool and the finance tool.",
+          "proofDemo": "data-grid"
+        },
+        {
+          "text": "Runs a multi-agent Claude Code pipeline for autonomous coding.",
+          "proofDemo": "agent-orchestra"
+        }
+      ],
+      "stack": [
+        "TypeScript",
+        "React",
+        "Vite",
+        "NestJS",
+        "Express",
+        "PostgreSQL",
+        "Drizzle ORM",
+        "Zod",
+        "CASL",
+        "React Query",
+        "Claude Code"
+      ]
+    },
+    {
+      "id": "piron-labs",
+      "enabled": true,
+      "source": "research-findings.md (résumé) ✅",
+      "role": "Associate Software Engineer",
+      "org": "Piron Labs (Pentaloop)",
+      "product": "Kickstart HQ",
+      "location": "Lahore, Pakistan",
+      "mode": "on-site",
+      "start": "2025-06",
+      "end": "2025-08",
+      "summary": "Kickstart HQ, a field-service management product covering scheduling, dispatching, invoicing, technicians and payments.",
+      "highlights": [
+        {
+          "text": "Cut response time from 27s to 3.5s with webpack optimisation, code splitting and compression.",
+          "proofDemo": "web-perf-lab"
+        },
+        {
+          "text": "Added lazy loading and removed redundant API calls across the scheduling and dispatch flows.",
+          "proofDemo": "dispatch-board"
+        }
+      ],
+      "stack": [
+        "React",
+        "webpack",
+        "Node.js"
+      ],
+      "metric": {
+        "from": "27s",
+        "to": "3.5s",
+        "label": "response time"
+      }
+    },
+    {
+      "id": "webox-systems",
+      "enabled": true,
+      "source": "research-findings.md (résumé) ✅; sequential, not concurrent with Euthyna",
+      "role": "Full-Stack Developer",
+      "org": "Webox Systems",
+      "product": "VoodVR",
+      "location": "Lahore, Pakistan",
+      "mode": "hybrid",
+      "start": "2024-06",
+      "end": "2025-06",
+      "summary": "VoodVR, an AI VR video platform: dashboards, profiles and creator flows, from payments to deployment.",
+      "highlights": [
+        {
+          "text": "Integrated Stripe Connect for creator payouts, subscriptions and webhook-driven billing.",
+          "proofDemo": "stripe-connect-flow"
+        },
+        {
+          "text": "Shipped real-time chat on Stream Chat.",
+          "proofDemo": "live-chat"
+        },
+        {
+          "text": "Built dashboards, profile and creator flows in React and Node, then tested them and deployed to AWS."
+        }
+      ],
+      "stack": [
+        "React",
+        "Node.js",
+        "Stripe Connect",
+        "Stream Chat",
+        "AWS"
+      ]
+    },
+    {
+      "id": "fcit-research",
+      "enabled": false,
+      "source": "experience.md + publications.md ✅. Role title and dates are TODO in docs/context, so this entry stays hidden; MotionIQ (projects) and HumCareADL (research) carry the facts. Do not infer dates from repo activity.",
+      "role": "Research role (title TODO)",
+      "org": "Faculty of Computing & IT, University of the Punjab",
+      "location": "Lahore, Pakistan",
+      "start": "",
+      "end": "",
+      "summary": "Wearable-sensor human activity recognition, published in Springer's Multimedia Tools and Applications (2026).",
+      "highlights": [
+        {
+          "text": "Second of five authors on HumCareADL: a multimodal wearable-IMU dataset and HyMCL-Net, a hybrid CNN-LSTM for activity recognition.",
+          "proofDemo": "har-live"
+        }
+      ],
+      "stack": []
+    }
+  ]
 }

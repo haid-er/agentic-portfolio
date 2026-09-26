@@ -1,8 +1,9 @@
-/** GET /api/ai/status — AiStatus. STUB (owner: ai-gateway). */
-import { getStatus } from '@/lib/ai/server'
+/** GET /api/ai/status: AiStatus (+ this IP's rate-limit window; does not spend a request). Owner: ai-gateway. */
+import { aiHeaders, clientIp, getStatus, rateFor } from '@/lib/ai/server'
 
+export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-export async function GET(): Promise<Response> {
-  return Response.json(await getStatus())
+export async function GET(req: Request): Promise<Response> {
+  return Response.json(await getStatus(), { headers: aiHeaders(rateFor(clientIp(req))) })
 }

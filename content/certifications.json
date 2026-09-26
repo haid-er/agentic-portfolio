@@ -1,3 +1,55 @@
 {
-  "items": []
+  "items": [
+    {
+      "id": "deeplearning-ai-supervised-ml",
+      "enabled": true,
+      "source": "research-findings.md (Coursera verify link) ✅",
+      "name": "Supervised Machine Learning: Regression and Classification",
+      "issuer": "DeepLearning.AI & Stanford University (Coursera)",
+      "date": "2024-11-09",
+      "url": "https://www.coursera.org/verify/3YGP1SY6NZDU",
+      "credentialId": "3YGP1SY6NZDU",
+      "demoSlugs": [
+        "neural-playground"
+      ]
+    },
+    {
+      "id": "ibm-node-express",
+      "enabled": true,
+      "source": "research-findings.md (Coursera verify link) ✅",
+      "name": "Developing Back-End Apps with Node.js and Express",
+      "issuer": "IBM (Coursera)",
+      "date": "2024-10-21",
+      "url": "https://www.coursera.org/verify/SR8D90BB97KS",
+      "credentialId": "SR8D90BB97KS",
+      "demoSlugs": [
+        "layered-api-lab"
+      ]
+    },
+    {
+      "id": "meta-html-css",
+      "enabled": true,
+      "source": "research-findings.md (Coursera verify link) ✅",
+      "name": "HTML and CSS in depth",
+      "issuer": "Meta (Coursera)",
+      "date": "2023-10-14",
+      "url": "https://www.coursera.org/verify/ATLRBGC7LGWM",
+      "credentialId": "ATLRBGC7LGWM",
+      "demoSlugs": [
+        "theme-lab"
+      ]
+    },
+    {
+      "id": "udemy-react-complete-guide",
+      "enabled": true,
+      "source": "research-findings.md (résumé) ✅; date unknown",
+      "name": "React – The Complete Guide (incl. Redux, Redux Toolkit)",
+      "issuer": "Udemy",
+      "date": "",
+      "demoSlugs": [
+        "kanban-board",
+        "data-grid"
+      ]
+    }
+  ]
 }

@@ -34,7 +34,7 @@ export function SectionShell({ id, folio, title, note, aside, hideTitle, classNa
           )}
         >
           {folio ? (
-            <span aria-hidden="true" className="display text-4 text-accent-ink almanac:font-light strata:text-accent-2">
+            <span aria-hidden="true" data-folio="" className="display text-4 text-accent-ink almanac:font-light strata:text-accent-2">
               {folio}
             </span>
           ) : null}

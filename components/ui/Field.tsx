@@ -71,9 +71,13 @@ export function Select({ label, hint, error, hideLabel, wrapperClassName, classN
   return (
     <Field label={label} hint={hint} error={error} hideLabel={hideLabel} className={wrapperClassName}>
       {({ id, describedBy, invalid }) => (
-        <select id={id} aria-describedby={describedBy} aria-invalid={invalid || undefined} className={cx(controlClasses, 'pr-8', className)} {...rest}>
-          {children}
-        </select>
+        // One select style site-wide: no browser chevron, the same mono arrow as the project filters.
+        <div className="relative">
+          <select id={id} aria-describedby={describedBy} aria-invalid={invalid || undefined} className={cx(controlClasses, 'appearance-none pr-9 cursor-pointer', className)} {...rest}>
+            {children}
+          </select>
+          <Icon name="arrow" size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 rotate-90 text-ink-2" />
+        </div>
       )}
     </Field>
   )

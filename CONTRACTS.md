@@ -87,15 +87,15 @@ Every file above already exists as a stub, so the app typechecks and builds. Rep
 - Admin uses `COLLECTIONS` (`{name, file, label, description, kind, schema}`), `getRawCollection(name)` (includes disabled items) and `validateCollection(name, data)`.
 - Types: `import type { Skill, Project, ... } from '@/lib/content'` (re-exported from `schema.ts`).
 
-**Item rules.** Every list item has `id` (kebab-case), `enabled`, optional `verified` (`false` = unverified: seeded disabled, "unverified" badge in admin) and an optional `source` (provenance, admin-only, never rendered). Missing data is `""` or omitted, and **must be hidden** by the component. Never render placeholders like "TODO".
+**Item rules.** Every list item has a unique `id` (kebab-case; project slugs and playground demo slugs are unique too, enforced by the schema), `enabled`, optional `verified` (`false` = unverified: seeded disabled, "unverified" badge in admin) and an optional `source` (provenance, admin-only, never rendered). Missing data is `""` or omitted, and **must be hidden** by the component. Never render placeholders like "TODO".
 
 | Collection (file) | Shape (abridged) |
 |---|---|
-| `site` | `profile{name, headline, tagline, shortBio, location, email, phone?, avatar?, motto, pillars[{id,title,summary}], languages[{name,level}], interests[]}`, `hero{kicker[], role, lede, ctas[{label,href,variant}], plateTitle, plateNote, showGridReading}`, `about{body[]}`, `contact{blurb, formEnabled, availability?}`, `socials[]`, `sections[{id, enabled, title, navLabel?, note?}]`, `seo{title, titleTemplate, description, keywords[], siteUrl, ogImage?, twitterHandle?, sameAs[]}`, `analytics{enabled}`, `contactFormEndpoint`, `masthead{location, strapline, colophon}` |
+| `site` | `profile{name, headline, tagline, shortBio, location, email, phone?, avatar?, motto, pillars[{id,title,summary}], languages[{name,level}], interests[]}`, `hero{kicker[], role, lede, ctas[{label,href,variant}], plateTitle, plateNote, showGridReading, plateLayers?['collection:id']}`, `about{body[]}`, `contact{blurb, formEnabled, availability?}`, `socials[]`, `sections[{id, enabled, title, navLabel?, note?}]`, `seo{title, titleTemplate, description, keywords[], siteUrl, ogImage?, twitterHandle?, sameAs[]}`, `analytics{enabled}`, `contactFormEndpoint`, `masthead{location, strapline, colophon}`, `privacy?{excluded[]}` (extra never-render terms on top of the contract floor in `lib/content/privacy.ts`) |
 | `theme` | DESIGN.md 2.4: `{default: 'auto'|'almanac'|'strata', themes: {almanac|strata: {label, reads, swapLabel, tokens: {'--bg': '#…'}}}}` |
 | `skills` | `items[{name, pillar, level: core|working|exploring, demoSlugs[≥1], keywords?}]` |
 | `experience` | `items[{role, org, orgUrl?, product?, location?, mode?, start, end('' = present), summary?, highlights[{text, proofDemo?}], stack[], metric?{from,to,label}}]` |
-| `projects` | `items[{slug, title, summary, story[], role?, pillar, tags[], stack[], start?, end?, outcome?, links{live?, repo?}, private, featured, demoSlugs[], image?}]` (`private: true` never renders the repo link: use `projectLinks(p)`) |
+| `projects` | `items[{slug, title, summary, story[], role?, pillar, tags[], stack[], start?, end?, ongoing?, outcome?, links{live?, repo?}, private, featured, demoSlugs[], image?}]` (`private: true` never renders the repo link: use `projectLinks(p)`) |
 | `research` | `items[{title, venue, volume?, article?, year, doi?, url?, authorPosition?, authorCount?, abstract?, results[{label,value,unit,note?}], resultsCaption?, bibtex?, demoSlugs[]}]`, `pipeline{enabled, title, note, steps[], demoSlug?}` |
 | `education` | `items[{institution, degree, field?, location?, start, end, grade?, notes[], demoSlugs?}]` |
 | `certifications` | `items[{name, issuer, date, url?, credentialId?, demoSlugs?}]` |
@@ -135,6 +135,8 @@ All primitives read tokens only: no hex values, font names or theme names. World
 | `Loading`, `EmptyState`, `ErrorState` | register-mark spinner; flat-line empty state; honest error (role=alert) |
 | `Meter` | `{label, value, max?, unit?, ink?: 1-4, note?}`: accuracy bar that fills once on view (client) |
 | `Segmented` | `{label, options[{value,label}], value, onChange}`: radiogroup with arrow keys (client) |
+| `CopyButton` | `{text, label?, copiedLabel?, targetId?, variant?}`: clipboard copy with toast + aria-live; on failure selects `targetId` and asks for Ctrl/Cmd+C (client) |
+| `Range` | `{label, value, min, max, step?, format?, onChange, hint?, disabled?}`: slider with mono read-out, 44px (client) |
 | `ToastProvider`, `useToast` | `toast(message, {tone?, ms?})`. The provider is already in the root layout |
 | `DemoPanel`, `DemoGrid`, `DemoToolbar` | shared demo layout: titled panel, stage/controls split at ≥900px, wrapping toolbar |
 
@@ -157,33 +159,67 @@ Keyframes: `misregister contour-drift settle print-in roll-in roll-out fade-in d
 
 ## 5. AI gateway (`@/lib/ai`)
 
-Demos never call providers directly and never see keys. The router order is **groq → gemini → deepseek** (DeepSeek only when `content/ai.json` enables it, with hard `max_tokens` and a per-instance budget). After that it falls back to in-browser, or returns a "demo quota reached" error.
+The gateway is live; the full docs (files, router rules, cooldowns) are in `lib/ai/README.md`, which is the source of truth. Demos never call providers directly and never see keys. The router order is **groq → gemini → deepseek** (DeepSeek only when `content/ai.json` enables it, with hard `max_tokens ≤ 512` and a per-instance token budget). When every provider fails the server returns `503 quota_exhausted`; the demo may then offer the in-browser model or a clearly labelled sample.
 
 **Client** (`import { … } from '@/lib/ai'`):
 ```ts
-generateText(req: AiTextRequest, {signal?}): Promise<AiTextResult>            // supports tools -> toolCalls
-streamText(req, {signal?, onToken?}): Promise<AiTextResult>                  // SSE, token callback
-generateObject({ ...req, schema: ZodSchema, schemaName }, {signal?}): Promise<AiObjectResult<T>>  // zod-validated, 1 retry
-getAiStatus(): Promise<AiStatus>                                             // providers + limits
-useAI(demo) -> { run(messages, extra?), abort, status, text, error, meta, busy }
-isQuotaError(e) -> boolean                                                   // show the in-browser / quota fallback
+generateText(req: AiTextRequest, opts?: { signal?: AbortSignal }): Promise<AiTextResult>          // tools -> toolCalls (no streaming)
+streamText(req: Omit<AiTextRequest, 'tools'>, opts?: { signal?; onToken?: (chunk: string) => void }): Promise<AiTextResult>
+generateObject<S extends z.ZodType>(req: AiTextRequest & { schema: S; schemaName: string }, opts?: { signal? }): Promise<AiObjectResult<z.infer<S>>>
+getAiStatus(opts?: { fresh?: boolean }): Promise<AiStatus>                                         // does not spend a rate-limit request
+useAI(demo: DemoSlug, options?: { system?; maxTokens?; temperature?; browserFallback?: boolean })
+  -> { run(messages, extra?), runInBrowser(messages?), abort, reset, status, text, error, meta, busy, fallback, retryIn, loadProgress }
+imageToDataUrl(file: Blob, opts?: { maxSide?; type?: 'image/jpeg' | 'image/webp'; quality? }): Promise<string>  // fits the 4.5 MB body
+isQuotaError(e): e is AiError        aiErrorMessage(e): string
+BROWSER_MODEL, BROWSER_MODEL_DOWNLOAD ('~140 MB', SmolLM2-135M, opt-in only), AI_LIMITS, AI_HEADERS
 class AiError { code: AiErrorCode; status; retryAfterSec? }
 ```
 `AiTextRequest = { demo: DemoSlug; messages: AiMessage[]; system?; maxTokens?; temperature?; vision?; tools?: AiToolDef[] }`
 `AiMessage.content` is a string or parts: `{type:'text',text}` / `{type:'image',dataUrl}` (vision).
-`AiErrorCode`: `rate_limited input_too_large quota_exhausted unavailable invalid_output bad_request upstream aborted`.
+`AiMeta` adds `route` (router trail, e.g. groq failed rate_limited → gemini ok) and `rateLimit {limit, remaining, resetSec}` (filled by the client from the headers).
+`AiStatus.providers[]` carries `state` (`ready | off | no-key | cooling | budget`), `retryInSec`, `visionModel`; plus `AiStatus.vision`, `limits.maxImageBytes` / `limits.maxImages` and `deepseekBudgetLeft`.
+A provider `model` / `visionModel` field may list **comma-separated alternates**, tried in order.
 
 **Embeddings (browser)** (`@/lib/ai/embeddings`): `embed(texts, onProgress?) → Float32Array[]` (all-MiniLM-L6-v2, 384-d, normalised), `loadEmbedder()`, `cosine(a,b)`.
 
-**Wire protocol** (implemented by ai-gateway in `app/api/ai/**` using `lib/ai/server.ts`):
-- `POST /api/ai/chat`: body `AiTextRequest & {stream?: boolean}`. With `stream: true` it sends SSE (`event: token` with a JSON string, `event: done` with `AiMeta`, `event: error` with `{code,message}`); otherwise JSON `AiTextResult`.
-- `POST /api/ai/object`: body `AiObjectWireRequest` (adds `schemaName`, `jsonSchema` from `z.toJSONSchema`), returns `AiObjectResult<unknown>`.
+**Wire protocol** (`app/api/ai/**` using `lib/ai/server.ts`):
+- `POST /api/ai/chat`: body `AiTextRequest & {stream?: boolean}`. With `stream: true` it sends SSE (`event: token` with a JSON string, `event: done` with `AiMeta`, `event: error` with `{code,message}`); otherwise JSON `AiTextResult`. Streams fail over only before the first token. Tools work only without streaming.
+- `POST /api/ai/object`: body `AiObjectWireRequest` (adds `schemaName`, `jsonSchema` from `z.toJSONSchema`), returns `AiObjectResult<unknown>`. Vision requests are supported. The server runs one repair turn; the client validates again with zod and retries once. It rejects JSON Schemas with a `$ref` other than `#` or `#/$defs/...`, or with a `$ref` cycle that never descends through `properties`/`items`, with `400 bad_request` (recursive zod tree schemas are fine). `pattern` is enforced only by the client's zod schema.
 - `GET /api/ai/status`: returns `AiStatus`.
-- Errors: status code + `{error:{code,message,retryAfterSec?}}`. A 429 carries `Retry-After`.
-- Every response carries `x-ai-provider`, `x-ai-model` and the `ratelimit-*` headers.
-- The server enforces the per-IP limit (`perIpPerMinute`), `maxInputChars`, a 4 MB image cap, the `maxTokens` clamp, and the per-demo enable flag.
+- Timeouts: 20 s per attempt, a stream must start within 12 s, 50 s overall.
 
-Until the gateway lands, the routes return `503 unavailable`. Every AI demo **must** handle that error with an honest fallback (in-browser or a sample result, clearly labelled).
+| Status | Codes |
+|---|---|
+| 400 | `bad_request` |
+| 413 | `input_too_large` |
+| 429 | `rate_limited` (with `Retry-After`) |
+| 499 | `aborted` |
+| 502 | `invalid_output`, `upstream` |
+| 503 | `unavailable`, `quota_exhausted` (quota carries `Retry-After`) |
+
+Errors are `{error:{code,message,retryAfterSec?}}`.
+Headers on every response: `x-ai-provider`, `x-ai-model`, `ratelimit-limit|remaining|reset`, `cache-control: no-store`; when known, `x-ai-route` (e.g. `groq:rate_limited>gemini:ok`), `x-ai-latency-ms`, `x-ai-input-tokens`, `x-ai-output-tokens`.
+
+| Limit (server-enforced) | Value |
+|---|---|
+| Requests per IP per minute | `ai.perIpPerMinute` (plus an instance ceiling) |
+| Input characters | `ai.maxInputChars` (system + all text parts) |
+| Output tokens | clamped to `min(request.maxTokens, ai.maxTokens)`; DeepSeek ≤ 512 |
+| Images | ≤ `AI_LIMITS.maxImages` (4) per request, ≤ 4 MB decoded each, needs `vision: true` |
+| Request body | 4.5 MB (Vercel limit): use `imageToDataUrl(file)` |
+| Tools / JSON schema | ≤ 16 tools, ≤ 16,000 serialized chars |
+| Demo gate | demos hidden in `content/playground.json` get `503 unavailable` |
+
+Every AI demo **must** handle `503` (unavailable or quota) and `429` honestly: a countdown, the in-browser fallback, or a sample result, clearly labelled.
+
+### Admin API (`app/api/admin/**`, admin session cookie required)
+
+- `POST /api/admin/content/[collection]`: body `{data, baseSha?, note?}` (a bare collection object is also accepted) → `SaveResult {ok, mode: 'github'|'disk', sha, commitSha?, commitUrl?, unchanged?, summary?, message, code?, issues?[{path,message}]}`. Statuses: 422 `invalid` (zod issues, or the theme contrast gate for `theme`), 409 `conflict` (`baseSha` is stale), 503 `unconfigured`, 502 `upstream`, 429 `rate_limited`, 401 `unauthorized`.
+- `GET /api/admin/content/[collection]` → `{ok, data, sha, mode}`: the latest stored copy (fresher than the build on Vercel).
+- `POST /api/admin/upload` multipart `{file, name?}` → `{ok, url: '/uploads/x.pdf', name, bytes, kind, replaced, availableAfterDeploy}`; `GET` lists the files.
+- `GET /api/admin/status` → `Activity` (recent content commits + deploy state).
+- Browser helpers in `@/lib/admin/client`: `saveContent(name, data, {baseSha?, note?})`, `loadContent(name)`, `uploadFile(file, {name?})`, `listUploadsClient()`, `getActivityClient()`. All resolve (never throw), with `{ok:false, code, message}` on failure. Editors keep the returned `sha` and send it as `baseSha` on the next save.
+- Without `GITHUB_TOKEN` (local `next start`/`next dev`) saves run in disk mode and write `content/<name>.json`; identical content is not rewritten.
 
 ---
 
@@ -217,5 +253,7 @@ components/demos/<slug>/
 - Accessibility: every interactive element has a visible `:focus-visible` outline (global), 44px targets, labels for inputs, `aria-live` for async results, and colour is never the only signal.
 - Links: internal links use `next/link`; external links use `target="_blank" rel="noopener noreferrer"`.
 - Env vars are read only on the server (`process.env.X` in route handlers or `lib/*/server.ts`). Nothing secret is prefixed with `NEXT_PUBLIC_`.
-- Allowed checks: `npx tsc --noEmit -p .` and `npx eslint <files>`. Don't run `npm install`, `next build` or `next dev` in the shared tree during the parallel build phase.
+- Allowed checks: `npm run typecheck`, `npm run lint`, `npm test` (vitest unit tests, `*.test.ts` next to pure modules). Don't run `npm install`, `next build` or `next dev` in the shared tree during the parallel build phase.
 - Tests: Playwright in `e2e/` against `next start` (Chromium in `/opt/pw-browsers`, which `playwright.config.ts` sets). Run with `npm run build && npm run test:e2e`.
+- `DemoProps.data` carries server-resolved content to a demo that needs it (e.g. web-perf-lab's `{reported}`), so demo chunks never import `lib/content`. PDF demos load pdf.js through `loadPdfjs()` from `@/lib/pdf` (bundled worker, works offline).
+- If a CSP with `connect-src` / `img-src` / `worker-src` is ever added, allow: `api.open-meteo.com`, `geocoding-api.open-meteo.com`, `api.carbonintensity.org.uk`, `huggingface.co` + `cdn.jsdelivr.net` (transformers.js models, sql.js fallback), `tile.openstreetmap.org` (img). Keep `geolocation=(self)` in Permissions-Policy (solar-pv-estimator).

@@ -1,3 +1,40 @@
 {
-  "items": []
+  "items": [
+    {
+      "id": "pucit-bs-it",
+      "enabled": true,
+      "source": "research-findings.md (résumé): BS IT, Dec 2021 – May 2025, CGPA 3.63/4.00 ✅. FYP label deliberately omitted (MotionIQ = medium confidence).",
+      "institution": "Punjab University College of Information Technology (PUCIT), University of the Punjab",
+      "degree": "BS",
+      "field": "Information Technology",
+      "location": "Lahore, Pakistan",
+      "start": "2021-12",
+      "end": "2025-05",
+      "grade": "CGPA 3.63 / 4.00",
+      "notes": [
+        "Co-authored HumCareADL (Springer, Multimedia Tools and Applications, 2026) with the FCIT research group.",
+        "Best Graphic Designer credit at PUCIT.",
+        "AppFest: team CodePunks ranked 8th in CMS development."
+      ],
+      "demoSlugs": [
+        "algo-visualizer",
+        "har-live"
+      ]
+    },
+    {
+      "id": "superior-ics",
+      "enabled": true,
+      "source": "education.md 🗒️ (programme) + LinkedIn ✅. Years/marks TODO.",
+      "institution": "Superior Group of Colleges",
+      "degree": "Intermediate (ICS)",
+      "field": "Computer Science, Physics, Mathematics",
+      "location": "Sargodha, Pakistan",
+      "start": "",
+      "end": "",
+      "notes": [],
+      "demoSlugs": [
+        "code-judge"
+      ]
+    }
+  ]
 }
