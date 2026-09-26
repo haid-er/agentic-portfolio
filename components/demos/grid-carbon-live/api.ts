@@ -110,10 +110,20 @@ export async function fetchSnapshot(postcode: string, signal?: AbortSignal): Pro
 
 /* ---------------- analysis ---------------- */
 
+/**
+ * Index of the half hour containing `now`. Before the series starts (clock skew) the first slot
+ * is the next reading, so 0; once the series has run out it is -1 and nothing may be shown as "now".
+ */
 export function currentIndex(series: Point[], now = Date.now()): number {
   const i = series.findIndex((p) => Date.parse(p.from) <= now && now < Date.parse(p.to))
-  return i >= 0 ? i : 0
+  if (i >= 0) return i
+  const first = series[0]
+  return first && now < Date.parse(first.from) ? 0 : -1
 }
+
+/** A snapshot older than one refresh cycle (plus slack) is labelled with its timestamp. */
+export const STALE_MS = 35 * 60 * 1000
+export const isStale = (s: Snapshot, now = Date.now()) => now - Date.parse(s.fetchedAt) > STALE_MS
 
 export interface Window { start: number; end: number; avg: number }
 

@@ -58,9 +58,10 @@ export function SpecimenTable({ items, pending, dim, onStar, onCycle }: {
                     type="button"
                     aria-pressed={it.starred}
                     aria-label={`Star ${it.name}`}
-                    onClick={() => onStar(it)}
+                    aria-disabled={busy || undefined}
+                    onClick={() => { if (!busy) onStar(it) }}
                     className={cx(
-                      'grid place-items-center size-11 rounded-1 border border-transparent hover:border-rule',
+                      'grid place-items-center size-11 rounded-1 border border-transparent hover:border-rule aria-disabled:opacity-60 aria-disabled:cursor-wait',
                       it.starred ? 'text-accent-ink' : 'text-ink-3',
                     )}
                   >
@@ -80,9 +81,10 @@ export function SpecimenTable({ items, pending, dim, onStar, onCycle }: {
                 <Td className="py-1">
                   <button
                     type="button"
-                    onClick={() => onCycle(it)}
+                    aria-disabled={busy || undefined}
+                    onClick={() => { if (!busy) onCycle(it) }}
                     aria-label={`Status ${it.status}. Change status of ${it.name}`}
-                    className="min-h-tap inline-flex items-center"
+                    className="min-h-tap inline-flex items-center aria-disabled:opacity-60 aria-disabled:cursor-wait"
                   >
                     <Badge tone={STATUS_TONE[it.status]}>{it.status}</Badge>
                   </button>

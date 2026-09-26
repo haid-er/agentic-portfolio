@@ -33,8 +33,10 @@ export function DeployPill({ className }: { className?: string }) {
       )}
     >
       <Icon name={v.icon} size={16} className={cx(v.busy && 'motion-safe:animate-[spin-reg_2.4s_linear_infinite]')} />
-      <span className="sr-only">Press status: </span>
-      <span aria-live="polite">{v.short}</span>
+      {/* The live region only holds the state label, which changes on transitions;
+          the ticking clock in `short` stays out of it so it is not re-announced every second. */}
+      <span className="sr-only" aria-live="polite">Press status: {v.title}</span>
+      <span aria-hidden="true">{v.short}</span>
     </Link>
   )
 }

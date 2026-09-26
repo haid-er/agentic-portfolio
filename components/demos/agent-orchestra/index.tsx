@@ -78,6 +78,17 @@ export default function Demo({ slug }: DemoProps) {
 
   useEffect(() => () => { ctrl.current?.abort(); stopReplay() }, [stopReplay])
 
+  // Stopping mid-replay jumps to the recorded end state, so status never sticks at 'running'.
+  const finishReplay = () => {
+    const log = lastLog.current
+    stopReplay()
+    if (!log?.length) return
+    dispatch({ type: 'reset' })
+    log.forEach((l) => dispatch(l.action))
+    clock.current = null
+    setNow(log[log.length - 1]?.t ?? 0)
+  }
+
   const policy: RetryPolicy = useMemo(() => ({
     maximumAttempts: Number(attempts), initialIntervalMs: 600, backoffCoefficient: 2, maximumIntervalMs: 5000,
     startToCloseTimeoutMs: Number(timeout) * 1000,
@@ -210,13 +221,13 @@ export default function Demo({ slug }: DemoProps) {
           </div>
 
           <div className="flex flex-wrap items-center gap-2">
-            {running ? (
+            {running && !replaying ? (
               <Button variant="danger" icon="close" onClick={() => ctrl.current?.abort()}>Cancel workflow</Button>
             ) : (
               <Button type="submit" arrow disabled={!goal.trim() || replaying}>Start workflow</Button>
             )}
-            {lastLog.current && !running ? (
-              <Button variant="secondary" icon={replaying ? 'pause' : 'refresh'} onClick={replaying ? stopReplay : replay}>
+            {replaying || (lastLog.current && !running) ? (
+              <Button variant="secondary" icon={replaying ? 'pause' : 'refresh'} onClick={replaying ? finishReplay : replay}>
                 {replaying ? 'Stop replay' : 'Replay from history'}
               </Button>
             ) : null}
@@ -243,13 +254,14 @@ export default function Demo({ slug }: DemoProps) {
         )}
       </DemoPanel>
 
-      <ResultPanel state={state} counts={counts} simulated={ranMode === 'simulated'} offerSim={offerSim} onSimulate={() => { setMode('simulated'); void start('simulated') }} />
+      <ResultPanel state={state} replaying={replaying} counts={counts} simulated={ranMode === 'simulated'} offerSim={offerSim} onSimulate={() => { setMode('simulated'); void start('simulated') }} />
     </DemoGrid>
   )
 }
 
-function ResultPanel({ state, counts, simulated, offerSim, onSimulate }: {
+function ResultPanel({ state, replaying, counts, simulated, offerSim, onSimulate }: {
   state: Run
+  replaying: boolean
   counts: { attempts: number; retries: number; timeouts: number; failures: number; tokens: number }
   simulated: boolean
   offerSim: string | null
@@ -262,7 +274,7 @@ function ResultPanel({ state, counts, simulated, offerSim, onSimulate }: {
         {state.status === 'idle' ? (
           <EmptyState title="Nothing merged yet">The reviewer&apos;s merged answer and score land here.</EmptyState>
         ) : state.status === 'running' ? (
-          <p className="m-0 flex items-center gap-2 mono text-ink-2" role="status"><Icon name="nodes" size={16} className="text-accent-ink" />Agents at work…</p>
+          <p className="m-0 flex items-center gap-2 mono text-ink-2" role="status"><Icon name="nodes" size={16} className="text-accent-ink" />{replaying ? 'Replaying…' : 'Agents at work…'}</p>
         ) : state.status === 'cancelled' ? (
           <p className="m-0 text-0 text-ink-2">Cancelled. Every running activity received the cancellation and stopped.</p>
         ) : state.status === 'failed' ? (

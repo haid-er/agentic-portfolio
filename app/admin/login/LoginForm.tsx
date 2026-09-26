@@ -149,13 +149,15 @@ export function LoginForm({ next, initialError, signedOut, disabled }: Props) {
             <span>Caps Lock is on.</span>
           </p>
         ) : null}
+        {/* The message is announced once (it already says "Try again in N min"); the
+            ticking countdown is aria-hidden so it is not re-announced every second. */}
         <div aria-live="assertive" className="empty:hidden">
           {error ? (
             <p id={errId} className="m-0 flex items-center gap-1 text-0 text-danger">
               <Icon name="alert" size={16} />
               <span>
                 {error}
-                {locked ? <> Try again in <span className="nums">{clock((lockedUntil - now) / 1000)}</span>.</> : null}
+                {locked ? <span aria-hidden="true"> Try again in <span className="nums">{clock((lockedUntil - now) / 1000)}</span>.</span> : null}
               </span>
             </p>
           ) : null}

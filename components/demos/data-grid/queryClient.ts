@@ -147,10 +147,16 @@ export class QueryClient {
 
   /* ---------- fetching ---------- */
 
-  fetch(key: string, reason: string): Promise<void> {
+  /**
+   * Start a request for `key`. An identical request already in flight is joined (dedupe),
+   * unless `cancelRefetch` is set: then it is aborted and a fresh one starts, so the result
+   * can never predate the reason for fetching (e.g. a mutation that just settled).
+   */
+  fetch(key: string, reason: string, { cancelRefetch = false } = {}): Promise<void> {
     const inner = this.internals.get(key)
     const s = this.states.get(key)
     if (!inner || !s) return Promise.resolve()
+    if (inner.promise && cancelRefetch) this.abort(key)
     if (inner.promise) {
       this.note('dedupe', s.label, `Request already in flight; "${reason}" joins it.`)
       this.emit()
@@ -192,12 +198,34 @@ export class QueryClient {
       }
     }
 
-    inner.promise = run().finally(() => {
+    const promise = run().finally(() => {
+      // An aborted run must not clear the request that replaced it.
+      if (inner.controller !== controller) return
       inner.promise = null
       inner.controller = null
       this.emit()
     })
-    return inner.promise
+    inner.promise = promise
+    return promise
+  }
+
+  /** Abort the in-flight request for `key`, keeping its data. */
+  private abort(key: string): boolean {
+    const inner = this.internals.get(key)
+    if (!inner?.controller) return false
+    inner.controller.abort()
+    inner.controller = null
+    inner.promise = null
+    this.write(key, { fetching: false })
+    return true
+  }
+
+  /** Cancel in-flight reads (before an optimistic write, so a late response cannot undo it). */
+  cancel(match: (key: string) => boolean): number {
+    let n = 0
+    for (const key of this.states.keys()) if (match(key) && this.abort(key)) n++
+    if (n) this.emit()
+    return n
   }
 
   /** Window focus: refetch observed entries whose data is stale. */
@@ -220,19 +248,13 @@ export class QueryClient {
       if (!match(key)) continue
       n++
       this.write(key, { dataUpdatedAt: 0 })
-      if (s.observers > 0) void this.fetch(key, why)
+      if (s.observers > 0) void this.fetch(key, why, { cancelRefetch: true })
     }
     this.note('invalidate', 'cache', `${why}: ${n} ${n === 1 ? 'entry' : 'entries'} marked stale.`)
     this.emit()
   }
 
   /* ---------- manual cache writes (optimistic updates) ---------- */
-
-  snapshot<T>(match: (key: string) => boolean): Map<string, T | undefined> {
-    const out = new Map<string, T | undefined>()
-    for (const [key, s] of this.states) if (match(key)) out.set(key, s.data as T | undefined)
-    return out
-  }
 
   updateData<T>(match: (key: string) => boolean, fn: (data: T) => T) {
     for (const [key, s] of this.states) {
@@ -241,17 +263,28 @@ export class QueryClient {
     this.emit()
   }
 
-  restore<T>(snap: Map<string, T | undefined>) {
-    for (const [key, data] of snap) if (this.states.has(key)) this.write(key, { data })
-    this.emit()
-  }
-
   record(kind: LogKind, label: string, text: string) {
     this.note(kind, label, text)
     this.emit()
   }
 
+  /**
+   * Drop an entry. One still on screen cannot vanish under its observer, so it is reset to
+   * an empty pending entry and refetched instead.
+   */
   remove(key: string) {
+    const inner = this.internals.get(key)
+    const s = this.states.get(key)
+    if (inner && s && s.observers > 0) {
+      this.abort(key)
+      this.write(key, { status: 'pending', data: undefined, error: undefined, dataUpdatedAt: 0, fetchCount: 0, failureCount: 0 })
+      void this.fetch(key, 'removed while on screen')
+      return
+    }
+    this.drop(key)
+  }
+
+  private drop(key: string) {
     const inner = this.internals.get(key)
     inner?.controller?.abort()
     if (inner?.gcTimer) clearTimeout(inner.gcTimer)
@@ -261,7 +294,7 @@ export class QueryClient {
   }
 
   clear() {
-    for (const key of [...this.states.keys()]) this.remove(key)
+    for (const key of [...this.states.keys()]) this.drop(key)
     this.log = []
     this.emit()
   }
@@ -278,7 +311,7 @@ export class QueryClient {
       if (!cur || cur.observers > 0) return
       if (cur.fetching) { inner.gcTimer = setTimeout(() => this.scheduleGc(key), 1000); return }
       this.note('gc', cur.label, `Inactive for ${Math.round(this.opts.gcTime / 1000)} s: removed from the cache.`)
-      this.remove(key)
+      this.drop(key)
     }, wait)
   }
 }

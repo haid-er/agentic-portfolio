@@ -3,7 +3,7 @@
  * Same data the homepage "On GitHub" section renders; never includes private repos,
  * star counts or commit messages. On failure: 200 with `ok: false` (nothing estimated).
  */
-import { getGitHubActivity } from './activity'
+import { getGitHubActivity } from '@/lib/github/server'
 
 export const revalidate = 21600
 

@@ -3,7 +3,7 @@
  * contents sheet, command palette). Client + server safe: no imports of content.
  */
 import type { IconName } from '@/components/ui/Icon'
-import type { ThemeKey } from '@/lib/content/schema'
+import type { ThemeKey } from '@/lib/theme/keys'
 
 export interface WorldLabel {
   label: string
@@ -49,8 +49,10 @@ export interface IndexEntry {
 export interface NavModel {
   /** Every enabled section that renders something, in page order (hero excluded). */
   sections: NavSection[]
-  /** Short list for the desktop header and the mobile folio bar. */
+  /** Mobile folio bar: at most 3 sections (DESIGN 6.6: 3 items + Contents). */
   primary: NavSection[]
+  /** Desktop header links: every nav-labelled section, capped at DESKTOP_NAV_MAX. */
+  desktop: NavSection[]
   /** Ids watched by the scroll-spy, hero included. */
   spyIds: string[]
   index: IndexEntry[]

@@ -15,12 +15,27 @@
       "authorCount": 5,
       "abstract": "Earlier wearable-IMU activity datasets suffer from narrow demographics, low sampling rates and small cohorts. HumCareADL is a diverse multimodal dataset that spans age groups and contexts. HyMCL-Net is a hybrid multi-branch CNN-LSTM in which convolutions learn spatial features and LSTMs learn temporal dependencies.",
       "results": [
-        { "label": "HumCareADL", "value": 85.27, "unit": "%" },
-        { "label": "CogAge", "value": 81.83, "unit": "%" },
-        { "label": "WISDM", "value": 98.52, "unit": "%" }
+        {
+          "label": "HumCareADL",
+          "value": 85.27,
+          "unit": "%"
+        },
+        {
+          "label": "CogAge",
+          "value": 81.83,
+          "unit": "%"
+        },
+        {
+          "label": "WISDM",
+          "value": 98.52,
+          "unit": "%"
+        }
       ],
       "resultsCaption": "Average accuracy as reported in the paper",
-      "demoSlugs": ["har-live", "neural-playground"]
+      "demoSlugs": [
+        "har-live",
+        "neural-playground"
+      ]
     }
   ],
   "pipeline": {

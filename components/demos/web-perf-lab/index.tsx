@@ -2,18 +2,19 @@
 /**
  * Web perf lab: toggle four optimisations and watch a simulated field-service dashboard
  * load. The waterfall replays on every change, on the baseline's time scale, so the win is
- * visible as empty space. The reported production result comes from content, not from here.
+ * visible as empty space. The reported production result comes from content, resolved on the
+ * server and passed in as `reported` (see ./reported.ts), so this chunk never bundles lib/content.
  */
 import { useEffect, useMemo, useState } from 'react'
 import {
   Badge, Button, DemoGrid, DemoPanel, DemoToolbar, ErrorState, Metric, Segmented, Toggle,
 } from '@/components/ui'
-import { getExperience } from '@/lib/content'
 import type { DemoProps } from '@/lib/demos/types'
 import { useLocalStorage, useReducedMotion } from '@/lib/hooks'
 import { cx } from '@/lib/utils'
 import { ALL_OFF, ALL_ON, kb, NETWORKS, seconds, simulate, type NetId, type Opts } from './model'
 import { SNIPPETS, TOGGLES } from './snippets'
+import type { ReportedMetric } from './reported'
 import { Waterfall } from './Waterfall'
 
 export { notes } from './notes'
@@ -21,20 +22,13 @@ export { notes } from './notes'
 const NET_OPTIONS = (Object.keys(NETWORKS) as NetId[]).map((id) => ({ value: id, label: NETWORKS[id].label }))
 const PLAY_MS = 1800
 
-/** The reported before/after, read from the working record (never hard-coded). */
-function reportedMetric() {
-  for (const e of getExperience()) {
-    if (e.metric && e.highlights.some((h) => h.proofDemo === 'web-perf-lab')) return { ...e.metric, org: e.org, product: e.product }
-  }
-  return null
-}
-
 function safeOpts(raw: unknown): Opts {
   const r = (typeof raw === 'object' && raw ? raw : {}) as Partial<Opts>
   return { split: Boolean(r.split), lazy: Boolean(r.lazy), compress: Boolean(r.compress), dedupe: Boolean(r.dedupe) }
 }
 
-export default function Demo(_props: DemoProps) {
+export default function Demo({ data }: DemoProps) {
+  const reported = (data as { reported?: ReportedMetric | null } | undefined)?.reported ?? null
   const reduced = useReducedMotion()
   const [rawOpts, setRawOpts] = useLocalStorage<Opts>('web-perf-lab:opts', ALL_OFF)
   const [netRaw, setNet] = useLocalStorage<NetId>('web-perf-lab:net', '3g')
@@ -46,7 +40,6 @@ export default function Demo(_props: DemoProps) {
   const result = useMemo(() => simulate(opts, NETWORKS[net]), [opts, net])
   const baseline = useMemo(() => simulate(ALL_OFF, NETWORKS[net]), [net])
   const scale = Math.max(baseline.loaded, result.loaded) * 1.02
-  const reported = useMemo(reportedMetric, [])
 
   // replay the waterfall from 0 whenever the inputs change
   const [head, setHead] = useState(Infinity)
@@ -99,7 +92,7 @@ export default function Demo(_props: DemoProps) {
             </DemoPanel>
 
             <DemoPanel title="The change" meta={TOGGLES.find((t) => t.key === focus)?.label}>
-              <pre className="m-0 p-3 bg-bg-2 border border-rule-soft rounded-1 overflow-x-auto text-00 font-mono leading-[1.55]"><code>{SNIPPETS[focus]}</code></pre>
+              <pre tabIndex={0} aria-label="Code snippet" className="m-0 p-3 bg-bg-2 border border-rule-soft rounded-1 overflow-x-auto text-00 font-mono leading-[1.55]"><code>{SNIPPETS[focus]}</code></pre>
               <div className="flex flex-wrap gap-2 mt-3" role="group" aria-label="Show the code for">
                 {TOGGLES.map((t) => (
                   <Button key={t.key} size="sm" variant={t.key === focus ? 'secondary' : 'ghost'} aria-pressed={t.key === focus} onClick={() => setFocus(t.key)}>

@@ -5,8 +5,8 @@
  * Shape carries meaning as well as ink: poison messages are squares, redeliveries are ringed.
  */
 import { cx } from '@/lib/utils'
-import { bindingMatches, DLX, EXCHANGE, validateBinding, type ConsumerState, type Snapshot, type Transit } from './engine'
-import type { Box, Layout } from './layout'
+import { bindingMatches, DLX, EXCHANGE, validateBinding, type ConsumerView, type Snapshot, type Transit } from './engine'
+import { fitLabel, type Box, type Layout } from './layout'
 
 const INK_FILL = ['', 'fill-data-1', 'fill-data-2', 'fill-data-3', 'fill-data-4'] as const
 
@@ -17,7 +17,7 @@ const ease = (t: number) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2)
 export function Diagram({ snap, layout }: { snap: Snapshot; layout: Layout }) {
   const { nodes, width, height } = layout
   const tall = layout.orientation === 'tall'
-  const summary = `Broker diagram. ${snap.queues.map((q) => `${q.name}: ${q.ready.length} ready`).join(', ')}. ${snap.dlq.ready.length} in ${snap.dlq.name}. ${snap.transits.length} messages in flight.`
+  const summary = `Broker diagram. ${snap.queues.map((q) => `${q.name}: ${q.depth} ready`).join(', ')}. ${snap.dlq.depth} in ${snap.dlq.name}. ${snap.transits.length} messages in flight.`
   return (
     <svg
       viewBox={`0 0 ${width} ${height}`}
@@ -46,8 +46,8 @@ export function Diagram({ snap, layout }: { snap: Snapshot; layout: Layout }) {
         <ExchangeNode b={nodes.x as Box} snap={snap} layout={layout} />
         {snap.queues.map((q) => {
           const b = nodes[q.id] as Box
-          const fill = q.ready.length / Math.max(1, q.maxLength)
-          const unacked = snap.consumers.filter((c) => c.queueId === q.id).reduce((n, c) => n + c.inbound + c.buffer.length + (c.current ? 1 : 0), 0)
+          const fill = q.depth / Math.max(1, q.maxLength)
+          const unacked = snap.consumers.filter((c) => c.queueId === q.id).reduce((n, c) => n + c.unacked, 0)
           return (
             <g key={q.id}>
               <Plate b={b} strong />
@@ -55,7 +55,7 @@ export function Diagram({ snap, layout }: { snap: Snapshot; layout: Layout }) {
               <rect x={b.x - b.w / 2 + 8} y={b.y - 2} width={b.w - 16} height={8} className="fill-bg-2 stroke-rule" strokeWidth={0.75} />
               <rect x={b.x - b.w / 2 + 8} y={b.y - 2} width={(b.w - 16) * Math.min(1, fill)} height={8} className={fill >= 0.8 ? 'fill-warn' : 'fill-accent'} />
               <text x={b.x} y={b.y + b.h / 2 - 8} fontSize={layout.small} textAnchor="middle" className={fill >= 0.8 ? 'fill-warn' : 'fill-ink-2'}>
-                {tall ? `${q.ready.length}/${q.maxLength}` : `${q.ready.length}/${q.maxLength} · ${unacked} unacked`}
+                {tall ? `${q.depth}/${q.maxLength}` : `${q.depth}/${q.maxLength} · ${unacked} unacked`}
               </text>
             </g>
           )
@@ -100,8 +100,8 @@ function Edges({ snap, layout }: { snap: Snapshot; layout: Layout }) {
             {line(x, b, live ? 'stroke-accent' : 'stroke-rule-soft', live ? undefined : '4 4')}
             {layout.orientation === 'wide' && snap.exchange !== 'fanout' ? (
               <g>
-                <rect x={mx - 58} y={my - 10} width={116} height={18} rx={2} className={cx('fill-bg-2', invalid ? 'stroke-danger' : 'stroke-rule-soft')} strokeWidth={1} />
-                <text x={mx} y={my + 3} fontSize={10.5} textAnchor="middle" className={invalid ? 'fill-danger' : 'fill-ink-2'}>{q.binding || '(empty)'}</text>
+                <rect x={mx - 58} y={my - layout.small / 2 - 5} width={116} height={layout.small + 8} rx={2} className={cx('fill-bg-2', invalid ? 'stroke-danger' : 'stroke-rule-soft')} strokeWidth={1} />
+                <text x={mx} y={my + layout.small * 0.35} fontSize={layout.small} textAnchor="middle" className={invalid ? 'fill-danger' : 'fill-ink-2'}>{fitLabel(q.binding || '(empty)', 108, layout.small)}</text>
               </g>
             ) : null}
           </g>
@@ -148,19 +148,24 @@ function ExchangeNode({ b, snap, layout }: { b: Box; snap: Snapshot; layout: Lay
 }
 
 function DlqNode({ b, snap, layout }: { b: Box; snap: Snapshot; layout: Layout }) {
-  const n = snap.dlq.ready.length
+  const n = snap.dlq.depth
+  const total = snap.dlx ? snap.stats.deadLettered : snap.stats.dropped
+  const title = snap.dlx ? `${DLX} → ${snap.dlq.name}` : 'no dead-letter exchange'
+  const detail = n
+    ? `${n} held · ${total} ${snap.dlx ? 'total' : 'discarded'}`
+    : `${total} ${snap.dlx ? 'dead-lettered' : 'discarded'}`
   return (
     <g opacity={snap.dlx ? 1 : 0.55}>
       <Plate b={b} dashed />
-      <text x={b.x} y={b.y - 4} fontSize={layout.font} textAnchor="middle" className="fill-danger">{snap.dlx ? `${DLX} → ${snap.dlq.name}` : 'no dead-letter exchange'}</text>
-      <text x={b.x} y={b.y + 13} fontSize={layout.small} textAnchor="middle" className="fill-ink-2">{snap.dlx ? `${snap.stats.deadLettered} dead-lettered` : `${snap.stats.dropped} discarded`}{n ? ` · ${n} held` : ''}</text>
+      <text x={b.x} y={b.y - 4} fontSize={layout.font} textAnchor="middle" className="fill-danger">{fitLabel(title, b.w - 12, layout.font)}</text>
+      <text x={b.x} y={b.y + 13} fontSize={layout.small} textAnchor="middle" className="fill-ink-2">{fitLabel(detail, b.w - 12, layout.small)}</text>
     </g>
   )
 }
 
-function ConsumerNode({ c, b, layout }: { c: ConsumerState; b: Box; layout: Layout }) {
+function ConsumerNode({ c, b, layout }: { c: ConsumerView; b: Box; layout: Layout }) {
   const tall = layout.orientation === 'tall'
-  const unacked = c.inbound + c.buffer.length + (c.current ? 1 : 0)
+  const unacked = c.unacked
   const l = b.x - b.w / 2
   const slots = Math.min(c.prefetch, tall ? 6 : 10)
   const gap = tall ? 10 : 12

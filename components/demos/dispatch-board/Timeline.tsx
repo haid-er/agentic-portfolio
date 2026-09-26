@@ -1,4 +1,5 @@
 /** Gantt of the day: drive (hatched), wait (thin line) and job blocks per technician. */
+import { useEffect, useState } from 'react'
 import { cx } from '@/lib/utils'
 import { inkFor } from './ink'
 import { clock, DAY_END, DAY_START, type Plan } from './model'
@@ -7,7 +8,23 @@ const pct = (m: number) => `${((m - DAY_START) / (DAY_END - DAY_START)) * 100}%`
 const width = (a: number, b: number) => `${(Math.max(0, b - a) / (DAY_END - DAY_START)) * 100}%`
 const HOURS = Array.from({ length: (DAY_END - DAY_START) / 60 + 1 }, (_, i) => DAY_START + i * 60)
 
+/** True at >= 768px. Below that, blocks are too narrow for a 24px target (WCAG 2.5.8). */
+function useWide() {
+  const [wide, setWide] = useState(true)
+  useEffect(() => {
+    const mq = window.matchMedia('(min-width: 768px)')
+    const sync = () => setWide(mq.matches)
+    sync()
+    mq.addEventListener('change', sync)
+    return () => mq.removeEventListener('change', sync)
+  }, [])
+  return wide
+}
+
 export function Timeline({ plan, selected, onSelect }: { plan: Plan; selected: string | null; onSelect: (id: string) => void }) {
+  // On phones the job list below is the accessible way to select a job; the
+  // timeline blocks stay tappable but leave the tab order and accessibility tree.
+  const wide = useWide()
   return (
     <div className="grid gap-2 text-00">
       <div className="grid grid-cols-[4.5rem_minmax(0,1fr)] gap-2" aria-hidden="true">
@@ -42,11 +59,12 @@ export function Timeline({ plan, selected, onSelect }: { plan: Plan; selected: s
                       style={{ left: pct(driveFrom), width: width(driveFrom, s.arrive) }} />
                     {s.wait > 1 ? <span aria-hidden="true" className="absolute top-1/2 h-px bg-ink-3" style={{ left: pct(s.arrive), width: width(s.arrive, s.start) }} /> : null}
                     <button type="button" onClick={() => onSelect(s.job.id)} aria-pressed={on}
+                      tabIndex={wide ? undefined : -1} aria-hidden={wide ? undefined : true}
                       aria-label={`${s.job.id} ${s.job.skill}, ${clock(s.start)} to ${clock(s.end)}${s.late > 0 ? `, ${Math.round(s.late)} minutes late` : ''}`}
                       className={cx('absolute inset-y-1 overflow-hidden px-0.5 text-left font-mono text-[10px] leading-none text-surface border',
                         ink.bg, s.late > 0 ? 'border-danger border-2' : 'border-ink', on && 'outline-2 outline-offset-1 outline-focus outline')}
                       style={{ left: pct(s.start), width: width(s.start, s.end) }}>
-                      <span className="sr-only md:not-sr-only">{s.job.id}</span>
+                      <span className="sr-only md:not-sr-only md:bg-surface md:text-ink md:px-px">{s.job.id}</span>
                     </button>
                   </div>
                 )

@@ -122,7 +122,7 @@ export function useTelemetry({ scenario, hz, seed, transport, want, live }: Tele
       errors++
       if (es.readyState === EventSource.CLOSED) {
         setStatus('error')
-        setError('The stream endpoint refused the connection (it may be unavailable in this deployment).')
+        setError('The stream endpoint refused the connection (too many open streams from this network, or it is unavailable in this deployment).')
         return
       }
       if (errors >= MAX_ERRORS) {

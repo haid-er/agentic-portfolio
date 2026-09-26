@@ -68,6 +68,9 @@ export interface Innings {
   overRuns: number // runs conceded in the current over (for maidens)
 }
 
+/** The next CPU delivery, rolled before you choose a shot. `read` = you picked it out of the hand. */
+export interface Pending { delivery: Delivery; read: boolean }
+
 export interface Match {
   v: 1
   config: Config
@@ -78,6 +81,8 @@ export interface Match {
   result: string | null
   winner: 0 | 1 | null // null with phase 'done' = tie
   console: string[]
+  /** Set while you are batting: the ball about to be bowled at you (optional for matches saved before it existed). */
+  pending?: Pending | null
 }
 
 export type Action =
@@ -169,9 +174,9 @@ const BEST: Record<Delivery, readonly Shot[]> = {
 }
 
 const LEVEL = {
-  gentle: { w: 0.7, b: 1.2, iq: 0.45 },
-  county: { w: 1.0, b: 1.0, iq: 0.6 },
-  test: { w: 1.35, b: 0.85, iq: 0.75 },
+  gentle: { w: 0.7, b: 1.2, iq: 0.45, disguise: 0 },
+  county: { w: 1.0, b: 1.0, iq: 0.6, disguise: 12 },
+  test: { w: 1.35, b: 0.85, iq: 0.75, disguise: 25 },
 } as const
 
 const TIMING = {
@@ -208,6 +213,16 @@ const DEL_TEXT: Record<Delivery, readonly string[]> = {
   full: ['Full toss', 'Low full toss', 'Overpitched, waist high'],
   wide: ['Wide of off stump', 'Angled across, well wide', 'Floated wide'],
 }
+
+/** What you see at the bowler's release, before choosing a shot. */
+export const READ_TEXT: Record<Delivery, string> = {
+  yorker: 'Fast and full: he is aiming at the toes',
+  good: 'Hitting the deck on a good length',
+  short: 'Digging it in short: this one will climb',
+  full: 'Overpitched: it is coming through on the full',
+  wide: 'Angled well across off stump',
+}
+export const UNREAD_TEXT = 'Disguised: you cannot pick this one out of the hand'
 
 const LINES: Record<string, readonly string[]> = {
   dot_leave: ['left alone, sensible', 'shoulders arms and watches it go', 'no shot offered'],
@@ -318,6 +333,27 @@ export function newMatch(config: Config): Match {
 /* ------------------------------------------------------------------ */
 
 export function step(prev: Match, action: Action): Match {
+  const next = update(prev, action)
+  if (next !== prev) facing(next)
+  return next
+}
+
+/** When you are about to bat, roll the CPU's next delivery now so you can read it before choosing a shot. */
+function facing(m: Match) {
+  if (m.phase !== 'innings' || !userBatting(m)) { m.pending = null; return }
+  if (m.pending) return
+  const delivery = DELIVERIES[weighted(m, CPU_BOWL[m.config.level])]?.value ?? 'good'
+  const read = randInt(m, 100) >= LEVEL[m.config.level].disguise
+  m.pending = { delivery, read }
+  const inn = current(m)
+  const bowler = inn?.bowlers[Math.floor(inn.legal / 6) % bowlerCount]?.name ?? 'The bowler'
+  print(m, `  ${bowler} runs in... ${pendingText(m.pending)}.`)
+}
+
+/** The batter's read of the next ball, for the field view and the terminal. */
+export const pendingText = (p: Pending) => (p.read ? READ_TEXT[p.delivery] : UNREAD_TEXT)
+
+function update(prev: Match, action: Action): Match {
   const m: Match = structuredClone(prev)
   switch (action.type) {
     case 'print':
@@ -351,7 +387,9 @@ export function step(prev: Match, action: Action): Match {
     }
     case 'bat': {
       if (m.phase !== 'innings' || !userBatting(m)) return prev
-      const delivery = DELIVERIES[weighted(m, CPU_BOWL[m.config.level])]?.value ?? 'good'
+      if (!m.pending) facing(m) // a match saved before deliveries were rolled ahead
+      const delivery = m.pending?.delivery ?? 'good'
+      m.pending = null
       bowlBall(m, delivery, action.shot, action.timing)
       return m
     }

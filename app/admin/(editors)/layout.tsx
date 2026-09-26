@@ -24,7 +24,7 @@ export default function EditorsLayout({ children }: { children: ReactNode }) {
   return (
     <div className="grid gap-s5 lg:grid-cols-[13rem_minmax(0,1fr)] lg:gap-s7 items-start">
       {/* Admin has no folio bar; lift toasts above the sticky save bar on phones instead. */}
-      <style>{':root{--folio-bar:120px}'}</style>
+      <style>{':root{--folio-bar:120px;--toast-lift:96px}'}</style>
       <CollectionNav items={items} />
       <div className="min-w-0">{children}</div>
     </div>

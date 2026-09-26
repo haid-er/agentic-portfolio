@@ -242,6 +242,7 @@ export function simulate(d: Design, load: Load, prevBacklog: Record<string, numb
       stats[w.id].in += share
       flow(q.id, w.id, share)
     }
+    // Drain pressure, not the queue's own load (see latency below).
     s.util = wcap ? s.served / wcap : s.served > 0 ? Infinity : 0
     backlog[q.id] = b
     if (!workers.length && s.served > 0) { s.note = 'no consumer'; hints.push('Nothing consumes the queue, so jobs pile up forever. Connect it to workers.') }
@@ -295,7 +296,10 @@ export function simulate(d: Design, load: Load, prevBacklog: Record<string, numb
   // 7. Latency per node, then per request path.
   for (const n of d.nodes) {
     const s = stats[n.id]
-    s.lat = latencyAt(SPEC[n.kind].base, Number.isFinite(s.util) ? s.util : 1)
+    // A queue's util is drain pressure (writes vs worker capacity), used for the bottleneck and advice.
+    // Its own latency depends only on intake: slow workers show up as backlog and lag, not slow writes.
+    const own = n.kind === 'queue' ? s.served / (SPEC.queue.cap * n.replicas) : s.util
+    s.lat = latencyAt(SPEC[n.kind].base, Number.isFinite(own) ? own : 1)
   }
   const dbLat = (ids: string[]) => (ids.length ? ids.reduce((t, id) => t + stats[id].lat, 0) / ids.length : 0)
   let latSum = 0

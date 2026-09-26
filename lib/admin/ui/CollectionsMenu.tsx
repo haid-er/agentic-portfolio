@@ -57,7 +57,7 @@ export function CollectionsMenu({ entries }: { entries: MenuEntry[] }) {
       </summary>
       <nav
         aria-label="Collections"
-        className="absolute right-0 top-full mt-2 z-[var(--z-sheet)] w-[min(22rem,calc(100vw-2*var(--gutter)))] max-h-[70vh] overflow-y-auto bg-surface border border-rule rounded-1 shadow-press p-s2"
+        className="absolute left-0 md:left-auto md:right-0 top-full mt-2 z-[var(--z-sheet)] w-[min(22rem,calc(100vw-2*var(--gutter)))] max-h-[70vh] overflow-y-auto bg-surface border border-rule rounded-1 shadow-press p-s2"
       >
         <ul className="m-0 p-0 list-none grid">
           {entries.map((e) => {

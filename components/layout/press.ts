@@ -13,7 +13,7 @@
  * data-theme={next}, so every var() inside them resolves to the next world's tokens
  * (including admin overrides) without a single hard-coded colour.
  */
-import type { ThemeKey } from '@/lib/content/schema'
+import type { ThemeKey } from '@/lib/theme/keys'
 import { setTheme } from '@/lib/theme/client'
 import { announce } from './events'
 import type { ThemeLabels } from './types'

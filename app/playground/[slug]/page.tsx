@@ -21,7 +21,9 @@ import { DemoStage } from '@/components/playground/DemoStage'
 import { getNeighbours, getRecordMentions, toCardModel } from '@/components/playground/model'
 import { PhoneNote } from '@/components/playground/SpecimenCard'
 import { catalogueNo, runsInLabel } from '@/components/playground/slug'
-import { getProfile, getSection } from '@/lib/content'
+import { reportedMetric } from '@/components/demos/web-perf-lab/reported'
+import { getExperience, getProfile, getSection } from '@/lib/content'
+import type { DemoSlug } from '@/lib/demos'
 import { getDemo, getDemos } from '@/lib/demos'
 import { breadcrumbJsonLd, demoJsonLd, demoMetadata, jsonLdString } from '@/lib/seo'
 
@@ -92,7 +94,7 @@ export default async function DemoPage({ params }: Params) {
             </a>
           ) : null}
         </div>
-        <DemoStage slug={demo.slug} title={demo.title} no={nav.no} glyph={card.glyph} runsIn={demo.runsIn} />
+        <DemoStage slug={demo.slug} title={demo.title} no={nav.no} glyph={card.glyph} runsIn={demo.runsIn} usesAI={demo.usesAI} data={demoData(demo.slug)} />
       </section>
 
       <DemoNotesBlock howItWorks={demo.notes.howItWorks} limits={demo.notes.limits} stack={demo.notes.stack} />
@@ -104,4 +106,10 @@ export default async function DemoPage({ params }: Params) {
       <RelatedDemos cards={nav.related} pillarLabel={card.pillarLabel} />
     </article>
   )
+}
+
+/** Server-resolved content a demo needs (DemoProps.data); undefined for most demos. */
+function demoData(slug: DemoSlug): unknown {
+  if (slug === 'web-perf-lab') return { reported: reportedMetric(getExperience()) }
+  return undefined
 }

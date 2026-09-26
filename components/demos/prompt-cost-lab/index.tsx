@@ -179,8 +179,15 @@ function Calibration({ calib, tooLong }: { calib: Calib; tooLong: boolean }) {
       </p>
     )
   }
-  const real = calib.res.usage.inputTokens
-  const diff = real ? (calib.estimate - real) / real : 0
+  const real = calib.res.usage?.inputTokens ?? 0
+  if (real <= 0) {
+    return (
+      <p className="m-0 text-00 text-ink-2" role="status">
+        {calib.res.provider} answered but did not report a token count for this call, so there is nothing to compare; the offline estimate of {calib.estimate.toLocaleString('en-US')} stands.
+      </p>
+    )
+  }
+  const diff = (calib.estimate - real) / real
   return (
     <div className="grid gap-1 p-3 border border-rule-soft rounded-1" role="status">
       <p className="m-0 flex flex-wrap items-center gap-2 text-0">

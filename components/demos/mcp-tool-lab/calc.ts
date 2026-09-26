@@ -15,10 +15,22 @@ type Tok = { t: 'num'; v: number } | { t: 'id'; v: string } | { t: 'op'; v: stri
 
 export class CalcError extends Error {}
 
+/** Drop thousands separators (2,340 -> 2340), but only outside parentheses, so min(1,200) keeps its argument comma. */
+function stripThousands(src: string): string {
+  let depth = 0
+  let out = ''
+  for (let i = 0; i < src.length; i++) {
+    const c = src[i]
+    if (c === '(') depth++
+    else if (c === ')') depth--
+    if (c === ',' && depth === 0 && /\d/.test(src[i - 1] ?? '') && /^\d{3}(?!\d)/.test(src.slice(i + 1))) continue
+    out += c
+  }
+  return out
+}
+
 function lex(src: string): Tok[] {
-  const s = src
-    .toLowerCase()
-    .replace(/(\d),(?=\d{3}\b)/g, '$1') // 2,340 -> 2340
+  const s = stripThousands(src.toLowerCase())
     .replace(/×/g, '*')
     .replace(/(?<=[\d)]\s*)x(?=\s*[\d(.])/g, '*') // 3 x 4, never the x in max()
     .replace(/÷/g, '/')

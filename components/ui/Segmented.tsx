@@ -24,9 +24,9 @@ export function Segmented<T extends string>({ label, options, value, onChange, c
     if (next) { onChange(next.value); refs.current[n]?.focus() }
   }
   return (
-    <div className={cx('flex flex-col gap-1', className)}>
+    <div className={cx('flex flex-col gap-1 min-w-0', className)}>
       <span id={id} className="mono text-ink-2">{label}</span>
-      <div role="radiogroup" aria-labelledby={id} onKeyDown={onKey} className="inline-flex flex-wrap border border-rule rounded-pill overflow-hidden self-start">
+      <div role="radiogroup" aria-labelledby={id} onKeyDown={onKey} className="inline-flex flex-wrap max-w-full border border-rule rounded-pill overflow-hidden self-start">
         {options.map((o, i) => {
           const on = o.value === value
           return (

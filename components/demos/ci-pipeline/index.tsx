@@ -53,8 +53,14 @@ export default function Demo(_props: DemoProps) {
   const cacheRef = useRef<Set<string>>(new Set())
   const recorded = useRef<number>(0)
 
-  // Keep the live cache store in sync with what was persisted (loaded after mount).
-  useEffect(() => { if (!pipeRef.current || pipeRef.current.result !== 'running') cacheRef.current = new Set(cacheKeys) }, [cacheKeys])
+  // Keep the live cache store in sync with what was persisted (loaded after mount). The Set is
+  // mutated in place, never replaced: a finished run keeps its reference and may be re-run.
+  useEffect(() => {
+    if (pipeRef.current?.result === 'running') return
+    const cache = cacheRef.current
+    cache.clear()
+    cacheKeys.forEach((k) => cache.add(k))
+  }, [cacheKeys])
 
   const cfg: RunConfig = useMemo(
     () => ({ branch, target, fault, runners: Number(runners), autoRetry, lockVersion }),
@@ -186,7 +192,7 @@ export default function Demo(_props: DemoProps) {
               variant="ghost"
               icon="close"
               disabled={running || cacheKeys.length === 0}
-              onClick={() => { cacheRef.current = new Set(); setCacheKeys([]); setAnnounce('Caches cleared.') }}
+              onClick={() => { cacheRef.current.clear(); setCacheKeys([]); setAnnounce('Caches cleared.') }}
             >
               Clear caches ({cacheKeys.length})
             </Button>

@@ -32,7 +32,8 @@ export function LivePanel() {
   useEffect(() => { setOrigin(window.location.origin) }, [])
 
   const last = rows[0]
-  const retryUntil = last && last.status === 429 ? last.at + Number(last.retryAfter || 0) * 1000 : 0
+  const is429 = last?.status === 429
+  const retryUntil = last && is429 ? last.at + Number(last.retryAfter || 0) * 1000 : 0
   const waiting = Math.max(0, Math.ceil((retryUntil - nowTs) / 1000))
 
   useEffect(() => {
@@ -94,14 +95,16 @@ export function LivePanel() {
         </ErrorState>
       ) : null}
 
-      <div aria-live="polite" className="min-h-6">
-        {last ? (
-          <p className="m-0 flex flex-wrap items-center gap-2 font-mono text-0">
-            <Badge tone={last.status === 429 ? 'danger' : 'ok'}>{last.status === 429 ? '429 Too Many Requests' : '200 OK'}</Badge>
-            {last.status === 429 ? <span className="text-ink-2 nums">{waiting > 0 ? `retry in ${waiting}s` : 'you can retry now'}</span> : <span className="text-ink-2 nums">{last.remaining} left</span>}
-            {isolates.size > 1 ? <span className="text-00 text-ink-3">{isolates.size} edge isolates answered; each keeps its own counter</span> : null}
-          </p>
-        ) : null}
+      {/* Only the status and the one-off "retry now" are announced; the ticking countdown sits outside the live region. */}
+      <div className="min-h-6 flex flex-wrap items-center gap-2 font-mono text-0">
+        <p aria-live="polite" className="m-0 flex flex-wrap items-center gap-2">
+          {last ? <span className="sr-only">{`Request ${last.n}:`}</span> : null}
+          {last ? <Badge tone={is429 ? 'danger' : 'ok'}>{is429 ? '429 Too Many Requests' : '200 OK'}</Badge> : null}
+          {last && !is429 ? <span className="text-ink-2 nums">{last.remaining} left</span> : null}
+          {last && is429 && waiting === 0 ? <span className="text-ink-2">you can retry now</span> : null}
+        </p>
+        {last && is429 && waiting > 0 ? <span aria-live="off" className="text-ink-2 nums">retry in {waiting}s</span> : null}
+        {last && isolates.size > 1 ? <span className="text-00 text-ink-3">{isolates.size} edge isolates answered; each keeps its own counter</span> : null}
       </div>
 
       {rows.length ? (

@@ -27,7 +27,9 @@ npm run dev          # http://localhost:3000
 | `npm run build` / `npm start` | production build / server |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run lint` | ESLint (next/core-web-vitals + typescript) |
-| `npm run test:e2e` | Playwright smoke tests against `next start` on :3100 (run `npm run build` first) |
+| `npm test` | Vitest unit tests (`*.test.ts` next to pure modules: content schema, privacy rule, demo engines) |
+| `npm run test:e2e` | Playwright e2e against `next start` on :3100 (run `npm run build` first; set `ADMIN_PASSWORD` and `ADMIN_SECRET`) |
+| `npm run copy:sqljs` | Copies the sql.js WASM into `public/demos/sql-playground/` (runs on postinstall and prebuild) |
 
 Preview a world directly with `/?theme=almanac` or `/?theme=strata`.
 
@@ -36,7 +38,7 @@ Preview a world directly with `/?theme=almanac` or `/?theme=strata`.
 | Name | Required | Purpose |
 |---|---|---|
 | `ADMIN_PASSWORD` | for admin | Password for `/admin/login` |
-| `ADMIN_SECRET` | for admin | HMAC key for the session cookie (32+ random bytes) |
+| `ADMIN_SECRET` | for admin | HMAC key for the session cookie: **at least 16 characters** (32+ random bytes recommended). `next dev` works without it (a dev fallback key, flagged on the dashboard) |
 | `GITHUB_TOKEN` | prod saves | Fine-grained token used to commit content (see below) |
 | `GITHUB_REPO` | prod saves | `owner/repo`, e.g. `haid-er/agentic-portfolio` |
 | `GITHUB_BRANCH` | prod saves | Branch to commit to (production: `main`) |
@@ -55,7 +57,7 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 
 1. GitHub → Settings → Developer settings → **Fine-grained tokens** → Generate new token.
 2. **Repository access:** *Only select repositories* → this repository only.
-3. **Permissions → Repository → Contents: Read and write.** Nothing else is needed (Metadata: read-only is added automatically).
+3. **Permissions → Repository → Contents: Read and write** on `haid-er/agentic-portfolio` only. Nothing else is needed (Metadata: read-only is added automatically).
 4. Choose an expiry, copy the token, and set it as `GITHUB_TOKEN` in Vercel (Production and Preview).
 
 ## How admin saves work
@@ -67,6 +69,11 @@ node -e "console.log(require('crypto').randomBytes(48).toString('base64url'))"
 4. Content is imported statically and validated at build time, so a bad edit can't reach production: the build fails and the previous deploy stays live.
 
 Uploads (images, the résumé PDF) go to `public/uploads/` the same way.
+
+- The dashboard's deploy tracking reads Vercel's `VERCEL_GIT_COMMIT_SHA` / `VERCEL_GIT_COMMIT_REF` system variables (keep **Automatically expose System Environment Variables** on) and only tracks deployments of `GITHUB_BRANCH`.
+- Saves send the last-seen `sha`, so two editors get a 409 conflict instead of silently overwriting each other.
+- Login is rate limited per instance: 5 failures per 15 minutes per IP.
+- Saving `theme.json` runs the same WCAG contrast gate on the server as in the editor.
 
 ## Deploy to Vercel
 

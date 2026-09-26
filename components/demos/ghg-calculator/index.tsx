@@ -183,7 +183,7 @@ function Headline({ totals, approachLabel, s2, entitiesIn, entitiesAll }: {
 function ModelNote() {
   return (
     <div className="grid gap-2 text-0 text-ink-2">
-      <p className="m-0 font-mono text-ink bg-bg-2 px-3 py-2 overflow-x-auto whitespace-nowrap">
+      <p tabIndex={0} className="m-0 font-mono text-ink bg-bg-2 px-3 py-2 overflow-x-auto whitespace-nowrap">
         reported = quantity × factor × inclusion(entity, boundary)
       </p>
       <ul className="m-0 pl-5 grid gap-1">

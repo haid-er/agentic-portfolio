@@ -13,7 +13,7 @@
  *
  * All copy comes from content/research.json, site.profile and the demo registry.
  */
-import { ButtonLink, Icon, Kicker, Meter, Mono, ProofRow, SectionShell, type IconName } from '@/components/ui'
+import { ButtonLink, CopyButton, Icon, Kicker, Meter, Mono, ProofRow, SectionShell, type IconName } from '@/components/ui'
 import { getProfile, getResearch, type ResearchItem } from '@/lib/content'
 import { getDemo, isDemoEnabled, type DemoSlug } from '@/lib/demos'
 import { cx } from '@/lib/utils'
@@ -112,7 +112,8 @@ function AuthorStrip({ position, count, name }: { position: number; count: numbe
 /* citation                                                            */
 /* ------------------------------------------------------------------ */
 
-function Citation({ bibtex }: { bibtex: string }) {
+function Citation({ bibtex, id }: { bibtex: string; id: string }) {
+  const preId = `bibtex-${id}`
   return (
     <details className="group border border-rule rounded-1 bg-surface">
       <summary className="mono flex items-center justify-between gap-3 min-h-tap px-4 cursor-pointer text-ink list-none [&::-webkit-details-marker]:hidden">
@@ -125,8 +126,12 @@ function Citation({ bibtex }: { bibtex: string }) {
         </span>
       </summary>
       <div className="grid gap-2 px-4 pb-4">
-        <Mono tone="ink-3">Click the entry to select it all</Mono>
+        <div className="flex flex-wrap items-center justify-between gap-2">
+          <Mono tone="ink-3">Copy the entry, or select it by hand</Mono>
+          <CopyButton text={bibtex} label="Copy BibTeX" targetId={preId} />
+        </div>
         <pre
+          id={preId}
           tabIndex={0}
           aria-label="BibTeX entry"
           className="m-0 p-3 bg-bg-2 rounded-0 overflow-x-auto text-00 leading-relaxed font-mono text-ink select-all whitespace-pre"
@@ -210,7 +215,7 @@ function Paper({ r, name, index }: { r: ResearchItem; name: string; index: numbe
           </a>
         ) : null}
 
-        {bibtex ? <Citation bibtex={bibtex} /> : null}
+        {bibtex ? <Citation bibtex={bibtex} id={r.id} /> : null}
       </div>
 
       {/* right: the results */}

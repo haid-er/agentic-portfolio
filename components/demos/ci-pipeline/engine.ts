@@ -161,9 +161,9 @@ function buildJobs(cfg: RunConfig): JobDef[] {
         name: 'Restore .next/cache', cmd: 'actions/cache@v4', dur: 1, cache: { kind: 'next', hitDur: 3 },
         logs: (c) => (c.hit ? [`Cache restored from key: ${cacheKey('next', c.cfg)}`] : ['Cache not found; building from scratch']),
       }, {
-        name: 'Build', cmd: 'npm run build', dur: 84, fasterWith: { kind: 'next', hitDur: 37 },
+        name: 'Build', cmd: aws ? 'npm run build' : 'npx vercel pull --yes && npx vercel build', dur: 84, fasterWith: { kind: 'next', hitDur: 37 },
         logs: () => ['Compiled successfully', 'Generating static pages (42/42)', 'Route (app) sizes written to .next/'],
-      }, { name: 'Upload artifact', cmd: 'actions/upload-artifact@v4', dur: 5, logs: () => ['Artifact "next-build" uploaded'] }, post('next')],
+      }, { name: 'Upload artifact', cmd: 'actions/upload-artifact@v4', dur: 5, logs: () => [`Artifact "${aws ? 'next-build' : 'vercel-output'}" uploaded`] }, post('next')],
     },
     {
       id: 'docker', name: 'image', stage: 'docker', needs: ['build'],
@@ -198,9 +198,9 @@ function buildJobs(cfg: RunConfig): JobDef[] {
     ? [
         { name: 'Set up job', dur: 3 },
         { name: 'Configure AWS credentials', cmd: 'aws-actions/configure-aws-credentials@v4 (OIDC)', dur: 3, logs: () => ['Assumed role deploy-ci via OIDC; no long-lived keys'] },
-        { name: 'Render task definition', cmd: 'aws-actions/amazon-ecs-render-task-definition@v1', dur: 2 },
-        { name: 'Deploy to ECS', cmd: `aws ecs update-service --cluster ${env} --service web`, dur: 8, logs: () => ['Service update started: rolling, minimum healthy 100%'] },
-        { name: 'Wait for stable service', cmd: 'aws ecs wait services-stable', dur: 55, logs: () => ['2/2 tasks healthy on the new task definition'] },
+        { name: 'Render task definition', cmd: 'aws-actions/amazon-ecs-render-task-definition@v1', dur: 2, logs: (c) => [`Container "web" image set to web:${c.sha}`] },
+        { name: 'Deploy to ECS', cmd: `aws-actions/amazon-ecs-deploy-task-definition@v2 (cluster: ${env})`, dur: 8, logs: () => ['Registered new task definition revision', 'Service update started: rolling, minimum healthy 100%'] },
+        { name: 'Wait for stable service', cmd: 'wait-for-service-stability: true', dur: 55, logs: () => ['2/2 tasks healthy on the new task definition'] },
         { name: 'Smoke test', cmd: 'curl -fsS $URL/api/health', dur: 4, logs: () => ['HTTP 200 {"ok":true}'] },
       ]
     : [

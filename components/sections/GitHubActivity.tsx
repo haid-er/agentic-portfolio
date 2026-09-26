@@ -1,5 +1,5 @@
 /**
- * Live GitHub activity for the public profile (ISR 6 h via app/api/github/activity.ts).
+ * Live GitHub activity for the public profile (ISR 6 h via lib/github/server.ts).
  *
  * A "deposition log": 12 weeks of public events drawn as sediment bars, newest on the
  * right, then the most recently pushed public repositories and the latest events.
@@ -7,7 +7,7 @@
  * links to the profile. Nothing is estimated.
  */
 import { ButtonLink, Card, Icon, SectionShell, Tag, type Layer } from '@/components/ui'
-import { getGitHubActivity, WINDOW_DAYS, type GhDay, type GitHubActivity as Activity } from '@/app/api/github/activity'
+import { getGitHubActivity, WINDOW_DAYS, type GhDay, type GitHubActivity as Activity } from '@/lib/github/server'
 import type { SectionProps } from './types'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']

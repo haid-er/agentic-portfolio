@@ -1,5 +1,5 @@
 /** The editable colour tokens, the pairs that must stay readable, and output formats. */
-import type { ThemeKey } from '@/lib/content/schema'
+import type { ThemeKey } from '@/lib/theme/keys'
 import { DEFAULT_COLORS, type ColorToken, type WorldColors } from '@/lib/theme'
 import { contrast, fixForeground, rotateHue } from './color'
 

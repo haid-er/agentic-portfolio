@@ -6,7 +6,7 @@
  */
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { buildTests, expectedFor, isCorrect, type Problem } from './problems'
-import type { WorkerMessage } from './protocol'
+import type { RunRequest, WorkerMessage } from './protocol'
 
 export type Verdict = 'AC' | 'WA' | 'TLE' | 'RE' | 'CE'
 export type TestVerdict = Verdict | 'pending' | 'running' | 'skipped'
@@ -48,11 +48,14 @@ export function useJudge() {
   const [state, setState] = useState<JudgeState>(IDLE)
   const worker = useRef<Worker | null>(null)
   const watchdog = useRef<number | undefined>(undefined)
+  const port = useRef<MessagePort | null>(null)
 
   const stop = useCallback(() => {
     window.clearTimeout(watchdog.current)
     worker.current?.terminate()
     worker.current = null
+    port.current?.close()
+    port.current = null
   }, [])
 
   useEffect(() => stop, [stop])
@@ -79,12 +82,19 @@ export function useJudge() {
       stop()
       for (const r of results) if (r.verdict === 'pending' || r.verdict === 'running') r.verdict = 'skipped'
       const first = results.find((r) => r.verdict !== 'AC' && r.verdict !== 'skipped')
+      // Accepted only when every test actually passed; a skipped test with no failure means the
+      // sandbox stopped early, which is never a pass.
+      const unfinished = !first && results.find((r) => r.verdict === 'skipped')
+      if (unfinished) {
+        unfinished.verdict = 'RE'
+        unfinished.error = 'The sandbox stopped before this test finished.'
+      }
       const times = results.map((r) => r.ms ?? 0)
       setState({
         status: 'done',
         mode,
         results: results.slice(),
-        verdict: first ? (first.verdict as Verdict) : 'AC',
+        verdict: first ? (first.verdict as Verdict) : unfinished ? 'RE' : 'AC',
         maxMs: times.length ? Math.max(...times) : 0,
         ...patch,
       })
@@ -107,7 +117,12 @@ export function useJudge() {
       setState({ ...IDLE, status: 'failed', mode, crash: e.message || 'The sandbox worker failed to start.' })
     }
 
-    w.onmessage = (e: MessageEvent<WorkerMessage>) => {
+    // Results arrive only on a private port; anything posted on the worker's global channel
+    // (which user code can reach) is ignored.
+    w.onmessage = null
+    const channel = new MessageChannel()
+    port.current = channel.port1
+    channel.port1.onmessage = (e: MessageEvent<WorkerMessage>) => {
       const m = e.data
       if (finished) return
       if (m.type === 'compile-error') {
@@ -150,7 +165,8 @@ export function useJudge() {
       if (m.type === 'end') finish({})
     }
 
-    w.postMessage({ type: 'run', code, tests: tests.map((t) => t.args), captureLogs: mode === 'samples' })
+    const req: RunRequest = { type: 'run', code, tests: tests.map((t) => t.args), captureLogs: mode === 'samples' }
+    w.postMessage(req, [channel.port2])
   }, [stop])
 
   const abort = useCallback(() => {

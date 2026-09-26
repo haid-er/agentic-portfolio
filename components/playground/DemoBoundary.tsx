@@ -8,7 +8,7 @@ import { Button, ErrorState } from '@/components/ui'
 
 interface State { error: Error | null; attempt: number }
 
-export class DemoBoundary extends Component<{ children: ReactNode; title: string }, State> {
+export class DemoBoundary extends Component<{ children: ReactNode; title: string; localOnly: boolean }, State> {
   state: State = { error: null, attempt: 0 }
 
   static getDerivedStateFromError(error: Error): Partial<State> {
@@ -28,8 +28,10 @@ export class DemoBoundary extends Component<{ children: ReactNode; title: string
           title={`${this.props.title} stopped working`}
           action={<Button variant="secondary" size="sm" icon="refresh" onClick={this.retry}>Restart the demo</Button>}
         >
-          The demo hit an error in your browser. Nothing was sent anywhere. Restarting usually fixes it; the notes
-          below still explain how it works.
+          {this.props.localOnly
+            ? 'The demo hit an error in your browser. Nothing was sent anywhere. '
+            : 'The demo hit an error. '}
+          Restarting usually fixes it; the notes below still explain how it works.
         </ErrorState>
       )
     }

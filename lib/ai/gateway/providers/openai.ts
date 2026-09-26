@@ -42,7 +42,8 @@ function toMessage(m: AiMessage): OaMessage {
 function reasoningKnobs(model: string): Record<string, unknown> {
   if (/gpt-oss/i.test(model)) return { reasoning_effort: 'low', include_reasoning: false }
   if (/qwen3|qwq/i.test(model)) return { reasoning_effort: 'none' }
-  if (/^deepseek/i.test(model)) return { reasoning_effort: 'low' }
+  // DeepSeek V4: max_tokens counts reasoning tokens and tools fail in thinking mode, so thinking is off.
+  if (/^deepseek/i.test(model)) return { reasoning_effort: 'none' }
   return {}
 }
 

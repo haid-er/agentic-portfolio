@@ -6,8 +6,10 @@
  *
  * Two honest modes:
  * - `endpoint` set (Web3Forms / Formspree, from admin): POSTs JSON to it.
- *   Web3Forms keys can ride on the URL (`?access_key=...`) and move into the body.
- * - no endpoint: builds a mailto: link, so the visitor's own mail app sends it.
+ *   Web3Forms keys ride on the URL (`?access_key=...`) and move into the body;
+ *   a Web3Forms URL without a key is treated as unset (see formEndpoint.ts).
+ * - no usable endpoint: builds a mailto: link, so the visitor's own mail app sends it.
+ *   With no `to` address either, nothing is rendered (the section decides this too).
  * If a POST fails, the same words are offered as a prefilled email instead.
  * Unsent drafts stay in this browser only (localStorage, `ghp:` namespace).
  */
@@ -15,6 +17,7 @@ import { useEffect, useRef, useState, type FormEvent } from 'react'
 import { Button, ErrorState, Icon, Input, Textarea, buttonClasses } from '@/components/ui'
 import { useLocalStorage } from '@/lib/hooks'
 import { cx } from '@/lib/utils'
+import { WEB3FORMS_HOST, endpointHost } from './formEndpoint'
 
 const MAX_MESSAGE = 4000
 const MIN_MESSAGE = 10
@@ -54,18 +57,13 @@ function mailtoHref(to: string, d: Draft) {
 function target(endpoint: string): { url: string; extra: Record<string, string>; honeypot: string; host: string } {
   const u = new URL(endpoint)
   const host = u.hostname.replace(/^www\./, '')
-  if (host === 'api.web3forms.com') {
+  if (host === WEB3FORMS_HOST) {
     const key = u.searchParams.get('access_key') ?? ''
     u.searchParams.delete('access_key')
     return { url: u.toString(), extra: key ? { access_key: key } : {}, honeypot: 'botcheck', host }
   }
   if (host.endsWith('formspree.io')) return { url: u.toString(), extra: {}, honeypot: '_gotcha', host }
   return { url: u.toString(), extra: {}, honeypot: '_honey', host }
-}
-
-function endpointHost(endpoint?: string) {
-  if (!endpoint) return ''
-  try { return target(endpoint).host } catch { return '' }
 }
 
 export function ContactForm({ endpoint, to, recipient }: { endpoint?: string; to: string; recipient: string }) {
@@ -197,6 +195,9 @@ export function ContactForm({ endpoint, to, recipient }: { endpoint?: string; to
       </div>
     )
   }
+
+  // Mailto mode with no address would open a blank email: show nothing instead.
+  if (mode === 'mailto' && !to) return null
 
   const busy = status.kind === 'sending'
   const len = draft.message.length

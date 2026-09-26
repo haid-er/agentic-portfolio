@@ -72,7 +72,7 @@ export function Header() {
             <span className="display truncate text-2 leading-none">{profile.name}</span>
           </Link>
 
-          <PrimaryNav items={nav.primary} spyIds={nav.spyIds} label={UI.primaryNav} />
+          <PrimaryNav items={nav.desktop} spyIds={nav.spyIds} label={UI.primaryNav} />
 
           <div className="flex flex-none items-center gap-2">
             <IndexButton label={UI.index} />

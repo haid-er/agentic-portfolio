@@ -110,7 +110,7 @@ export const DEMOS: readonly DemoMeta[] = [
     summary: 'Embed sentences in the browser, see them in 2D, run cosine top-k search and compare chunking strategies.',
     skills: ['Pinecone', 'Embeddings', 'Semantic search'],
     mirrors: 'Pinecone-backed retrieval in RAG services.',
-    runsIn: 'browser', mobile: desktop('downloads a ~25 MB embedding model on first run'), usesAI: false,
+    runsIn: 'browser', mobile: phoneOk, usesAI: false,
   },
   {
     slug: 'legal-rag-assistant', title: 'Legal RAG assistant', module: 'demos-ai-rag', pillar: 'ai',
@@ -124,7 +124,7 @@ export const DEMOS: readonly DemoMeta[] = [
     summary: 'Count tokens, estimate per-model cost, and see what caching, batching and a model router save.',
     skills: ['LLM cost engineering', 'OpenAI', 'Anthropic', 'Google'],
     mirrors: 'LLM-driven ESG estimation pipelines at Euthyna.',
-    runsIn: 'browser', mobile: phoneOk, usesAI: false,
+    runsIn: 'browser + ai', mobile: phoneOk, usesAI: true,
   },
 
   /* ---------------- demos-sensors-ml ---------------- */
@@ -209,7 +209,7 @@ export const DEMOS: readonly DemoMeta[] = [
     summary: 'UK grid carbon intensity now, a 48-hour forecast and generation mix, with a best-time-to-run hint.',
     skills: ['External API integration', 'Decarbonisation'],
     mirrors: 'Terra Real Estate decarbonisation work.',
-    runsIn: 'server', mobile: phoneOk, usesAI: false,
+    runsIn: 'browser', mobile: phoneOk, usesAI: false,
   },
   {
     slug: 'solar-pv-estimator', title: 'Solar PV estimator', module: 'demos-esg-climate', pillar: 'esg',
@@ -331,7 +331,7 @@ export const DEMOS: readonly DemoMeta[] = [
     summary: 'Wire a load balancer, APIs, a queue, cache, database and workers, then push load and find the bottleneck.',
     skills: ['System design', 'Scalability', 'AWS / Azure'],
     mirrors: 'Backend and platform architecture for enterprise SaaS.',
-    runsIn: 'browser', mobile: desktop('the canvas needs room to drag components'), usesAI: false,
+    runsIn: 'browser', mobile: desktop('the canvas needs room to drag components'), usesAI: false, glyph: 'nodes',
   },
 ]
 

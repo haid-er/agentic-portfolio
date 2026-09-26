@@ -8,7 +8,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { Button, DemoGrid, DemoPanel, EmptyState, ErrorState, Input, Segmented } from '@/components/ui'
 import { Icon } from '@/components/ui/Icon'
-import { AiError, aiErrorMessage, isQuotaError, streamText } from '@/lib/ai'
+import { AiError, aiErrorMessage, getAiStatus, isQuotaError, streamText } from '@/lib/ai'
 import type { DemoProps } from '@/lib/demos/types'
 import { useLocalStorage, useReducedMotion } from '@/lib/hooks'
 import { buildMessages, extractiveAnswer, SYSTEM_PROMPT } from './answer'
@@ -106,10 +106,13 @@ export default function Demo({ slug }: DemoProps) {
       } else if (got) {
         patch(id, { status: 'done', answer: got, note: `The stream broke off: ${aiErrorMessage(err)} The partial answer is kept.` })
       } else {
+        // Offer the on-device model only for quota errors, and only if the admin allows it (ai.browserFallback).
+        const quota = isQuotaError(err) && err.code !== 'rate_limited'
+        const allowed = quota ? await getAiStatus().then((s) => s.browserFallback).catch(() => true) : false
         patch(id, {
           status: 'done', via: 'extractive', answer: extractiveAnswer(expanded.terms, sent),
           note: `${aiErrorMessage(err)} Showing an extractive answer instead: the best-matching clause of each top source, quoted exactly.`,
-          canDevice: isQuotaError(err) && err.code !== 'rate_limited',
+          canDevice: quota && allowed,
         })
       }
     } finally {

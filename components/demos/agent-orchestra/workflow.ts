@@ -75,10 +75,18 @@ export async function orchestrate(rec: Recorder<WorkflowResult>, o: WorkflowOpti
     if (o.allowRevision && idx >= 0) {
       const task = plan.tasks[idx] as Task
       rec.event('MarkerRecorded', `reviewer asked for a revision of ${task.id} (${task.title}): ${review.notes.slice(0, 90)}`, wf)
-      const redo = await runWorker(task, idx, review.notes)
-      outputs[idx] = { task, work: redo.value }
-      revisions = 1
-      review = (await reviewOnce(true)).value
+      const first = outputs[idx]
+      try {
+        const redo = await runWorker(task, idx, review.notes)
+        outputs[idx] = { task, work: redo.value }
+        review = (await reviewOnce(true)).value
+        revisions = 1
+      } catch (e) {
+        // The first review is already a complete result: keep it rather than failing the workflow.
+        if (!(e instanceof ActivityFailure) || o.signal.aborted) throw e
+        if (first) outputs[idx] = first
+        rec.event('MarkerRecorded', `revision failed, keeping first review: ${e.message.slice(0, 90)}`, wf)
+      }
     }
 
     const result: WorkflowResult = { goal: o.goal, plan, outputs, review, revisions, simulated: o.simulated }

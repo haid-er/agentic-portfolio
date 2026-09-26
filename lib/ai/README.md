@@ -36,7 +36,7 @@ demo shows `ai.fallback` ──> user opts in ──> lib/ai/browser.ts (SmolLM2
 - Timeouts: 20 s per non-streaming attempt; streams must show a first visible token within 12 s and never go silent for 15 s; 50 s overall (`maxDuration = 60`).
 - Failover: non-streaming calls move on after any provider error. Streams move on only **before** the first token; after it, an `event: error` ends the stream and the client keeps the partial text.
 - Cooldowns (per provider + model, in memory): 429 → Retry-After (or 30 s), 5xx → 10–20 s, timeout → 15 s, bad key or unknown model → 5 min.
-- Reasoning models are kept brief so answers fit the cap: Groq gpt-oss `reasoning_effort: low`, Qwen3 `none`, DeepSeek `low`, Gemini 2.5 `thinkingBudget: 0`, Gemini 3.x `thinkingLevel: low`. When a model rejects a knob (400), the request is retried once without the optional knobs.
+- Reasoning models are kept brief so answers fit the cap: Groq gpt-oss `reasoning_effort: low`, Qwen3 `none`, DeepSeek `none` (thinking off: its max_tokens counts reasoning, and tools fail in thinking mode), Gemini 2.5 `thinkingBudget: 0`, Gemini 3.x `thinkingLevel: low`. When a model rejects a knob (400), the request is retried once without the optional knobs.
 - DeepSeek: `max_tokens ≤ 512`; before each call it reserves `estimated input + max_tokens` from `deepseekBudgetTokens` and settles with real usage.
 
 ## Limits (server-enforced)
@@ -54,7 +54,7 @@ demo shows `ai.fallback` ──> user opts in ──> lib/ai/browser.ts (SmolLM2
 ## Wire protocol
 
 - `POST /api/ai/chat` with `AiTextRequest & {stream?}`. JSON → `AiTextResult`. With `stream: true` → SSE: `event: token` (JSON string), `event: done` (`AiMeta`), `event: error` (`{code,message}`). Tools work only without streaming.
-- `POST /api/ai/object` with `AiObjectWireRequest` → `AiObjectResult<unknown>`. The server adds schema instructions, uses JSON mode (Groq/DeepSeek `json_object`, Gemini `responseJsonSchema`), validates, and runs **one repair turn** on failure. The client validates again with zod and retries once.
+- `POST /api/ai/object` with `AiObjectWireRequest` → `AiObjectResult<unknown>`. The server adds schema instructions, uses JSON mode (Groq/DeepSeek `json_object`, Gemini `responseJsonSchema`), validates, and runs **one repair turn** on failure. The client validates again with zod and retries once. The server check is bounded (a visit budget; `pattern` is not evaluated server-side) and rejects schemas whose `$ref` is not `#`/`#/$defs/...` or that recurse without descending into the value (`400 bad_request`); recursive tree schemas from zod are fine. DeepSeek budget: an object attempt reserves two calls' worth, affordability is re-checked right before each DeepSeek call, and failed or abandoned attempts are charged (estimated) instead of released.
 - `GET /api/ai/status` → `AiStatus` with each provider's `state` (`ready | off | no-key | cooling | budget`) and this IP's `ratelimit-*` headers (it does not spend a request).
 - Errors: `{error:{code,message,retryAfterSec?}}` with status 400/413/429/499/502/503; 429 and 503 quota carry `Retry-After`.
 - Headers on every response: `x-ai-provider`, `x-ai-model`, `ratelimit-limit|remaining|reset`, `cache-control: no-store`; when known, `x-ai-route` (`groq:rate_limited>gemini:ok`), `x-ai-latency-ms`, `x-ai-input-tokens`, `x-ai-output-tokens`.

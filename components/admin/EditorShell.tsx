@@ -21,6 +21,7 @@ import { describeChange } from '@/lib/admin/diff'
 import { timeAgo } from '@/lib/admin/format'
 import { cx } from '@/lib/utils'
 import { ConfirmDialog } from './ConfirmDialog'
+import { EditorBoundary } from './EditorBoundary'
 import { EditorCtx, type EditorApi, type Updater } from './EditorContext'
 import { RawJson } from './RawJson'
 import { getIn, pathKey, sameJson, setIn, type Path } from './lib/path'
@@ -40,19 +41,25 @@ interface Issue { key: string; path: Path; message: string }
 export interface ExtraIssue { path: Path; message: string }
 export type ExtraCheck = (data: unknown) => ExtraIssue[]
 
-/** Duplicate `id` / `slug` values in list collections (zod only checks the format). */
-function duplicateKeys(data: unknown): ExtraIssue[] {
-  const items = getIn(data, ['items'])
-  if (!Array.isArray(items)) return []
-  const out: ExtraIssue[] = []
-  for (const field of ['id', 'slug'] as const) {
-    const seen = new Map<string, number>()
-    items.forEach((it: Record<string, unknown>, i) => {
-      const v = it?.[field]
-      if (typeof v !== 'string' || !v) return
-      if (seen.has(v)) out.push({ path: ['items', i, field], message: `Duplicate ${field} “${v}” (also used by item #${seen.get(v)! + 1}).` })
-      else seen.set(v, i)
-    })
+/**
+ * Duplicate `id` / `slug` values in every list of objects, at any depth
+ * (`items`, `site.socials`, …). zod only checks the format, and a duplicate
+ * becomes a duplicate React key and anchor on the public site.
+ */
+function duplicateKeys(data: unknown, path: Path = [], out: ExtraIssue[] = []): ExtraIssue[] {
+  if (Array.isArray(data)) {
+    for (const field of ['id', 'slug'] as const) {
+      const seen = new Map<string, number>()
+      data.forEach((it: unknown, i) => {
+        const v = it && typeof it === 'object' ? (it as Record<string, unknown>)[field] : undefined
+        if (typeof v !== 'string' || !v) return
+        if (seen.has(v)) out.push({ path: [...path, i, field], message: `Duplicate ${field} “${v}” (also used by item #${seen.get(v)! + 1}).` })
+        else seen.set(v, i)
+      })
+    }
+    data.forEach((it, i) => duplicateKeys(it, [...path, i], out))
+  } else if (data && typeof data === 'object') {
+    for (const [k, v] of Object.entries(data)) duplicateKeys(v, [...path, k], out)
   }
   return out
 }
@@ -124,7 +131,15 @@ export function EditorShell({ name, meta, initialData, check, children }: {
   const [busy, setBusy] = useState(false)
   const [banner, setBanner] = useState<Banner | null>(null)
   const [savedAt, setSavedAt] = useState<{ at: number; summary: string; commitUrl?: string } | null>(null)
-  const [pendingHref, setPendingHref] = useState<string | null>(null)
+  /** A blocked navigation: a link target, or `href: null` for the Back button. */
+  const [pending, setPending] = useState<{ href: string | null } | null>(null)
+  /**
+   * 'ok' once the latest stored copy (and its sha) was read; until then a save
+   * re-checks first, so the conflict guard is never silently off.
+   */
+  const [sync, setSync] = useState<'pending' | 'ok' | 'failed' | 'unconfigured'>('pending')
+  /** A newer stored copy exists under unsaved edits: saving is refused until the owner chooses. */
+  const [stale, setStale] = useState(false)
   const [confirmDiscard, setConfirmDiscard] = useState(false)
   const [, tick] = useState(0)
   const [shortcut, setShortcut] = useState('Ctrl+S')
@@ -133,6 +148,12 @@ export function EditorShell({ name, meta, initialData, check, children }: {
   const dirty = !sameJson(data, saved)
   const dirtyRef = useRef(dirty)
   dirtyRef.current = dirty
+  const savedRef = useRef(saved)
+  savedRef.current = saved
+  /** Last data the form rendered without throwing (see EditorBoundary). */
+  const lastGood = useRef(data)
+  const dataRef = useRef(data)
+  dataRef.current = data
 
   /* ---------------- validation ---------------- */
   const clientIssues = useMemo(() => issuesOf(name, data, check), [name, data, check])
@@ -173,38 +194,68 @@ export function EditorShell({ name, meta, initialData, check, children }: {
   }), [data, saved, set, busy, revealed, issues, visible])
 
   /* ---------------- latest stored copy ---------------- */
-  useEffect(() => {
-    let alive = true
-    loadContent(name).then((res) => {
-      if (!alive) return
-      if (!res.ok) {
-        if (res.code === 'unconfigured') {
-          setBanner({ tone: 'warn', title: 'Saving is not configured here', body: 'This deployment has no content store (GITHUB_TOKEN + GITHUB_REPO). You can edit and validate, but a save will be refused.' })
-        } else if (res.code === 'unauthorized') {
-          setBanner(sessionBanner())
-        }
-        return
-      }
-      setMode(res.mode)
-      setBaseSha(res.sha ?? undefined)
-      if (res.data == null || sameJson(res.data, initialData)) return
-      const parsed = SCHEMAS[name].safeParse(res.data)
-      if (!parsed.success) return
-      if (!dirtyRef.current) {
-        setData(parsed.data)
-        setSaved(parsed.data)
-        setBanner({ tone: 'info', title: 'Showing the latest saved copy', body: 'It is newer than the build you are looking at; the public site catches up when the redeploy finishes.' })
+  /**
+   * Read the stored copy and decide what to do with it. The sha is adopted only
+   * together with the data it belongs to; under unsaved edits a newer copy
+   * marks the form stale instead, so a save cannot overwrite it.
+   */
+  const syncLatest = useCallback(async (): Promise<{ status: 'ok' | 'replaced' | 'stale' | 'failed'; sha?: string }> => {
+    const res = await loadContent(name)
+    if (!res.ok) {
+      if (res.code === 'unconfigured') {
+        setSync('unconfigured')
+        setBanner({ tone: 'warn', title: 'Saving is not configured here', body: 'This deployment has no content store (GITHUB_TOKEN + GITHUB_REPO). You can edit and validate, but a save will be refused.' })
       } else {
-        setBanner({
+        setSync('failed')
+        setBanner(res.code === 'unauthorized' ? sessionBanner() : {
           tone: 'warn',
-          title: 'A newer saved copy exists',
-          body: 'Someone (or another tab) saved this collection after this page was built. Saving now would be refused as a conflict.',
-          actions: [{ label: 'Load it (drop my edits)', onClick: () => { setData(parsed.data); setSaved(parsed.data); setBanner(null) } }],
+          title: 'Could not load the latest copy',
+          body: `${res.message} Saving checks again first and is refused if that also fails, so newer edits are never overwritten blindly.`,
+          actions: [{ label: 'Retry', onClick: () => { setBanner(null); void syncLatest() } }],
         })
       }
+      return { status: 'failed' }
+    }
+    setMode(res.mode)
+    setSync('ok')
+    const sha = res.sha ?? undefined
+    const parsed = res.data == null ? null : SCHEMAS[name].safeParse(res.data)
+    // Same as ours, missing, or unreadable (a save is the way to repair it): just take the sha.
+    if (!parsed || !parsed.success || sameJson(parsed.data, savedRef.current) || sameJson(res.data, savedRef.current)) {
+      setBaseSha(sha)
+      setStale(false)
+      return { status: 'ok', sha }
+    }
+    const adopt = () => {
+      setData(parsed.data)
+      setSaved(parsed.data)
+      setBaseSha(sha)
+      setStale(false)
+      setTouched(new Set())
+      setServerIssues([])
+      setRevealed(false)
+    }
+    if (!dirtyRef.current) {
+      adopt()
+      setBanner({ tone: 'info', title: 'Showing the latest saved copy', body: 'It is newer than the build you are looking at; the public site catches up when the redeploy finishes.' })
+      return { status: 'replaced' }
+    }
+    setStale(true)
+    setBanner({
+      tone: 'warn',
+      title: 'A newer saved copy exists',
+      body: 'Someone (or another tab) saved this collection after this page was built, so saving your edits is blocked. Copy your version from “Edit as JSON” if you need it, then load the newer copy and re-apply your edit.',
+      actions: [{ label: 'Load it (drop my edits)', onClick: () => { adopt(); setBanner(null) } }],
     })
-    return () => { alive = false }
-  }, [name, initialData])
+    return { status: 'stale' }
+  }, [name])
+
+  useEffect(() => {
+    let alive = true
+    // Deferred a tick so a fast unmount (route change) skips the request.
+    const t = window.setTimeout(() => { if (alive) void syncLatest() }, 0)
+    return () => { alive = false; window.clearTimeout(t) }
+  }, [syncLatest])
 
   // Keep "saved 3 min ago" fresh.
   useEffect(() => {
@@ -224,12 +275,32 @@ export function EditorShell({ name, meta, initialData, check, children }: {
       focusFirstInvalid(issuesOf(name, data, check)[0]?.key)
       return false
     }
+    if (stale) {
+      toast('A newer saved copy exists. Nothing was saved.', { tone: 'danger', ms: 7000 })
+      failed('conflict', '')
+      return false
+    }
     setBusy(true)
+    let sha = baseSha
+    if (sync === 'pending' || sync === 'failed') {
+      // Never save without knowing what we would overwrite.
+      const latest = await syncLatest()
+      if (latest.status !== 'ok') {
+        setBusy(false)
+        if (latest.status === 'failed') toast('Could not check for a newer saved copy, so nothing was saved. Try again.', { tone: 'danger', ms: 7000 })
+        else if (latest.status === 'replaced') toast('The form now shows a newer saved copy. Nothing was saved.', { tone: 'warn', ms: 7000 })
+        else toast('A newer saved copy exists. Nothing was saved.', { tone: 'danger', ms: 7000 })
+        return false
+      }
+      sha = latest.sha
+    }
+    const snapshot = data
     const summary = describeChange(saved, parsed.data).text
-    const res = await saveContent(name, parsed.data, { baseSha })
+    const res = await saveContent(name, parsed.data, { baseSha: sha })
     setBusy(false)
     if (res.ok) {
-      setData(parsed.data)
+      // Keep anything typed while the commit was in flight; it simply stays "unsaved".
+      setData((cur: unknown) => (cur === snapshot ? parsed.data : cur))
       setSaved(parsed.data)
       if (res.sha) setBaseSha(res.sha)
       if (res.mode) setMode(res.mode)
@@ -244,10 +315,10 @@ export function EditorShell({ name, meta, initialData, check, children }: {
     failed(res.code, res.message, res.issues)
     return false
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [busy, name, data, saved, baseSha, meta.label, toast, check])
+  }, [busy, name, data, saved, baseSha, meta.label, toast, check, stale, sync, syncLatest])
 
   function failed(code: ClientCode, message: string, serverList?: { path: string; message: string }[]) {
-    toast(message, { tone: 'danger', ms: 7000 })
+    if (message) toast(message, { tone: 'danger', ms: 7000 })
     switch (code) {
       case 'invalid':
         setServerIssues((serverList ?? []).map((i) => {
@@ -280,6 +351,8 @@ export function EditorShell({ name, meta, initialData, check, children }: {
       setData(parsed.data)
       setSaved(parsed.data)
       setBaseSha(res.sha ?? undefined)
+      setSync('ok')
+      setStale(false)
       setTouched(new Set())
       setServerIssues([])
       setRevealed(false)
@@ -308,6 +381,7 @@ export function EditorShell({ name, meta, initialData, check, children }: {
     setRevealed(false)
     setConfirmDiscard(false)
     toast('Changes discarded.')
+    if (stale) reloadLatest() // the newer stored copy replaces the stale base
   }
 
   /* ---------------- keyboard + guard ---------------- */
@@ -324,13 +398,25 @@ export function EditorShell({ name, meta, initialData, check, children }: {
     return () => window.removeEventListener('keydown', onKey)
   }, [])
 
-  useUnsavedGuard(dirty, setPendingHref)
+  const onBlocked = useCallback((href: string | null) => setPending({ href }), [])
+  const guard = useUnsavedGuard(dirty, onBlocked)
 
-  const leave = (href: string) => {
-    setPendingHref(null)
+  const go = (href: string | null) => (href === null ? guard.back() : router.push(href))
+
+  const leave = (href: string | null) => {
+    setPending(null)
+    guard.allowLeave(true)
     dirtyRef.current = false
     setSaved(data) // lifts the guard for this navigation
-    router.push(href)
+    go(href)
+  }
+
+  const saveAndLeave = async () => {
+    const href = pending?.href ?? null
+    setPending(null)
+    guard.allowLeave(true)
+    if (await save()) go(href)
+    else guard.allowLeave(false)
   }
 
   /* ---------------- counts for the header ---------------- */
@@ -371,8 +457,14 @@ export function EditorShell({ name, meta, initialData, check, children }: {
           onSubmit={(e) => { e.preventDefault(); void save() }}
           className="grid gap-s6 min-w-0"
         >
-          {children}
-          <RawJson />
+          <EditorBoundary
+            resetKey={data}
+            onRendered={() => { lastGood.current = dataRef.current }}
+            onRevert={() => setData(lastGood.current)}
+          >
+            {children}
+          </EditorBoundary>
+          <RawJson name={name} />
           <SaveBar
             dirty={dirty}
             busy={busy}
@@ -387,13 +479,13 @@ export function EditorShell({ name, meta, initialData, check, children }: {
       </div>
 
       <ConfirmDialog
-        open={pendingHref !== null}
+        open={pending !== null}
         title="Leave with unsaved edits?"
-        onClose={() => setPendingHref(null)}
+        onClose={() => setPending(null)}
         actions={[
-          { label: 'Stay', onClick: () => setPendingHref(null), autoFocus: true },
-          { label: 'Leave without saving', variant: 'danger', onClick: () => pendingHref && leave(pendingHref) },
-          { label: 'Save and leave', variant: 'primary', onClick: async () => { const href = pendingHref; setPendingHref(null); if (href && (await save())) router.push(href) } },
+          { label: 'Stay', onClick: () => setPending(null), autoFocus: true },
+          { label: 'Leave without saving', variant: 'danger', onClick: () => pending && leave(pending.href) },
+          { label: 'Save and leave', variant: 'primary', onClick: () => void saveAndLeave() },
         ]}
       >
         <p className="m-0">{change ? `Pending: ${change}.` : 'You changed this collection.'} Nothing is saved until you press Save.</p>

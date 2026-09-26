@@ -1,6 +1,9 @@
 /** Writes the GitHub Actions workflow that matches the current settings (illustrative, not executed). */
 import type { RunConfig } from './engine'
 
+/** GitHub expression that is true on the production branch. */
+const PROD = "github.ref == 'refs/heads/main'"
+
 export function toWorkflowYaml(cfg: RunConfig): string {
   const aws = cfg.target === 'aws'
   const deployNeeds = aws ? 'image' : 'build'
@@ -19,6 +22,12 @@ export function toWorkflowYaml(cfg: RunConfig): string {
     '  contents: read',
     '  id-token: write   # OIDC to the cloud, no long-lived keys',
     '',
+    ...(aws ? [] : [
+      'env:',
+      '  VERCEL_ORG_ID: ${{ vars.VERCEL_ORG_ID }}',
+      '  VERCEL_PROJECT_ID: ${{ vars.VERCEL_PROJECT_ID }}',
+      '',
+    ]),
     'jobs:',
     '  lint:',
     '    runs-on: ubuntu-24.04',
@@ -73,9 +82,21 @@ export function toWorkflowYaml(cfg: RunConfig): string {
     '          path: .next/cache',
     "          key: nextjs-${{ hashFiles('package-lock.json') }}",
     '      - run: npm ci',
-    '      - run: npm run build',
-    '      - uses: actions/upload-artifact@v4',
-    '        with: { name: next-build, path: .next }',
+    ...(aws
+      ? [
+          '      - run: npm run build',
+          '      - uses: actions/upload-artifact@v4',
+          '        with: { name: next-build, path: .next, include-hidden-files: true }',
+        ]
+      : [
+          // `vercel deploy --prebuilt` needs the Build Output API folder (.vercel/output) that `vercel build` writes.
+          `      - run: npx vercel pull --yes --environment=\${{ ${PROD} && 'production' || 'preview' }} --token "$VERCEL_TOKEN"`,
+          '        env: { VERCEL_TOKEN: "${{ secrets.VERCEL_TOKEN }}" }',
+          `      - run: npx vercel build \${{ ${PROD} && '--prod' || '' }} --token "$VERCEL_TOKEN"`,
+          '        env: { VERCEL_TOKEN: "${{ secrets.VERCEL_TOKEN }}" }',
+          '      - uses: actions/upload-artifact@v4',
+          '        with: { name: vercel-output, path: .vercel/output, include-hidden-files: true }',
+        ]),
     '',
   ]
   if (aws) {
@@ -83,6 +104,8 @@ export function toWorkflowYaml(cfg: RunConfig): string {
       '  image:',
       '    needs: build',
       '    runs-on: ubuntu-24.04',
+      '    outputs:',
+      '      uri: ${{ steps.ecr.outputs.registry }}/web:${{ github.sha }}',
       '    steps:',
       '      - uses: actions/checkout@v4',
       '      - uses: docker/setup-buildx-action@v3',
@@ -106,19 +129,32 @@ export function toWorkflowYaml(cfg: RunConfig): string {
       `    if: ${cond}`,
       '    runs-on: ubuntu-24.04',
       `    environment: ${env}${env === 'production' ? '   # required reviewers gate this job' : ''}`,
+      '    env: { DEPLOY_URL: "${{ vars.DEPLOY_URL }}" }',
       '    steps:',
     )
     if (aws) {
+      // Register a task definition revision that points at this commit's image, then roll the service onto it.
       lines.push(
+        '      - uses: actions/checkout@v4',
         '      - uses: aws-actions/configure-aws-credentials@v4',
         '        with: { role-to-assume: "${{ vars.DEPLOY_ROLE }}", aws-region: "${{ vars.AWS_REGION }}" }',
-        `      - run: aws ecs update-service --cluster ${env} --service web --force-new-deployment`,
-        `      - run: aws ecs wait services-stable --cluster ${env} --services web`,
+        '      - id: taskdef',
+        '        uses: aws-actions/amazon-ecs-render-task-definition@v1',
+        '        with:',
+        `          task-definition: .aws/task-definition.${env}.json`,
+        '          container-name: web',
+        '          image: ${{ needs.image.outputs.uri }}',
+        '      - uses: aws-actions/amazon-ecs-deploy-task-definition@v2',
+        '        with:',
+        '          task-definition: ${{ steps.taskdef.outputs.task-definition }}',
+        `          cluster: ${env}`,
+        '          service: web',
+        '          wait-for-service-stability: true',
       )
     } else {
       lines.push(
         '      - uses: actions/download-artifact@v4',
-        '        with: { name: next-build, path: .next }',
+        '        with: { name: vercel-output, path: .vercel/output }',
         `      - run: npx vercel deploy --prebuilt${env === 'production' ? ' --prod' : ''} --token "$VERCEL_TOKEN"`,
         '        env: { VERCEL_TOKEN: "${{ secrets.VERCEL_TOKEN }}" }',
       )

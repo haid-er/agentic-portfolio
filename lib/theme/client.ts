@@ -5,11 +5,8 @@
  * with `readToken()` when it changes (DESIGN.md 10: previews redraw in the current world's inks).
  */
 import { useSyncExternalStore } from 'react'
-import { THEME_KEYS, type ThemeKey } from '@/lib/content/schema'
 import { THEME_EVENT, THEME_STORAGE_KEY } from './index'
-
-const isKey = (v: string | null | undefined): v is ThemeKey =>
-  (THEME_KEYS as readonly string[]).includes(v ?? '')
+import { isThemeKey as isKey, type ThemeKey } from './keys'
 
 export function getThemeKey(): ThemeKey {
   if (typeof document === 'undefined') return 'almanac'

@@ -148,9 +148,40 @@ export const SAMPLE: CalcState = {
 
 export const EMPTY: CalcState = { ...SAMPLE, entities: [SAMPLE.entities[0] as Entity], activities: [] }
 
+export const MAX_OVERRIDE = 1e6
+
+const pick = <T,>(schema: z.ZodType<T>, v: unknown, fallback: T): T => {
+  const p = schema.safeParse(v)
+  return p.success ? p.data : fallback
+}
+const OverrideValue = z.number().min(0).max(MAX_OVERRIDE)
+
+/**
+ * Validates saved state item by item: a bad entity, line or override is dropped on its own,
+ * so one out-of-range value never wipes the whole inventory. SAMPLE only when the shape is unusable.
+ */
 export function loadState(raw: unknown): CalcState {
-  const p = StateSchema.safeParse(raw)
-  return p.success ? p.data : SAMPLE
+  const full = StateSchema.safeParse(raw)
+  if (full.success) return full.data
+  if (!raw || typeof raw !== 'object' || (raw as { v?: unknown }).v !== 1) return SAMPLE
+  const r = raw as Record<string, unknown>
+  const items = <T,>(schema: z.ZodType<T>, v: unknown, max: number): T[] =>
+    (Array.isArray(v) ? v : []).flatMap((x) => { const p = schema.safeParse(x); return p.success ? [p.data] : [] }).slice(0, max)
+  const overrides: CalcState['overrides'] = {}
+  if (r.overrides && typeof r.overrides === 'object') {
+    for (const [k, v] of Object.entries(r.overrides)) if (OverrideValue.safeParse(v).success) overrides[k] = v as number
+  }
+  const entities = items(EntitySchema, r.entities, MAX_ENTITIES)
+  if (!entities.length) return SAMPLE
+  return {
+    v: 1,
+    approach: pick(StateSchema.shape.approach, r.approach, SAMPLE.approach),
+    s2: pick(StateSchema.shape.s2, r.s2, SAMPLE.s2),
+    includeTD: pick(StateSchema.shape.includeTD, r.includeTD, SAMPLE.includeTD),
+    entities,
+    activities: items(ActivitySchema, r.activities, MAX_ACTIVITIES),
+    overrides,
+  }
 }
 
 export const newId = (prefix: string) => `${prefix}${Math.random().toString(36).slice(2, 8)}`

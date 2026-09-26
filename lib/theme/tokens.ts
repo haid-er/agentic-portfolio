@@ -6,7 +6,8 @@
  * browser `theme-color`. Admin overrides from content/theme.json are merged on
  * top with `worldTokens()`, so a retuned world is retuned everywhere.
  */
-import type { Theme, ThemeKey } from '@/lib/content/schema'
+import type { Theme } from '@/lib/content/schema'
+import type { ThemeKey } from './keys'
 
 export type ColorToken =
   | '--bg' | '--bg-2' | '--surface'

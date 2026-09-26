@@ -7,7 +7,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, DemoGrid, DemoPanel, Loading, Segmented, Toggle } from '@/components/ui'
 import { getTheme } from '@/lib/content'
-import { THEME_KEYS, type ThemeKey } from '@/lib/content/schema'
+import { THEME_KEYS, type ThemeKey } from '@/lib/theme/keys'
 import type { DemoProps } from '@/lib/demos/types'
 import { useLocalStorage } from '@/lib/hooks'
 import { DEFAULT_COLORS, themeLabels, type ColorToken } from '@/lib/theme'

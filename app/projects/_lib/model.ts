@@ -66,9 +66,11 @@ export function parseOutcome(outcome: string | undefined): OutcomeView | undefin
 /**
  * "Aug 2022 – Jan 2023", "May 2025", or "" when undated.
  * A project without an end date shows its start only: unlike experience, a
- * missing project end does not mean "present", so nothing is implied.
+ * missing project end does not mean "present", so nothing is implied. Only an
+ * explicit `ongoing: true` shows "– Present".
  */
-export function projectRange(p: Pick<Project, 'start' | 'end'>): string {
+export function projectRange(p: Pick<Project, 'start' | 'end' | 'ongoing'>): string {
+  if (p.ongoing && p.start) return formatRange(p.start, '')
   if (!p.start) return p.end ? formatPartialDate(p.end) : ''
   if (!p.end || p.end === p.start) return formatPartialDate(p.start)
   return formatRange(p.start, p.end)

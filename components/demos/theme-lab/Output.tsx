@@ -1,8 +1,8 @@
 'use client'
-/** Copy the edited world as CSS or as theme.json tokens, or hand it to the admin editor. */
+/** Copy the edited world as CSS or as theme.json tokens, ready to paste into the admin theme editor. */
 import { useState } from 'react'
 import { Button, ButtonLink, DemoPanel, Segmented, useToast } from '@/components/ui'
-import type { ThemeKey } from '@/lib/content/schema'
+import type { ThemeKey } from '@/lib/theme/keys'
 import { cssBlock, themeJsonTokens, type Edits, type Palette } from './tokens'
 
 type Format = 'css' | 'json'
@@ -31,8 +31,17 @@ export function Output({ world, label, palette, edits, failing, onSendToAdmin }:
     }
   }
 
-  const send = () => {
-    if (onSendToAdmin()) { setSent(true); toast(`Draft for ${label} saved in this browser.`, { tone: 'ok' }) }
+  // Hand-off: the admin editor takes pasted theme.json tokens, so copy them; the draft stays in this browser as a backup.
+  const send = async () => {
+    if (!onSendToAdmin()) return
+    setSent(true)
+    try {
+      await navigator.clipboard.writeText(themeJsonTokens(world, palette))
+      toast(`theme.json tokens for ${label} copied.`, { tone: 'ok' })
+    } catch {
+      setFormat('json')
+      toast('Clipboard is blocked here: copy the theme.json tokens above by hand.', { tone: 'warn' })
+    }
   }
 
   return (
@@ -57,7 +66,7 @@ export function Output({ world, label, palette, edits, failing, onSendToAdmin }:
         </p>
         <div className="flex flex-wrap gap-2">
           <Button size="sm" variant="secondary" icon="copy" onClick={copy}>Copy</Button>
-          <Button size="sm" icon="upload" onClick={send} disabled={failing > 0 || changed === 0}>Save draft for admin</Button>
+          <Button size="sm" icon="upload" onClick={send} disabled={failing > 0 || changed === 0}>Copy for admin</Button>
         </div>
         {failing > 0 ? (
           <p className="m-0 text-0 text-danger" role="status">Saving is blocked while {failing} pair{failing === 1 ? '' : 's'} fail contrast. Fix them first.</p>
@@ -65,7 +74,7 @@ export function Output({ world, label, palette, edits, failing, onSendToAdmin }:
         {sent ? (
           <div className="grid gap-2 p-3 border border-rule rounded-1 bg-bg-2">
             <p className="m-0 text-0 text-ink-2">
-              Draft saved in this browser. In the admin, open Themes, choose {label}, and paste the theme.json tokens (or import the draft where the editor offers it). Saving there commits and redeploys.
+              Open Themes in the admin in this browser and choose “Load Theme lab draft”: it picks up these {label} colours as unsaved edits and runs the contrast check before saving. Or paste these theme.json tokens by hand. Saving there commits and redeploys.
             </p>
             <ButtonLink href="/admin/theme" size="sm" variant="secondary">Open the theme editor (sign-in required)</ButtonLink>
           </div>

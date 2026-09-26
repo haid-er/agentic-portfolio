@@ -36,7 +36,8 @@ export interface Plan {
 }
 
 /** Decide which providers may serve this request, in router order. */
-export function planRoute(req: Pick<AiTextRequest, 'vision' | 'maxTokens'>, estInputTokens: number): Plan {
+/** `calls` = provider calls one attempt may make (2 for structured output: first + repair). */
+export function planRoute(req: Pick<AiTextRequest, 'vision' | 'maxTokens'>, estInputTokens: number, calls = 1): Plan {
   const cfg = aiConfig()
   const candidates: Candidate[] = []
   const skipped: AiRouteStep[] = []
@@ -49,7 +50,7 @@ export function planRoute(req: Pick<AiTextRequest, 'vision' | 'maxTokens'>, estI
     const models = modelList(req.vision ? p.visionModel : p.model)
     if (!models.length) { skip('no-vision'); continue }
     const maxTokens = clampMaxTokens(req.maxTokens, id)
-    if (id === 'deepseek' && !deepseekCanAfford(cfg.deepseekBudgetTokens, estInputTokens, maxTokens)) { skip('budget'); continue }
+    if (id === 'deepseek' && !deepseekCanAfford(cfg.deepseekBudgetTokens, estInputTokens * calls, maxTokens * calls)) { skip('budget'); continue }
     for (const model of models) {
       const cooling = coolingFor(healthKey(id, model))
       if (cooling) {
@@ -139,17 +140,46 @@ export interface Served<T> {
   value: T
 }
 
-/** Reserve DeepSeek budget for the attempt; settle with real usage afterwards. */
-function withBudget(c: Candidate, estInput: number) {
-  if (c.id !== 'deepseek') return { settle: (_u?: AiUsage) => {} }
-  const release = deepseekReserve(estInput + c.maxTokens)
+interface Budget {
+  /** The worst case this attempt reserved (input + full output cap, per call). */
+  reserved: AiUsage
+  /** Release the reservation and charge what was really used (idempotent). */
+  settle: (used: AiUsage) => void
+}
+
+const NO_USAGE: AiUsage = { inputTokens: 0, outputTokens: 0 }
+
+/** Failures that happen before the provider generates (so nothing was billed). */
+const UNBILLED = new Set(['rate_limited', 'auth', 'model', 'rejected'])
+
+/**
+ * Reserve DeepSeek budget for the attempt, re-checking affordability right before the
+ * call (earlier attempts can take ~40s, and parallel requests share the budget).
+ * Returns null when DeepSeek can no longer afford it, so the caller skips it.
+ */
+function withBudget(c: Candidate, estInput: number, calls = 1): Budget | null {
+  const reserved = { inputTokens: estInput * calls, outputTokens: c.maxTokens * calls }
+  if (c.id !== 'deepseek') return { reserved, settle: () => {} }
+  if (!deepseekCanAfford(aiConfig().deepseekBudgetTokens, reserved.inputTokens, reserved.outputTokens)) return null
+  const release = deepseekReserve(reserved.inputTokens + reserved.outputTokens)
+  let settled = false
   return {
-    settle: (u?: AiUsage) => {
+    reserved,
+    settle: (used) => {
+      if (settled) return
+      settled = true
       release()
-      if (u) deepseekCharge(u)
+      deepseekCharge(used)
     },
   }
 }
+
+/** What a failed attempt probably cost: nothing if refused up front, else the reservation. */
+function failedUsage(e: unknown, b: Budget): AiUsage {
+  return e instanceof ProviderError && UNBILLED.has(e.reason) ? NO_USAGE : b.reserved
+}
+
+const budgetSkip = (c: Candidate): AiRouteStep => ({ provider: c.id, outcome: 'skipped', reason: 'budget', ms: 0 })
 
 /**
  * Run `fn` against each candidate until one succeeds (non-streaming).
@@ -161,6 +191,7 @@ export async function routeComplete<T extends { usage: AiUsage }>(
   estInput: number,
   clientSignal: AbortSignal | undefined,
   fn: (adapter: ProviderAdapter, call: ProviderCall, key: string) => Promise<T & { model?: string }>,
+  calls = 1,
 ): Promise<Served<T>> {
   const route: AiRouteStep[] = [...plan.skipped]
   const failures: ProviderError[] = []
@@ -168,9 +199,10 @@ export async function routeComplete<T extends { usage: AiUsage }>(
   for (const c of plan.candidates) {
     throwIfClientAborted(clientSignal)
     if (Date.now() > deadline - 1_000) break
+    const budget = withBudget(c, estInput, calls)
+    if (!budget) { route.push(budgetSkip(c)); continue }
     const t0 = Date.now()
     const attempt = startAttempt(clientSignal, deadline, TIMEOUTS.complete)
-    const budget = withBudget(c, estInput)
     try {
       const value = await fn(ADAPTERS[c.id], { ...shape, model: c.model, maxTokens: c.maxTokens, signal: attempt.signal }, c.key)
       budget.settle(value.usage)
@@ -178,7 +210,7 @@ export async function routeComplete<T extends { usage: AiUsage }>(
       route.push({ provider: c.id, outcome: 'ok', ms: Date.now() - t0 })
       return { provider: c.id, model: value.model ?? c.model, route, value }
     } catch (e) {
-      budget.settle()
+      budget.settle(failedUsage(e, budget))
       throwIfClientAborted(clientSignal)
       if (e instanceof GatewayError) throw e
       const { step, err } = failureStep(c, e, t0)
@@ -210,6 +242,11 @@ export interface OpenStream {
   first: string
   /** The rest of the visible text; returns usage when the provider finishes. */
   rest: AsyncGenerator<string, StreamEnd>
+  /**
+   * Release the attempt early (visitor left). Safe to call any time and more than once;
+   * closes the upstream stream and charges an estimate of what was already generated.
+   */
+  close: () => void
 }
 
 /**
@@ -224,10 +261,11 @@ export async function routeStream(plan: Plan, shape: CallShape, estInput: number
   for (const c of plan.candidates) {
     throwIfClientAborted(clientSignal)
     if (Date.now() > deadline - 1_000) break
+    const budget = withBudget(c, estInput)
+    if (!budget) { route.push(budgetSkip(c)); continue }
     const t0 = Date.now()
     const attempt = startAttempt(clientSignal, deadline, TIMEOUTS.overall)
     const firstTimer = setTimeout(() => attempt.expire(`No first token after ${TIMEOUTS.firstToken / 1000}s`), TIMEOUTS.firstToken)
-    const budget = withBudget(c, estInput)
     const filter = new ThinkFilter()
     const gen = ADAPTERS[c.id].stream({ ...shape, model: c.model, maxTokens: c.maxTokens, signal: attempt.signal }, c.key, TIMEOUTS.idle)
     try {
@@ -245,12 +283,13 @@ export async function routeStream(plan: Plan, shape: CallShape, estInput: number
       }
       markSuccess(healthKey(c.id, c.model))
       route.push({ provider: c.id, outcome: 'ok', ms: Date.now() - t0 })
-      return { provider: c.id, model: c.model, route, first, rest: tail(gen, filter, end, attempt, budget.settle) }
+      const s = new StreamSession(gen, filter, end, attempt, budget, estInput, first.length)
+      return { provider: c.id, model: c.model, route, first, rest: s.tail(), close: () => s.close() }
     } catch (e) {
       clearTimeout(firstTimer)
       attempt.done()
-      budget.settle()
-      gen.return({ usage: { inputTokens: 0, outputTokens: 0 }, model: c.model }).catch(() => {})
+      budget.settle(failedUsage(e, budget))
+      gen.return({ usage: NO_USAGE, model: c.model }).catch(() => {})
       throwIfClientAborted(clientSignal)
       if (e instanceof GatewayError) throw e
       const { step, err } = failureStep(c, e, t0)
@@ -261,28 +300,53 @@ export async function routeStream(plan: Plan, shape: CallShape, estInput: number
   throw Object.assign(exhausted(plan, failures), { route })
 }
 
-async function* tail(
-  gen: AsyncGenerator<string, StreamEnd>,
-  filter: ThinkFilter,
-  ended: StreamEnd | undefined,
-  attempt: Attempt,
-  settle: (u?: AiUsage) => void,
-): AsyncGenerator<string, StreamEnd> {
-  let end = ended
-  try {
-    while (!end) {
-      const r = await gen.next()
-      if (r.done) { end = r.value; break }
-      const t = filter.push(r.value)
-      if (t) yield t
+/**
+ * Owns an open stream after its first token: relays the rest and makes sure the attempt
+ * timer, the upstream generator and the DeepSeek reservation are released exactly once,
+ * whether the stream finishes, errors, or is abandoned (even before `tail()` starts).
+ */
+class StreamSession {
+  private closed = false
+  private outChars: number
+
+  constructor(
+    private readonly gen: AsyncGenerator<string, StreamEnd>,
+    private readonly filter: ThinkFilter,
+    private end: StreamEnd | undefined,
+    private readonly attempt: Attempt,
+    private readonly budget: Budget,
+    private readonly estInput: number,
+    firstChars: number,
+  ) {
+    this.outChars = firstChars
+  }
+
+  async *tail(): AsyncGenerator<string, StreamEnd> {
+    try {
+      while (!this.end) {
+        if (this.closed) throw new ProviderError('network', 'Stream closed')
+        const r = await this.gen.next()
+        if (r.done) { this.end = r.value; break }
+        this.outChars += r.value.length
+        const t = this.filter.push(r.value)
+        if (t) yield t
+      }
+      const rest = this.filter.flush()
+      if (rest) yield rest
+      return this.end
+    } finally {
+      this.close()
     }
-    const rest = filter.flush()
-    if (rest) yield rest
-    settle(end.usage)
-    return end
-  } finally {
-    settle()
-    attempt.done()
-    if (!end) gen.return({ usage: { inputTokens: 0, outputTokens: 0 }, model: '' }).catch(() => {})
+  }
+
+  close() {
+    if (this.closed) return
+    this.closed = true
+    if (!this.end) this.attempt.expire('Stream closed early') // aborts the upstream fetch
+    this.attempt.done()
+    const u = this.end?.usage
+    // Ended early or no usage reported: the provider billed what it generated, so estimate.
+    this.budget.settle(u && (u.inputTokens || u.outputTokens) ? u : { inputTokens: this.estInput, outputTokens: Math.ceil(this.outChars / 4) })
+    if (!this.end) this.gen.return({ usage: NO_USAGE, model: '' }).catch(() => {})
   }
 }

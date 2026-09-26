@@ -27,7 +27,7 @@ import {
 import { aiConfig, isDemoAllowed, modelList, providerSettings } from './gateway/config'
 import { GatewayError, ProviderError } from './gateway/errors'
 import { coolingFor, deepseekCanAfford, deepseekLeft, healthKey } from './gateway/health'
-import { cleanSchema, extractJson, rootIsObject, schemaInstructions, validateAgainst } from './gateway/json'
+import { assertSchemaSafe, cleanSchema, extractJson, rootIsObject, schemaInstructions, validateAgainst } from './gateway/json'
 import { checkInput, peekRate, takeRate, type RateState } from './gateway/limits'
 import { completeOnce, planRoute, routeComplete, routeStream, splitSystem, type Plan } from './gateway/router'
 import type { ProviderAdapter, ProviderCall, StreamEnd } from './gateway/providers/types'
@@ -107,11 +107,11 @@ interface Preflight {
 }
 
 /** Demo gate + input caps + route plan. The per-IP limit is spent in the route (see `admit`). */
-function preflight(req: AiTextRequest, extra: { schema?: unknown } = {}): Preflight {
+function preflight(req: AiTextRequest, extra: { schema?: unknown; calls?: number } = {}): Preflight {
   if (!isDemoAllowed(req.demo)) throw new GatewayError('unavailable', 'This demo is switched off by the site admin.', 503)
   const cfg = aiConfig()
   const stats = checkInput(req, cfg.maxInputChars, { schema: extra.schema, tools: req.tools })
-  const plan = planRoute(req, stats.estTokens)
+  const plan = planRoute(req, stats.estTokens, extra.calls)
   return { plan, estInput: stats.estTokens, started: Date.now() }
 }
 
@@ -145,6 +145,8 @@ export interface GatewayStream {
   model: string
   /** Visible text chunks; returns the final meta. */
   chunks: AsyncGenerator<string, AiMeta>
+  /** Stop early (visitor left): frees the provider attempt and the DeepSeek reservation. */
+  close: () => void
 }
 
 /**
@@ -157,21 +159,25 @@ export async function openStream(req: AiTextRequest, ctx: GatewayContext): Promi
   const { system, messages } = splitSystem(req)
   const open = await routeStream(pf.plan, { system, messages, temperature: req.temperature }, pf.estInput, ctx.signal)
   async function* chunks(): AsyncGenerator<string, AiMeta> {
-    yield open.first
     let outChars = open.first.length
     let end: StreamEnd | undefined
-    for (;;) {
-      const r = await open.rest.next()
-      if (r.done) { end = r.value; break }
-      outChars += r.value.length
-      yield r.value
+    try {
+      yield open.first
+      for (;;) {
+        const r = await open.rest.next()
+        if (r.done) { end = r.value; break }
+        outChars += r.value.length
+        yield r.value
+      }
+    } finally {
+      open.close() // no-op after a normal finish; releases everything when returned early
     }
     const usage = end.usage.inputTokens || end.usage.outputTokens
       ? end.usage
       : { inputTokens: pf.estInput, outputTokens: Math.ceil(outChars / 4) } // provider sent no usage: estimate
     return meta({ ...open, model: end.model || open.model }, usage, pf.started)
   }
-  return { provider: open.provider, model: open.model, chunks: chunks() }
+  return { provider: open.provider, model: open.model, chunks: chunks(), close: open.close }
 }
 
 /** Streaming completion; yields text chunks, returns meta. */
@@ -187,7 +193,13 @@ export async function* stream(req: AiTextRequest, ctx: GatewayContext): AsyncGen
 /** Structured output (JSON), validated against req.jsonSchema with one repair turn. */
 export async function completeObject(req: AiObjectWireRequest, ctx: GatewayContext): Promise<AiMeta & { object: unknown }> {
   const schema = cleanSchema(req.jsonSchema)
-  const pf = preflight({ ...req, tools: undefined }, { schema })
+  try {
+    assertSchemaSafe(schema)
+  } catch (e) {
+    throw new GatewayError('bad_request', e instanceof Error ? e.message : 'Unsupported JSON Schema.', 400)
+  }
+  // Up to two provider calls per attempt (first + repair), so budget for both.
+  const pf = preflight({ ...req, tools: undefined }, { schema, calls: 2 })
   const { system, messages } = splitSystem(req, schemaInstructions(req.schemaName, schema))
   const json = { name: req.schemaName, schema, rootIsObject: rootIsObject(schema) }
 
@@ -212,7 +224,7 @@ export async function completeObject(req: AiObjectWireRequest, ctx: GatewayConte
     throw new ProviderError('invalid_output', again.issues.slice(0, 3).join('; '))
   }
 
-  const served = await routeComplete(pf.plan, { system, messages, temperature: req.temperature ?? 0.2, json }, pf.estInput, ctx.signal, attempt)
+  const served = await routeComplete(pf.plan, { system, messages, temperature: req.temperature ?? 0.2, json }, pf.estInput, ctx.signal, attempt, 2)
   return { ...meta(served, served.value.usage, pf.started), object: served.value.object }
 }
 

@@ -85,7 +85,8 @@ function PairRow({ pair, palette, onFix }: { pair: Pair; palette: Palette; onFix
       <Td className="whitespace-nowrap">{pair.use}</Td>
       <Td className="whitespace-nowrap">
         <span
-          className="inline-flex items-center px-2 py-[2px] border border-rule-soft font-mono text-00"
+          // Graphic pairs (3:1) are sampled as large bold text, where 3:1 is the WCAG bar.
+          className={cx('inline-flex items-center px-2 py-[2px] border border-rule-soft font-mono', pair.min < 4.5 ? 'text-[19px] font-bold leading-tight' : 'text-00')}
           style={{ background: palette[pair.bg], color: palette[pair.fg] }}
         >
           {pair.fg.slice(2)} / {pair.bg.slice(2)}

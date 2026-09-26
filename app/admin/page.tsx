@@ -17,6 +17,16 @@ import { listUploads, MAX_UPLOAD_BYTES, UPLOAD_ACCEPT, type UploadEntry } from '
 import { COLLECTIONS, type CollectionName } from '@/lib/content'
 import { folio } from '@/lib/utils'
 
+
+/** Deep links into the Site editor's tabs (components/admin/editors/SiteEditor.tsx SITE_TABS). */
+const SITE_TAB_LINKS = [
+  { id: 'profile', label: 'Profile' },
+  { id: 'hero', label: 'Hero & about' },
+  { id: 'contact', label: 'Contact & links' },
+  { id: 'sections', label: 'Section order' },
+  { id: 'seo', label: 'SEO' },
+] as const
+
 export const dynamic = 'force-dynamic'
 export const metadata = { title: 'Dashboard' }
 
@@ -97,6 +107,17 @@ export default async function AdminHome() {
                   </Link>
                 </h3>
                 <p className="m-0 text-0 text-ink-2">{c.description}</p>
+                {c.name === 'site' ? (
+                  <ul aria-label="Site editor tabs" className="relative z-[1] m-0 p-0 list-none flex flex-wrap gap-2">
+                    {SITE_TAB_LINKS.map((t) => (
+                      <li key={t.id}>
+                        <Link href={`/admin/site?tab=${t.id}`} className="inline-flex items-center min-h-tap px-3 rounded-pill border border-rule mono text-ink no-underline hover:bg-bg-2">
+                          {t.label}
+                        </Link>
+                      </li>
+                    ))}
+                  </ul>
+                ) : null}
                 {c.stats.line ? <p className="m-0 mono text-ink nums">{c.stats.line}</p> : null}
                 <div className="flex flex-wrap items-center gap-s2 mt-auto pt-s2">
                   {c.stats.unverified ? <Badge tone="warn">{c.stats.unverified} unverified</Badge> : null}

@@ -54,6 +54,11 @@ function hasContent(id: SectionId): boolean {
   }
 }
 
+/** Mobile folio bar holds 3 sections plus Contents (DESIGN 6.6). */
+const FOLIO_BAR_MAX = 3
+/** Desktop header links; the rest stay reachable through the Ctrl/Cmd+K index. */
+const DESKTOP_NAV_MAX = 6
+
 /** The playground section links to the full gallery; every other section is an anchor. */
 const sectionHref = (id: SectionId) => (id === 'playground' ? '/playground' : `/#${id}`)
 
@@ -76,7 +81,9 @@ export function getNavModel(): NavModel {
 
   // Admin marks nav-worthy sections by giving them a short navLabel.
   const labelled = sections.filter((s) => Boolean(all.find((x) => x.id === s.id)?.navLabel?.trim()))
-  const primary = (labelled.length ? labelled : sections).slice(0, 3)
+  const navWorthy = labelled.length ? labelled : sections
+  const primary = navWorthy.slice(0, FOLIO_BAR_MAX)
+  const desktop = navWorthy.slice(0, DESKTOP_NAV_MAX)
 
   const playgroundLabel = getSection('playground')?.navLabel || getSection('playground')?.title || 'Playground'
   const groupLabels: Record<IndexGroup, string> = {
@@ -120,7 +127,7 @@ export function getNavModel(): NavModel {
     ...actions(),
   ]
 
-  return { sections, primary, spyIds: all.map((s) => s.id), index, groupLabels }
+  return { sections, primary, desktop, spyIds: all.map((s) => s.id), index, groupLabels }
 }
 
 function pages(playgroundLabel: string): IndexEntry[] {
@@ -128,6 +135,21 @@ function pages(playgroundLabel: string): IndexEntry[] {
     { key: 'page:home', group: 'page', label: getProfile().name, hint: '/', icon: 'register', href: '/', keywords: 'home front page top' },
     { key: 'page:playground', group: 'page', label: playgroundLabel, hint: '/playground', icon: 'pulse', href: '/playground', keywords: 'demos gallery all' },
   ]
+  if (getProjects().length) {
+    const s = getSection('projects')
+    out.push({
+      key: 'page:projects', group: 'page', label: s?.navLabel || s?.title || 'Projects', hint: '/projects',
+      icon: 'core', href: '/projects', keywords: 'projects index all work case studies',
+    })
+  }
+  // Pillar landings in the gallery (/playground?pillar=<id>).
+  for (const p of getProfile().pillars) {
+    if (!getDemos().some((d) => d.pillar === p.id)) continue
+    out.push({
+      key: `page:pillar:${p.id}`, group: 'page', label: `${playgroundLabel}: ${p.title}`, hint: `?pillar=${p.id}`,
+      icon: PILLAR_GLYPH[p.id] as IconName, href: `/playground?pillar=${p.id}`, keywords: `${p.summary} pillar ${p.id}`,
+    })
+  }
   if (getResume().enabled) {
     out.push({
       key: 'page:resume', group: 'page', label: getSection('resume')?.title || 'Résumé', hint: '/resume',

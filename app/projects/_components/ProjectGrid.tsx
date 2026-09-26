@@ -11,12 +11,14 @@
  * - `limit` shows the first N cards until "Show all" (unfiltered view only);
  *   focus then moves to the first newly shown card.
  * - After the first interaction, cards re-print (Almanac) or settle (Strata)
- *   with a short stagger. Reduced motion: no animation.
+ *   with a short stagger. Reduced motion: no animation. Cards are keyed by slug
+ *   (never remounted by a filter change) so a focused tag button keeps focus;
+ *   the stagger is replayed by restarting the CSS animation instead.
  *
  * Without JavaScript the server HTML shows the unfiltered grid, which is complete.
  */
 import Link from 'next/link'
-import { useCallback, useEffect, useId, useMemo, useRef, useState, type CSSProperties } from 'react'
+import { useCallback, useEffect, useId, useLayoutEffect, useMemo, useRef, useState, type CSSProperties } from 'react'
 import { Button, EmptyState, Icon } from '@/components/ui'
 import type { Pillar } from '@/lib/content/schema'
 import type { GlyphId } from '@/lib/demos/registry'
@@ -47,6 +49,7 @@ export function ProjectGrid({ projects, pillars, limit = 0, headingLevel = 'h3',
   const [expanded, setExpanded] = useState(false)
   const [run, setRun] = useState(0)
   const focusSlug = useRef<string | null>(null)
+  const listRef = useRef<HTMLUListElement>(null)
 
   /* read a shared filter once, after hydration (the server always renders "all") */
   useEffect(() => {
@@ -126,6 +129,15 @@ export function ProjectGrid({ projects, pillars, limit = 0, headingLevel = 'h3',
     focusSlug.current = null
   }, [expanded, uid])
 
+  /* replay the stagger on every filter change without remounting the cards */
+  useLayoutEffect(() => {
+    if (run === 0 || !listRef.current) return
+    const items = Array.from(listRef.current.children) as HTMLElement[]
+    for (const li of items) li.style.animationName = 'none'
+    void listRef.current.offsetWidth // one reflow so the animations restart
+    for (const li of items) li.style.animationName = ''
+  }, [run])
+
   const activePillarLabel = pillars.find((p) => p.id === pillar)?.label
   const status = [
     `Showing ${shown.length} of ${projects.length} projects`,
@@ -199,10 +211,10 @@ export function ProjectGrid({ projects, pillars, limit = 0, headingLevel = 'h3',
 
       {/* ---------------- grid ---------------- */}
       {shown.length ? (
-        <ul className="m-0 p-0 list-none grid gap-s5 md:grid-cols-2 xl:grid-cols-3">
+        <ul ref={listRef} className="m-0 p-0 list-none grid gap-s5 md:grid-cols-2 xl:grid-cols-3">
           {shown.map((p, i) => (
             <li
-              key={`${run}-${p.slug}`}
+              key={p.slug}
               className={cx(
                 'min-w-0',
                 run > 0 && 'motion-safe:almanac:animate-[print-in_var(--dur-med)_var(--ease-out)_both] motion-safe:strata:animate-[settle_var(--dur-med)_var(--ease-out)_both]',

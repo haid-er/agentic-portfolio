@@ -11,7 +11,7 @@ import type { DemoProps } from '@/lib/demos/types'
 import { useLocalStorage, usePageVisible } from '@/lib/hooks'
 import { cx } from '@/lib/utils'
 import {
-  BAND_TONE, FeedError, OUTCODE, SnapshotSchema, bandOf, bestWindow, currentIndex, fetchSnapshot, ukTime, utcTime,
+  BAND_TONE, FeedError, OUTCODE, SnapshotSchema, bandOf, bestWindow, currentIndex, fetchSnapshot, isStale, ukTime, utcTime,
   type Snapshot,
 } from './api'
 import { ForecastChart } from './Forecast'
@@ -100,7 +100,7 @@ export default function Demo(_props: DemoProps) {
       ) : !snap ? (
         <Loading label="Reading the grid" />
       ) : (
-        <Board snap={snap} offline={offline} loading={load.status === 'loading'} hours={hours} setHours={setHours} kw={kw} setKw={setKw} />
+        <Board snap={snap} offline={offline} loading={load.status === 'loading'} onRefresh={refresh} hours={hours} setHours={setHours} kw={kw} setKw={setKw} />
       )}
     </div>
   )
@@ -147,24 +147,37 @@ function AreaForm({ value, onApply, busy, onRefresh }: { value: string; onApply:
   )
 }
 
-function Board({ snap, offline, loading, hours, setHours, kw, setKw }: {
+function Board({ snap, offline, loading, onRefresh, hours, setHours, kw, setKw }: {
   snap: Snapshot
   offline: boolean
   loading: boolean
+  onRefresh: () => void
   hours: Hours
   setHours: (h: Hours) => void
   kw: string
   setKw: (k: string) => void
 }) {
   const nowIdx = currentIndex(snap.series)
-  const now = snap.series[nowIdx]
+  const now = nowIdx >= 0 ? snap.series[nowIdx] : undefined
   const slots = (Number(hours) || 3) * 2
-  const win = useMemo(() => bestWindow(snap.series, nowIdx, slots), [snap.series, nowIdx, slots])
+  const win = useMemo(() => (nowIdx >= 0 ? bestWindow(snap.series, nowIdx, slots) : null), [snap.series, nowIdx, slots])
+  const stale = offline || isStale(snap)
   const ahead = snap.series.slice(nowIdx)
   const lo = ahead.length ? ahead.reduce((a, b) => (b.value < a.value ? b : a)) : null
   const hi = ahead.length ? ahead.reduce((a, b) => (b.value > a.value ? b : a)) : null
   const area = snap.area === 'GB' ? 'Great Britain' : `${snap.area} (${snap.postcode})`
 
+  if (nowIdx < 0 && snap.series.length) {
+    return (
+      <ErrorState
+        title="Saved snapshot has expired"
+        action={<Button variant="secondary" size="sm" icon="refresh" onClick={onRefresh} disabled={loading}>{loading ? 'Updating' : 'Try again'}</Button>}
+      >
+        The saved snapshot from <time dateTime={snap.fetchedAt}>{ukTime(snap.fetchedAt, true)} UK time</time> no longer covers the current half hour.
+        {' '}{loading ? 'Fetching a fresh reading…' : 'Reconnect to refresh.'} Nothing is estimated.
+      </ErrorState>
+    )
+  }
   if (!now) {
     return <ErrorState title="No readings in the feed">The grid feed answered without any half-hour readings. Nothing is estimated.</ErrorState>
   }
@@ -189,7 +202,7 @@ function Board({ snap, offline, loading, hours, setHours, kw, setKw }: {
             </p>
           ) : null}
           <p className="m-0 flex flex-wrap items-center gap-2 text-00 text-ink-3" aria-live="polite">
-            {offline ? <Badge tone="warn">Offline · snapshot from {utcTime(snap.fetchedAt)} UTC</Badge> : null}
+            {stale ? <Badge tone="warn">{offline ? 'Offline · ' : ''}Snapshot from {ukTime(snap.fetchedAt, true)} UK</Badge> : null}
             {loading ? <span>Updating…</span> : null}
             <span>
               Source:{' '}

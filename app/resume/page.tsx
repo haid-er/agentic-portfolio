@@ -224,9 +224,9 @@ export default function ResumePage() {
                           <EntryHead title={pr.title} sub={pr.role} meta={range} />
                           {pr.summary ? <p className="m-0 text-0 text-ink-2 measure">{pr.summary}<Proof slug={pr.demoSlugs[0]} /></p> : null}
                           {links.live || links.repo ? (
-                            <p className="m-0 flex flex-wrap gap-x-s4 text-00 font-mono [overflow-wrap:anywhere]">
-                              {links.live ? <ExtLink href={links.live} className="text-accent-ink">{shortUrl(links.live)}</ExtLink> : null}
-                              {links.repo ? <ExtLink href={links.repo} className="text-accent-ink">{shortUrl(links.repo)}</ExtLink> : null}
+                            <p className="m-0 flex flex-wrap gap-x-s4 gap-y-1 text-00 font-mono [overflow-wrap:anywhere]">
+                              {links.live ? <ExtLink href={links.live} className="inline-flex items-center min-h-6 text-accent-ink print:min-h-0">{shortUrl(links.live)}</ExtLink> : null}
+                              {links.repo ? <ExtLink href={links.repo} className="inline-flex items-center min-h-6 text-accent-ink print:min-h-0">{shortUrl(links.repo)}</ExtLink> : null}
                             </p>
                           ) : null}
                         </article>

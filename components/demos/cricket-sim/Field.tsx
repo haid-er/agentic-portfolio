@@ -5,10 +5,33 @@
  * wheel of this innings' scoring shots. Colours come from tokens only.
  */
 import type { RefObject } from 'react'
-import type { Ball } from './engine'
+import type { Ball, Delivery, Pending } from './engine'
 
 export const PITCH = { top: 72, bottom: 128 } // y of bowler's and batter's creases
 export const ZONE = { from: 0.8, to: 0.92 } // share of the flight where timing is perfect-to-good
+
+/** Where each delivery pitches (share of the flight; null = full toss) and its line (x at the batter). */
+const LINE: Record<Delivery, { bounce: number | null; x: number; tag: string }> = {
+  yorker: { bounce: 0.93, x: 100, tag: 'yorker' },
+  good: { bounce: 0.58, x: 101, tag: 'length' },
+  short: { bounce: 0.3, x: 100, tag: 'short' },
+  full: { bounce: null, x: 100, tag: 'full toss' },
+  wide: { bounce: 0.55, x: 107, tag: 'wide' },
+}
+
+const flightY = (p: number) => PITCH.top + (PITCH.bottom - PITCH.top) * p
+
+/**
+ * The ball at share `p` of its flight. A read delivery follows its own line and
+ * climbs after pitching (bigger = higher, seen from above); a disguised one gives nothing away.
+ */
+export function ballAt(p: number, pending: Pending | null | undefined) {
+  const line = pending?.read ? LINE[pending.delivery] : null
+  const x = 100 + ((line?.x ?? 100) - 100) * Math.min(p, 1)
+  const bounce = line?.bounce ?? null
+  const rise = bounce === null || p < bounce ? 0 : (p - bounce) * (pending?.delivery === 'short' ? 3.2 : 0.8)
+  return { x, y: flightY(p), r: 2.4 + Math.min(rise, 2) }
+}
 
 const shotEnd = (b: Ball) => {
   const runs = b.result.kind === 'runs' ? b.result.runs : b.result.kind === 'extra' ? b.result.runs - 1 : 0
@@ -18,8 +41,9 @@ const shotEnd = (b: Ball) => {
   return { x: 100 - Math.sin(a) * len, y: PITCH.bottom - 6 - Math.cos(a) * len, runs }
 }
 
-export function Field({ balls, ballRef, flying, showZone, label }: {
+export function Field({ balls, ballRef, flying, showZone, pending, label }: {
   balls: Ball[]
+  pending?: Pending | null
   ballRef: RefObject<SVGCircleElement | null>
   flying: boolean
   showZone: boolean
@@ -27,7 +51,8 @@ export function Field({ balls, ballRef, flying, showZone, label }: {
 }) {
   const shots = balls.filter((b) => b.angle !== null && b.result.kind !== 'wicket')
   const last = balls[balls.length - 1]
-  const zoneY = (p: number) => PITCH.top + (PITCH.bottom - PITCH.top) * p
+  const zoneY = flightY
+  const read = pending?.read ? LINE[pending.delivery] : null
   return (
     <svg viewBox="0 0 200 200" className="block w-full max-w-[420px] mx-auto h-auto" role="img" aria-label={label}>
       <defs>
@@ -58,6 +83,16 @@ export function Field({ balls, ballRef, flying, showZone, label }: {
         <g>
           <rect x="92" y={zoneY(ZONE.from)} width="16" height={zoneY(ZONE.to) - zoneY(ZONE.from)} fill="var(--accent)" opacity="0.28" />
           <text x="111" y={zoneY((ZONE.from + ZONE.to) / 2) + 2} className="font-mono" fontSize="5" fill="var(--ink-2)">hit zone</text>
+        </g>
+      ) : null}
+      {read ? (
+        <g aria-hidden="true">
+          {read.bounce !== null ? (
+            <circle cx={100 + (read.x - 100) * read.bounce} cy={zoneY(read.bounce)} r="3" fill="none" stroke="var(--accent-2)" strokeWidth="0.9" strokeDasharray="1.5 1" />
+          ) : (
+            <line x1={read.x} y1={PITCH.top + 2} x2={read.x} y2={PITCH.bottom - 10} stroke="var(--accent-2)" strokeWidth="0.7" strokeDasharray="1.5 1.5" />
+          )}
+          <text x="89" y={zoneY(read.bounce ?? 0.5) + 2} textAnchor="end" className="font-mono" fontSize="5" fill="var(--ink-2)">{read.tag}</text>
         </g>
       ) : null}
       <path d={`M90 ${PITCH.top}H110M90 ${PITCH.bottom}H110`} stroke="var(--ink)" strokeWidth="0.8" />

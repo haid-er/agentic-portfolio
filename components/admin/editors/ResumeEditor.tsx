@@ -14,7 +14,7 @@ export function ResumeEditor() {
       <Group title="Résumé page" description="The print-optimised /resume page and its downloadable PDF.">
         <ToggleField path={['enabled']} label="Résumé page and section enabled" />
         <ImageField path={['pdfUrl']} label="Résumé PDF" kind="pdf" uploadName="resume" optional={false}
-          hint="Uploads replace /uploads/resume.pdf. Empty = the page prints itself (window.print)." />
+          hint="Path of the uploaded PDF under /uploads/…; uploads replace /uploads/resume.pdf. If the file is missing at build time, or the field is empty, Download PDF prints /resume instead." />
         <TextAreaField path={['summary']} label="Summary" rows={3} recommend={{ max: 360 }} />
         <FieldGrid>
           <div className="flex items-end gap-2">

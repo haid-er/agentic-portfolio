@@ -142,6 +142,22 @@ export function consolidate(g: Group): Consolidation {
       }
     }
     visiting.delete(id)
+    // GHG Protocol judges control on the group's combined holding: stakes held by the parent and
+    // by entities it already controls add up, so 30% + 30% via a subsidiary is still a majority.
+    const links = incoming.get(id) ?? []
+    const blocked = links.some((l) => l.control === 'none' || l.control === 'joint')
+    if (!blocked) {
+      const heldVia = (key: 'financial' | 'operational') =>
+        links.reduce((sum, l) => (l.control === 'unstated' && memo.get(l.owner)?.[key] === 1 ? sum + clamp01(l.equityPct / 100) : sum), 0)
+      if (finControl < 1 && heldVia('financial') > 0.5) {
+        finControl = 1
+        notes.push('Majority stake read as control (not stated in the text)')
+      }
+      if (op < 1 && heldVia('operational') > 0.5) {
+        op = 1
+        notes.push('Majority stake read as control (not stated in the text)')
+      }
+    }
     const r: EntityResult = {
       id,
       equity: clamp01(equity),

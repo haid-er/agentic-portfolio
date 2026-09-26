@@ -37,6 +37,8 @@ export default async function AdminLayout({ children }: { children: ReactNode })
 
   return (
     <div className="min-h-dvh bg-bg text-ink">
+      {/* Admin has no folio bar: toasts sit at the bottom on phones (editors raise it again). */}
+      <style>{':root{--folio-bar:0px}'}</style>
       <header className="border-b border-rule bg-bg">
         <div className="wrap flex justify-between gap-s3 py-s1 mono text-ink-3 border-b border-rule-soft">
           <span>Admin · private</span>

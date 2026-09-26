@@ -14,6 +14,7 @@ import type { CollectionName } from '@/lib/content/schema'
 import { describeChange } from './diff'
 import { GithubError } from './github'
 import { readRepoFile, saveMode, StoreError, writeRepoFile, type SaveMode } from './store'
+import { themeCheck } from '@/components/admin/lib/themeCheck'
 
 export interface SaveIssue {
   path: string
@@ -81,6 +82,14 @@ export async function saveCollection(name: CollectionName, data: unknown, opts: 
   if (!parsed.success) {
     const issues = parsed.error.issues.slice(0, 50).map((i) => ({ path: i.path.join('.') || '(root)', message: i.message }))
     return { ...fail(mode, 'invalid', `${meta.label} has ${issues.length} problem${issues.length === 1 ? '' : 's'}; nothing was saved.`), issues }
+  }
+
+  // Same WCAG gate as the theme editor, so a hand-crafted request cannot bypass it.
+  if (name === 'theme') {
+    const contrastIssues = themeCheck(parsed.data).slice(0, 50).map((i) => ({ path: i.path.join('.'), message: i.message }))
+    if (contrastIssues.length) {
+      return { ...fail(mode, 'invalid', `${meta.label} fails the contrast check (${contrastIssues.length} problem${contrastIssues.length === 1 ? '' : 's'}); nothing was saved.`), issues: contrastIssues }
+    }
   }
 
   const text = serialize(parsed.data)

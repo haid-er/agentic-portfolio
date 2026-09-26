@@ -302,9 +302,9 @@ function PineconeView({ result, k, filter, docs, dim }: { result: Result | null;
   const res = result?.hits.slice(0, 3).map((h) => `  { id: '${docs[h.index]?.id}', score: ${h.score.toFixed(4)}, metadata: { topic: '${docs[h.index]?.topic}' } },`)
   return (
     <div className="grid gap-2">
-      <pre className="m-0 p-3 text-00 leading-[1.6] bg-bg-2 rounded-0 overflow-x-auto" aria-label="Query request">{req}</pre>
+      <pre className="m-0 p-3 text-00 leading-[1.6] bg-bg-2 rounded-0 overflow-x-auto" aria-label="Query request" tabIndex={0}>{req}</pre>
       {res?.length ? (
-        <pre className="m-0 p-3 text-00 leading-[1.6] bg-bg-2 rounded-0 overflow-x-auto" aria-label="Query response">{`// matches\n[\n${res.join('\n')}${result && result.hits.length > 3 ? `\n  … ${result.hits.length - 3} more` : ''}\n]`}</pre>
+        <pre className="m-0 p-3 text-00 leading-[1.6] bg-bg-2 rounded-0 overflow-x-auto" aria-label="Query response" tabIndex={0}>{`// matches\n[\n${res.join('\n')}${result && result.hits.length > 3 ? `\n  … ${result.hits.length - 3} more` : ''}\n]`}</pre>
       ) : null}
       <p className="m-0 text-00 text-ink-3">
         The search runs locally by brute force. A managed index answers the same request with approximate nearest neighbours over millions of vectors. <Badge tone="neutral">exact here</Badge>

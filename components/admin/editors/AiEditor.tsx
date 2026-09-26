@@ -84,8 +84,8 @@ export function AiEditor() {
               hint={id === 'deepseek' && data.providers.deepseek.enabled ? 'DeepSeek costs money per token. Keep the budget below low.' : undefined}
             />
             <FieldGrid>
-              <TextField path={['providers', id, 'model']} label="Text model" mono />
-              <TextField path={['providers', id, 'visionModel']} label="Vision model" optional mono hint="Empty = no image input on this provider." />
+              <TextField path={['providers', id, 'model']} label="Text model" mono hint="Comma-separate alternates; the router tries them in order (e.g. “gemini-3.8-flash, gemini-3.5-flash-lite”)." />
+              <TextField path={['providers', id, 'visionModel']} label="Vision model" optional mono hint="Comma-separate alternates; the router tries them in order (e.g. “gemini-3.8-flash, gemini-3.5-flash-lite”). Empty = no image input on this provider." />
             </FieldGrid>
           </Group>
         )

@@ -75,7 +75,7 @@ export function AskPanel({ q, onChange, resources, decision, roleLabel }: {
                 className={cx(
                   'grid grid-cols-[auto_minmax(0,1fr)] gap-x-3 px-3 py-2 border-l-4 rounded-0',
                   c.result === 'decided' ? (c.rule.inverted ? 'border-danger bg-bg-2' : 'border-ok bg-bg-2') : 'border-rule-soft',
-                  c.result === 'not-reached' && 'opacity-60',
+                  c.result === 'not-reached' && 'border-dashed', // dimmed by dashes and the "not reached" words, not by fading text
                 )}
               >
                 <span className="font-mono text-00 text-ink-3 nums pt-[2px]">#{c.index + 1}</span>

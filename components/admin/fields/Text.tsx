@@ -107,7 +107,7 @@ export function NumberField({ path, label, hint, optional, className, min, max, 
     >
       {({ id, describedBy, invalid }) => (
         <div className="flex items-center gap-3 min-w-0">
-          <div className="relative flex-none w-[9.5rem]">
+          <div className="relative flex-auto min-w-0 max-w-[9.5rem]">
             <input
               id={id}
               data-path={f.key}

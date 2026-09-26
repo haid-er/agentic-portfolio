@@ -6,7 +6,11 @@
 import type { Envelope, Reply, Request } from './protocol'
 import { buildSeedSql } from './seed'
 
-/** Self-hosted copy first (offline-friendly), then the pinned CDN build. */
+/**
+ * Self-hosted copy first (offline-friendly), then the CDN build. The self-hosted file is copied
+ * from node_modules/sql.js/dist at install time, so it always matches the installed JS glue; the
+ * CDN version must equal the exact sql.js version pinned in package.json.
+ */
 export const WASM_URLS = [
   '/demos/sql-playground/sql-wasm.wasm',
   'https://cdn.jsdelivr.net/npm/sql.js@1.14.2/dist/sql-wasm.wasm',

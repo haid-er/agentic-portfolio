@@ -6,7 +6,7 @@
  */
 import { useEffect, useMemo, useState } from 'react'
 import { Button, DemoGrid, DemoPanel, DemoToolbar, EmptyState, Segmented, Select } from '@/components/ui'
-import { getResearch } from '@/lib/content'
+import research from '@/content/research.json'
 import type { DemoProps } from '@/lib/demos/types'
 import { usePageVisible } from '@/lib/hooks'
 import { cx } from '@/lib/utils'
@@ -22,12 +22,24 @@ export { notes } from './notes'
 const MODES = [{ value: 'magnitude', label: 'Magnitude' }, { value: 'gravity', label: 'Gravity split' }] as const
 const pad = (n: number) => String(n).padStart(2, '0')
 
-/** Step titles come from content when it lists all eight; the demo's own labels otherwise. */
+/**
+ * Step titles come from content when the pipeline block is enabled and lists all eight;
+ * the demo's own labels otherwise. Only research.json is imported (not the lib/content
+ * barrel) so this client chunk stays small; a light shape check stands in for zod.
+ */
 function stepTitles(): string[] {
-  try {
-    const steps = getResearch().pipeline?.steps ?? []
-    if (steps.length === STEPS.length) return steps
-  } catch { /* fall back */ }
+  const block: unknown = (research as { pipeline?: unknown }).pipeline
+  if (block && typeof block === 'object') {
+    const { enabled, steps } = block as { enabled?: unknown; steps?: unknown }
+    if (
+      enabled === true &&
+      Array.isArray(steps) &&
+      steps.length === STEPS.length &&
+      steps.every((t) => typeof t === 'string' && t.trim() !== '')
+    ) {
+      return steps as string[]
+    }
+  }
   return STEPS.map((s) => s.title)
 }
 

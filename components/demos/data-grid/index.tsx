@@ -5,7 +5,7 @@
  * retries, refetch on window focus, keepPreviousData pagination with next-page prefetch, and
  * optimistic mutations that roll back when the server says no.
  */
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Badge, Button, DemoGrid, DemoPanel, DemoToolbar, EmptyState, ErrorState, Loading, Segmented, Toggle, useToast,
 } from '@/components/ui'
@@ -59,6 +59,7 @@ export default function Demo(_props: DemoProps) {
   const [page, setPage] = useState(1)
   const [failNext, setFailNext] = useState(false)
   const [pending, setPending] = useState<ReadonlySet<string>>(new Set())
+  const inFlight = useRef(0)
 
   const [client] = useState(() => new QueryClient({ staleTime: 15000, gcTime: 30000, retry: 2, refetchOnFocus: true }))
   const net: NetSettings = useMemo(
@@ -110,11 +111,19 @@ export default function Demo(_props: DemoProps) {
   const log = useCacheLog(client)
   const now = useNow(250, visible)
 
+  const patchRow = (id: string, fields: Partial<Item>) =>
+    client.updateData<Page>(isItemsKey, (pg) => ({ ...pg, items: pg.items.map((i) => (i.id === id ? { ...i, ...fields } : i)) }))
+
   async function mutate(item: Item, change: Partial<Pick<Item, 'starred' | 'status'>>, what: string) {
+    if (pending.has(item.id)) return
     const match = isItemsKey
-    const snap = client.snapshot<Page>(match)
-    client.updateData<Page>(match, (pg) => ({ ...pg, items: pg.items.map((i) => (i.id === item.id ? { ...i, ...change } : i)) }))
+    // Like cancelQueries in onMutate: a read that started before the click must not land on top of the patch.
+    client.cancel(match)
+    // Rollback reverts only the fields this mutation touched, so other rows' patches survive.
+    const before: Partial<Item> = Object.fromEntries(Object.keys(change).map((k) => [k, item[k as keyof typeof change]]))
+    patchRow(item.id, change)
     client.record('optimistic', item.id, `${what}: cache patched before the server answers.`)
+    inFlight.current++
     setPending((s) => new Set(s).add(item.id))
     const fail = failNext
     if (fail) setFailNext(false)
@@ -122,13 +131,14 @@ export default function Demo(_props: DemoProps) {
       await patchItem({ id: item.id, ...change, fail }, net)
       client.record('confirm', item.id, 'Server confirmed the change.')
     } catch (e) {
-      client.restore(snap)
+      patchRow(item.id, before)
       const msg = e instanceof Error ? e.message : 'Mutation failed.'
-      client.record('rollback', item.id, `${msg} Cache restored from the snapshot.`)
+      client.record('rollback', item.id, `${msg} Changed fields reverted in the cache.`)
       toast(`Rolled back: ${item.name}. ${msg}`, { tone: 'danger' })
     } finally {
       setPending((s) => { const n = new Set(s); n.delete(item.id); return n })
-      client.invalidate(match, 'Mutation settled')
+      // Refetch once the last overlapping mutation settles, so a refetch cannot undo a patch still in flight.
+      if (--inFlight.current === 0) client.invalidate(match, 'Mutation settled')
     }
   }
 
@@ -144,6 +154,16 @@ export default function Demo(_props: DemoProps) {
   const items = data?.items ?? []
   const updatedAt = state?.dataUpdatedAt ? new Date(state.dataUpdatedAt).toLocaleTimeString([], { hour12: false }) : null
   const stale = state ? client.isStale(state, now) : true
+  // Branch on this key's own data, never on the placeholder borrowed from the previous page.
+  const ownData = state?.data
+  const failedEmpty = state?.status === 'error' && ownData === undefined
+  const statusText = failedEmpty
+    ? `Page ${page} could not load.`
+    : state?.error && ownData
+      ? `Refetch failed. Showing the cached copy of page ${page}.`
+      : ownData
+        ? `Page ${page} of ${pageCount}, ${ownData.items.length} ${ownData.items.length === 1 ? 'row' : 'rows'}.`
+        : `Loading page ${page}.`
 
   return (
     <div className="grid gap-4 min-w-0">
@@ -195,11 +215,12 @@ export default function Demo(_props: DemoProps) {
         >
           <div className="grid gap-4">
             <Segmented label="Status filter (a separate cache key per filter)" options={FILTER_OPTS} value={status} onChange={switchFilter} />
-            <div aria-live="polite" aria-busy={state?.fetching ?? false} className="grid gap-3 min-w-0">
-              {state?.error && data ? (
-                <p role="alert" className="m-0 text-0 text-danger">Last refetch failed: {state.error} Showing the cached copy; nothing is invented.</p>
+            <p role="status" className="sr-only">{statusText}</p>
+            <div aria-busy={state?.fetching ?? false} className="grid gap-3 min-w-0">
+              {state?.error && ownData ? (
+                <p className="m-0 text-0 text-danger">Last refetch failed: {state.error} Showing the cached copy; nothing is invented.</p>
               ) : null}
-              {!data && state?.status === 'error' ? (
+              {failedEmpty ? (
                 <ErrorState title="Could not load this page" action={<Button size="sm" variant="secondary" icon="refresh" onClick={() => void client.fetch(key, 'retry button')}>Try again</Button>}>
                   {state.error}
                 </ErrorState>
@@ -210,12 +231,12 @@ export default function Demo(_props: DemoProps) {
               ) : (
                 <SpecimenTable items={items} pending={pending} dim={isPlaceholder} onStar={onStar} onCycle={onCycle} />
               )}
-              {isPlaceholder ? <p className="m-0 mono text-ink-3">Showing the previous page while page {page} loads (keepPreviousData).</p> : null}
+              {isPlaceholder && state?.fetching ? <p className="m-0 mono text-ink-3">Showing the previous page while page {page} loads (keepPreviousData).</p> : null}
             </div>
             <nav aria-label="Pages" className="flex flex-wrap items-center justify-between gap-3">
               <Button size="sm" variant="secondary" onClick={() => setPage((p) => Math.max(1, p - 1))} disabled={page <= 1}>Previous</Button>
               <span className="mono text-ink-2 nums">page {page} / {pageCount}{data ? ` · ${data.total} rows · ${data.source}` : ''}</span>
-              <Button size="sm" variant="secondary" arrow onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={page >= pageCount || isPlaceholder}>Next</Button>
+              <Button size="sm" variant="secondary" arrow onClick={() => setPage((p) => Math.min(pageCount, p + 1))} disabled={page >= pageCount || ownData === undefined}>Next</Button>
             </nav>
           </div>
         </DemoPanel>

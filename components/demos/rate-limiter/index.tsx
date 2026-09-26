@@ -19,6 +19,13 @@ type Speed = '1' | '2' | '4'
 const PATTERN_OPTIONS = (Object.keys(PATTERNS) as Pattern[]).map((p) => ({ value: p, label: PATTERNS[p].label }))
 const SPEEDS = [{ value: '1', label: '1×' }, { value: '2', label: '2×' }, { value: '4', label: '4×' }] as const
 
+/** A new sim, pre-stepped by one window so the paused first frame already shows traffic. */
+function makeSim(limit: number, windowSec: number, pattern: Pattern): RateSim {
+  const sim = new RateSim({ limit, windowMs: windowSec * 1000, pattern })
+  if (pattern !== 'manual') sim.step(windowSec * 1000) // manual stays empty until the viewer sends
+  return sim
+}
+
 export default function Demo(_props: DemoProps) {
   const reduced = useReducedMotion()
   const visible = usePageVisible()
@@ -34,13 +41,11 @@ export default function Demo(_props: DemoProps) {
   const [announce, setAnnounce] = useState('')
   const stageRef = useRef<HTMLDivElement | null>(null)
   const sim = useRef<RateSim | null>(null)
-  if (!sim.current) sim.current = new RateSim({ limit, windowMs: windowSec * 1000, pattern })
-
-  // Start running once mounted, unless the viewer prefers reduced motion.
-  useEffect(() => { setRunning(!reduced) }, [reduced])
+  // Nothing autoplays: the demo starts paused on a pre-stepped frame until the viewer presses Run.
+  if (!sim.current) sim.current = makeSim(limit, windowSec, pattern)
 
   const rebuild = useCallback((next: { limit: number; windowSec: number; pattern: Pattern }) => {
-    sim.current = new RateSim({ limit: next.limit, windowMs: next.windowSec * 1000, pattern: next.pattern })
+    sim.current = makeSim(next.limit, next.windowSec, next.pattern)
     setCrash(null)
     setFrame((f) => f + 1)
   }, [])

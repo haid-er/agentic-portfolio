@@ -51,6 +51,14 @@ export class RateLimiter {
     return this.peek(key, now)
   }
 
+  /** Take back the most recent event (e.g. an attempt that turned out to succeed). */
+  undo(key: string, now = Date.now()) {
+    const b = this.bucket(key, now)
+    b.hits.pop()
+    if (b.hits.length < this.rule.limit) b.lockedUntil = 0
+    this.buckets.set(key, b)
+  }
+
   reset(key: string) {
     this.buckets.delete(key)
   }
@@ -82,9 +90,15 @@ export function clientIp(headers: Headers): string {
 
 /* Shared limiters (module singletons survive between requests on a warm instance). */
 
-/** Failed logins: 5 per IP per 15 minutes, then a 15 minute lockout. */
-export const loginFailures = new RateLimiter({ limit: 5, windowMs: 15 * 60_000 })
-/** Failed logins from anywhere: a ceiling against distributed guessing. */
+/** Login attempts allowed per IP per 15 minutes before a 15 minute lockout. */
+export const LOGIN_FAILURE_LIMIT = 5
+/** Login attempts per IP (counted before the password check; cleared on success). */
+export const loginFailures = new RateLimiter({ limit: LOGIN_FAILURE_LIMIT, windowMs: 15 * 60_000 })
+/**
+ * Failed logins from anywhere: a ceiling against distributed guessing. When
+ * reached it only refuses IPs that already have a failure of their own, so it
+ * can never lock out a clean IP (the owner).
+ */
 export const loginFailuresGlobal = new RateLimiter({ limit: 60, windowMs: 15 * 60_000 })
 /** Writes (content saves + uploads) per session IP: generous, just a runaway-loop guard. */
 export const writes = new RateLimiter({ limit: 40, windowMs: 60_000 })

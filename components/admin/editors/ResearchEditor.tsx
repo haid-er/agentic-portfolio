@@ -37,7 +37,7 @@ export function ResearchEditor() {
                 <TextField path={[...p, 'year']} label="Year" inputMode="numeric" mono />
                 <TextField path={[...p, 'doi']} label="DOI" optional mono placeholder="10.1007/…" />
                 <TextField path={[...p, 'url']} label="Paper URL" hint={HREF_HINT} optional inputMode="url" mono />
-                <div className="grid grid-cols-2 gap-s3">
+                <div className="grid gap-s3 xs:grid-cols-2">
                   <NumberField path={[...p, 'authorPosition']} label="Author position" optional min={1} />
                   <NumberField path={[...p, 'authorCount']} label="Author count" optional min={1} />
                 </div>

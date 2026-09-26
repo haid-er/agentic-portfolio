@@ -1,6 +1,8 @@
 /**
  * Hand-placed node boxes for the broker diagram in two orientations:
- * `wide` (left to right, >= 620px of stage) and `tall` (top to bottom, phones).
+ * `wide` (left to right) and `tall` (top to bottom, phones and narrow columns).
+ * Font sizes are in viewBox units, so `layoutFor` raises them when the SVG is drawn smaller
+ * than 1:1, keeping text at a readable size on screen.
  */
 export type Orientation = 'wide' | 'tall'
 export interface Box { x: number; y: number; w: number; h: number }
@@ -36,4 +38,35 @@ function tall(): Layout {
 }
 
 const CACHE: Record<Orientation, Layout> = { wide: wide(), tall: tall() }
-export const layoutFor = (o: Orientation) => CACHE[o]
+
+/** Smallest on-screen text sizes (CSS px) for labels and secondary read-outs. */
+const MIN_FONT_PX = 12
+const MIN_SMALL_PX = 11
+/** The tall diagram is capped at this CSS width (keep in sync with max-w-[440px] in Diagram). */
+const TALL_MAX_PX = 440
+/** Wide needs roughly 1:1 scale; below this its long labels would have to shrink too far. */
+const WIDE_MIN_SCALE = 0.93
+
+/** Picks the orientation for a stage width: wide only when it renders near full size. */
+export function orientationFor(stageWidth: number): Orientation {
+  return stageWidth / CACHE.wide.width >= WIDE_MIN_SCALE ? 'wide' : 'tall'
+}
+
+/** Layout for the stage width, with fonts raised so text never renders below the minimums. */
+export function layoutFor(o: Orientation, stageWidth: number): Layout {
+  const base = CACHE[o]
+  const drawn = o === 'tall' ? Math.min(stageWidth, TALL_MAX_PX) : stageWidth
+  // Clamp so an unmeasured (0) or tiny stage cannot blow the text up past the boxes.
+  const scale = Math.min(2, Math.max(0.8, drawn / base.width || 1))
+  return {
+    ...base,
+    font: Math.max(base.font, MIN_FONT_PX / scale),
+    small: Math.max(base.small, MIN_SMALL_PX / scale),
+  }
+}
+
+/** Shortens a label to fit `width` viewBox units of monospace text at `fontSize`. */
+export function fitLabel(text: string, width: number, fontSize: number): string {
+  const max = Math.max(4, Math.floor(width / (fontSize * 0.6)))
+  return text.length <= max ? text : `${text.slice(0, max - 1)}…`
+}

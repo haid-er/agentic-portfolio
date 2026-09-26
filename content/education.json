@@ -16,7 +16,10 @@
         "Best Graphic Designer credit at PUCIT.",
         "AppFest: team CodePunks ranked 8th in CMS development."
       ],
-      "demoSlugs": ["algo-visualizer", "har-live"]
+      "demoSlugs": [
+        "algo-visualizer",
+        "har-live"
+      ]
     },
     {
       "id": "superior-ics",
@@ -29,7 +32,9 @@
       "start": "",
       "end": "",
       "notes": [],
-      "demoSlugs": ["code-judge"]
+      "demoSlugs": [
+        "code-judge"
+      ]
     }
   ]
 }

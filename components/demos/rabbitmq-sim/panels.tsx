@@ -7,7 +7,7 @@ import {
 import { cx } from '@/lib/utils'
 import {
   bindingMatches, DLX, EXCHANGE, validateBinding,
-  type ConsumerPatch, type ConsumerState, type ExchangeType, type LogTone, type QueueState, type Snapshot,
+  type ConsumerPatch, type ConsumerState, type ConsumerView, type ExchangeType, type LogTone, type QueueState, type Snapshot,
 } from './engine'
 import { inkFill } from './Diagram'
 import { Range } from './Range'
@@ -105,7 +105,7 @@ export function BindingsPanel({ snap, onExchange, onBinding, onRate, onDlx, onMa
 
 export function ConsumerPanel({ snap, selected, onSelect, onPatch, onKill, onRevive }: {
   snap: Snapshot
-  selected: ConsumerState
+  selected: ConsumerView
   onSelect: (id: string) => void
   onPatch: (p: ConsumerPatch) => void
   onKill: () => void
@@ -113,7 +113,7 @@ export function ConsumerPanel({ snap, selected, onSelect, onPatch, onKill, onRev
 }) {
   const c = selected
   const qName = snap.queues.find((q) => q.id === c.queueId)?.name ?? ''
-  const unacked = c.inbound + c.buffer.length + (c.current ? 1 : 0)
+  const unacked = c.unacked
   return (
     <DemoPanel title="Consumer" meta={`${c.label} ← ${qName}`}>
       <div className="grid gap-4">
@@ -180,12 +180,12 @@ export function QueueTable({ snap }: { snap: Snapshot }) {
           <tbody>
             {snap.queues.map((q) => {
               const group = snap.consumers.filter((c) => c.queueId === q.id)
-              const unacked = group.reduce((n, c) => n + c.inbound + c.buffer.length + (c.current ? 1 : 0), 0)
+              const unacked = group.reduce((n, c) => n + c.unacked, 0)
               return (
                 <Tr key={q.id}>
                   <Td className="font-mono whitespace-nowrap">{q.name}</Td>
                   <Td className="font-mono text-ink-2 whitespace-nowrap">{snap.exchange === 'fanout' ? '(fanout)' : q.binding || '(empty)'}</Td>
-                  <Td className="text-right">{q.ready.length}/{q.maxLength}</Td>
+                  <Td className="text-right">{q.depth}/{q.maxLength}</Td>
                   <Td className="text-right">{unacked}</Td>
                   <Td className="text-right">{q.deadLettered}</Td>
                 </Tr>
@@ -203,7 +203,7 @@ export function DlqPanel({ snap, onPurge, onReplay }: { snap: Snapshot; onPurge:
   return (
     <DemoPanel
       title={`Dead letters · ${snap.dlq.name}`}
-      meta={`${snap.dlq.ready.length} held`}
+      meta={snap.dlq.depth > items.length ? `${snap.dlq.depth} held · newest ${items.length} shown` : `${snap.dlq.depth} held`}
       actions={items.length ? (
         <>
           <Button size="sm" variant="secondary" icon="refresh" onClick={onReplay}>Replay</Button>

@@ -10,13 +10,16 @@
  */
 import 'server-only'
 import { z } from 'zod'
-import { getSocials } from '@/lib/content'
+import { getSite, getSocials } from '@/lib/content'
+import { makeExcluded, siteExcluded } from '@/lib/content/privacy'
 
 export const GITHUB_REVALIDATE = 21600 // 6 h
 export const WINDOW_DAYS = 84 // 12 weeks; the events API only covers ~90 days
 
-/** Never shown on the site (BRIEF 2: excluded entirely). */
-const EXCLUDED = /logiccove|vlad|fallnet/i
+/** Contract terms plus `site.privacy.excluded` (shared rule, lib/content/privacy). */
+function makeSiteExcluded(): (text: string) => boolean {
+  return makeExcluded(siteExcluded(getSite()))
+}
 
 export interface GhRepo {
   name: string
@@ -191,16 +194,22 @@ export async function getGitHubActivity(): Promise<GitHubActivity> {
     gh(`/users/${handle}/repos?type=owner&sort=pushed&per_page=30`),
     gh(`/users/${handle}/events/public?per_page=100`),
   ])
-  if (!reposRes && !eventsRes) return fallback(handle, profileUrl)
+  if (!reposRes) return fallback(handle, profileUrl)
 
   const user = UserWire.safeParse(userRes?.data)
   const repos = z.array(RepoWire).safeParse(reposRes?.data)
   const events = z.array(EventWire).safeParse(eventsRes?.data)
-  if (!repos.success && !events.success) return fallback(handle, profileUrl)
+  // Without the repo list nothing can be vetted (forks, exclusions by description), so
+  // showing raw events would risk leaking them: treat it as a failure.
+  if (!repos.success) return fallback(handle, profileUrl)
 
-  const repoList: GhRepo[] = (repos.success ? repos.data : [])
-    .filter((r) => !r.fork && !r.private && !r.archived && owned(`${r.owner.login}/${r.name}`, handle))
-    .filter((r) => !EXCLUDED.test(r.name) && !EXCLUDED.test(r.description ?? ''))
+  const isExcluded = makeSiteExcluded()
+  const repoData = repos.data
+  const showable = (r: z.infer<typeof RepoWire>) =>
+    !r.fork && !r.private && !isExcluded(r.name) && !isExcluded(r.description ?? '')
+
+  const repoList: GhRepo[] = repoData
+    .filter((r) => showable(r) && !r.archived && owned(`${r.owner.login}/${r.name}`, handle))
     .map((r) => ({
       name: r.name,
       url: r.html_url,
@@ -209,13 +218,12 @@ export async function getGitHubActivity(): Promise<GitHubActivity> {
       pushedAt: r.pushed_at ?? '',
     }))
 
-  // Forked / excluded repos never appear in the feed either.
-  const hidden = new Set(
-    (repos.success ? repos.data : []).filter((r) => r.fork || EXCLUDED.test(r.name)).map((r) => r.name.toLowerCase()),
-  )
+  // Events count only for repos that pass the same checks as the repo list, so the feed,
+  // day bars and list never disagree. Archived repos keep their (real, public) history.
+  const vetted = new Set(repoData.filter(showable).map((r) => r.name.toLowerCase()))
   const eventList = (events.success ? events.data : []).filter((e) => {
     const name = e.repo.name.split('/')[1]?.toLowerCase() ?? ''
-    return e.public !== false && owned(e.repo.name, handle) && !EXCLUDED.test(e.repo.name) && !hidden.has(name)
+    return e.public !== false && owned(e.repo.name, handle) && !isExcluded(e.repo.name) && vetted.has(name)
   })
 
   const now = new Date(eventsRes?.date ?? reposRes?.date ?? Date.now())

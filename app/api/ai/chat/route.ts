@@ -46,6 +46,8 @@ export async function POST(req: Request): Promise<Response> {
         }
       },
       cancel() {
+        // return() alone would not run cleanup if the generator never started; close() always does.
+        s.close()
         void s.chunks.return(undefined as never).catch(() => {})
       },
     })

@@ -11,7 +11,7 @@ import type { DemoProps } from '@/lib/demos/types'
 import { useInView, usePageVisible, useReducedMotion } from '@/lib/hooks'
 import { Diagram } from './Diagram'
 import { Broker, SCENARIOS, type ExchangeType, type ScenarioKey, type Snapshot } from './engine'
-import { layoutFor, type Orientation } from './layout'
+import { layoutFor, orientationFor } from './layout'
 import { BindingsPanel, ConsumerPanel, DlqPanel, JavaPanel, LogPanel, QueueTable, StatsRow } from './panels'
 
 export { notes } from './notes'
@@ -36,7 +36,7 @@ export default function Demo(_props: DemoProps) {
   const [selected, setSelected] = useState('c-a')
   const [crash, setCrash] = useState<string | null>(null)
   const [announce, setAnnounce] = useState('')
-  const [orientation, setOrientation] = useState<Orientation>('tall')
+  const [stageWidth, setStageWidth] = useState(0)
   const stageRef = useRef<HTMLDivElement | null>(null)
 
   const b = broker.current
@@ -56,12 +56,12 @@ export default function Demo(_props: DemoProps) {
 
   useEffect(() => { b.animate = !reduced }, [b, reduced])
 
-  // Stage width decides the orientation of the diagram.
+  // Stage width decides the orientation of the diagram and how much its text is enlarged.
   useEffect(() => {
     const el = stageRef.current
     if (!el || typeof ResizeObserver === 'undefined') return
     const ro = new ResizeObserver(([entry]) => {
-      if (entry) setOrientation(entry.contentRect.width >= 620 ? 'wide' : 'tall')
+      if (entry) setStageWidth(Math.round(entry.contentRect.width))
     })
     ro.observe(el)
     return () => ro.disconnect()
@@ -123,7 +123,7 @@ export default function Demo(_props: DemoProps) {
     )
   }
 
-  const layout = layoutFor(orientation)
+  const layout = layoutFor(orientationFor(stageWidth), stageWidth)
   const sel = snap.consumers.find((c) => c.id === selected) ?? snap.consumers[0]
   const selQueue = snap.queues.find((q) => q.id === sel?.queueId)
 

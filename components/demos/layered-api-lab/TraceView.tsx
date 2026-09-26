@@ -73,7 +73,7 @@ export function TraceView({ trace, status, selected, onSelect, runKey }: {
                 className={cx(
                   'w-full min-h-tap px-1 py-1 flex flex-col items-center justify-center gap-[2px] rounded-0 border text-center',
                   selected === l ? 'border-ink bg-bg-2' : 'border-rule-soft bg-surface hover:bg-bg-2',
-                  st === 'idle' && 'opacity-60',
+                  st === 'idle' && 'border-dashed', // dimmed by the grey swatch and dashes, never by fading text
                 )}
               >
                 <span aria-hidden="true" className="block h-1 w-full rounded-pill" style={{ background: st === 'idle' ? 'var(--rule-soft)' : LAYER_INK[l] }} />

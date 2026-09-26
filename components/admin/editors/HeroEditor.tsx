@@ -38,6 +38,18 @@ export function HeroEditor() {
           <TextField path={['hero', 'plateTitle']} label="Plate title" />
           <TextField path={['hero', 'plateNote']} label="Plate note" />
         </FieldGrid>
+        <ListField<string>
+          path={['hero', 'plateLayers']}
+          label="Core-sample layers"
+          hint="Ordered collection:id refs, e.g. experience:euthyna, project:motioniq, education:pucit-bs-it, research:humcareadl. The plate sorts them by date. Empty = every enabled role, education and research item plus featured projects."
+          collapsible={false}
+          addLabel="Add layer"
+          max={12}
+          itemTitle={(s, i) => s || `Layer ${i + 1}`}
+          newItem={() => ''}
+        >
+          {(lp) => <TextField path={lp} label="Ref (collection:id)" mono />}
+        </ListField>
         <ToggleField path={['hero', 'showGridReading']} label="Show the live UK grid-carbon reading" hint="Fetched from carbonintensity.org.uk; shows “Feed unavailable. Nothing is estimated.” on failure." />
       </Group>
 

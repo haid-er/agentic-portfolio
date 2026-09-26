@@ -10,10 +10,25 @@
     "Cloud Deployment & Production Delivery"
   ],
   "technologies": [
-    "React", "Next.js", "Node.js", "NestJS", "TypeScript", "Python",
-    "PostgreSQL", "MongoDB", "MySQL", "Pinecone", "BullMQ",
-    "OpenAI", "Anthropic", "Langfuse",
-    "AWS", "Azure", "Hostinger", "Vercel", "Git"
+    "React",
+    "Next.js",
+    "Node.js",
+    "NestJS",
+    "TypeScript",
+    "Python",
+    "PostgreSQL",
+    "MongoDB",
+    "MySQL",
+    "Pinecone",
+    "BullMQ",
+    "OpenAI",
+    "Anthropic",
+    "Langfuse",
+    "AWS",
+    "Azure",
+    "Hostinger",
+    "Vercel",
+    "Git"
   ],
   "updated": ""
 }

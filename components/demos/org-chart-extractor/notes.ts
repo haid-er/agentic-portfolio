@@ -6,7 +6,7 @@ export const notes: DemoNotes = {
   limits: [
     'The sample organisation and names are fictional.',
     'Vision models can misread small or rotated text and crossing lines; check the tree before exporting.',
-    'One page per PDF and up to 40 people per extraction (the free-tier output cap).',
+    'One page per PDF and up to 20 people per extraction (the free-tier output cap); crop large charts into sections.',
     'Nothing is stored: edits live in this tab until you export.',
   ],
   stack: ['React 19', 'TypeScript', 'Zod structured output', 'AI gateway vision (Groq / Gemini)', 'pdf.js', 'SVG'],

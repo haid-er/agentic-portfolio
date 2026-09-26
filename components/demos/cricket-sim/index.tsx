@@ -12,8 +12,8 @@ import { useLocalStorage, usePageVisible, useReducedMotion } from '@/lib/hooks'
 import { cx } from '@/lib/utils'
 import { Commentary } from './Commentary'
 import { CSketch } from './CSketch'
-import { current, DELIVERIES, newMatch, SHOTS, step, target, userBatting, type Action, type Config, type Match, type Shot, type Timing } from './engine'
-import { Field, PITCH, ZONE } from './Field'
+import { current, DELIVERIES, newMatch, pendingText, SHOTS, step, target, userBatting, type Action, type Config, type Match, type Shot, type Timing } from './engine'
+import { ballAt, Field, ZONE } from './Field'
 import { Scoreboard } from './Scoreboard'
 import { Scorecard } from './Scorecard'
 import { Setup } from './Setup'
@@ -78,6 +78,7 @@ export default function Demo(_props: DemoProps) {
   }, [dispatch, stopFlight])
 
   const duration = FLIGHT_MS[m?.config.level ?? 'county']
+  const pending = m?.pending ?? null
   const face = useCallback(() => {
     if (flight.current) return
     setFlying(true)
@@ -85,12 +86,14 @@ export default function Demo(_props: DemoProps) {
     const t0 = performance.now()
     const tick = (now: number) => {
       const p = (now - t0) / duration
-      ballRef.current?.setAttribute('cy', (PITCH.top + (PITCH.bottom - PITCH.top) * Math.min(p, 1.15)).toFixed(2))
+      const b = ballAt(Math.min(p, 1.15), pending)
+      const el = ballRef.current
+      if (el) { el.setAttribute('cx', b.x.toFixed(2)); el.setAttribute('cy', b.y.toFixed(2)); el.setAttribute('r', b.r.toFixed(2)) }
       if (p > 1.15) { resolve('leave', 'none'); return } // no shot offered: it is a leave
       if (flight.current) flight.current.raf = requestAnimationFrame(tick)
     }
     flight.current = { start: t0, raf: requestAnimationFrame(tick) }
-  }, [duration, resolve])
+  }, [duration, resolve, pending])
 
   const play = (shot: Shot) => {
     if (!m || m.phase !== 'innings' || !batting) return
@@ -190,6 +193,7 @@ export default function Demo(_props: DemoProps) {
                 ballRef={ballRef}
                 flying={flying}
                 showZone={timingOn && batting && m.phase === 'innings'}
+                pending={batting && m.phase === 'innings' ? pending : null}
                 label={inn ? `Field view with a wagon wheel of ${m.config.teams[inn.team]}'s scoring shots` : 'Field view'}
               />
               {lastTiming !== 'none' && !flying && batting && m.phase === 'innings' ? (
@@ -277,13 +281,18 @@ function PhaseControls({ m, batting, timingOn, flying, target: tgt, onFace, onPl
       if (batting) {
         return (
           <div className="grid gap-3">
+            {m.pending ? (
+              <p className="m-0 text-1" aria-live="polite">
+                <span className="mono text-ink-3">The read · </span>{pendingText(m.pending)}.
+              </p>
+            ) : null}
             {timingOn ? (
               <div className="flex flex-wrap items-center gap-3">
                 <Button onClick={onFace} disabled={flying} icon="play">{flying ? 'Ball on its way…' : 'Face up'}</Button>
                 <span className="text-0 text-ink-2">{flying ? 'Pick a shot as the ball reaches the hit zone.' : 'Space or tap to face the next ball.'}</span>
               </div>
             ) : (
-              <p className="m-0 text-0 text-ink-2">Pick a shot: the bowler&apos;s delivery is revealed as you play it.</p>
+              <p className="m-0 text-0 text-ink-2">Read the delivery, then pick the shot that suits it.</p>
             )}
             <div role="group" aria-label="Shots" className="grid grid-cols-2 xs:grid-cols-3 gap-2">
               {SHOTS.map((s) => (

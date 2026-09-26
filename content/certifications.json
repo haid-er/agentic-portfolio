@@ -9,7 +9,9 @@
       "date": "2024-11-09",
       "url": "https://www.coursera.org/verify/3YGP1SY6NZDU",
       "credentialId": "3YGP1SY6NZDU",
-      "demoSlugs": ["neural-playground"]
+      "demoSlugs": [
+        "neural-playground"
+      ]
     },
     {
       "id": "ibm-node-express",
@@ -20,7 +22,9 @@
       "date": "2024-10-21",
       "url": "https://www.coursera.org/verify/SR8D90BB97KS",
       "credentialId": "SR8D90BB97KS",
-      "demoSlugs": ["layered-api-lab"]
+      "demoSlugs": [
+        "layered-api-lab"
+      ]
     },
     {
       "id": "meta-html-css",
@@ -31,7 +35,9 @@
       "date": "2023-10-14",
       "url": "https://www.coursera.org/verify/ATLRBGC7LGWM",
       "credentialId": "ATLRBGC7LGWM",
-      "demoSlugs": ["theme-lab"]
+      "demoSlugs": [
+        "theme-lab"
+      ]
     },
     {
       "id": "udemy-react-complete-guide",
@@ -40,7 +46,10 @@
       "name": "React – The Complete Guide (incl. Redux, Redux Toolkit)",
       "issuer": "Udemy",
       "date": "",
-      "demoSlugs": ["kanban-board", "data-grid"]
+      "demoSlugs": [
+        "kanban-board",
+        "data-grid"
+      ]
     }
   ]
 }

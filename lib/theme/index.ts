@@ -5,10 +5,16 @@
  * - `themeOverridesCss(theme)`: admin token overrides -> CSS variables (root layout <style>).
  * - `noFlashScript(theme)`: inline <head> script that picks the world before paint.
  * - `themeColors(theme)`: browser chrome colours for the viewport export.
+ * - `rootViewport(theme)`: the root layout's whole `viewport` (uses themeColors).
  * - `themeLabels(theme)`: display names + swap labels (the UI never shows keys).
  */
-import { THEME_KEYS, type Theme, type ThemeKey } from '@/lib/content/schema'
+import type { Viewport } from 'next'
+import type { Theme } from '@/lib/content/schema'
+import { THEME_KEYS, type ThemeKey } from './keys'
 import { worldTokens } from './tokens'
+
+export { THEME_KEYS, isThemeKey } from './keys'
+export type { ThemeKey } from './keys'
 
 export { DEFAULT_COLORS, isLiteralColor, worldTokens } from './tokens'
 export type { ColorToken, WorldColors } from './tokens'
@@ -17,9 +23,6 @@ export const THEME_STORAGE_KEY = 'ghp-theme'
 export const THEME_EVENT = 'ghp:themechange'
 
 export const otherTheme = (k: ThemeKey): ThemeKey => (k === 'almanac' ? 'strata' : 'almanac')
-
-export const isThemeKey = (v: unknown): v is ThemeKey =>
-  typeof v === 'string' && (THEME_KEYS as readonly string[]).includes(v)
 
 /* ------------------------------------------------------------------ */
 /* token overrides -> CSS                                              */
@@ -129,4 +132,19 @@ export function themeColors(theme: Theme): { media: string; color: string }[] {
     media: `(prefers-color-scheme: ${theme.themes[k].reads})`,
     color: worldTokens(theme, k)['--bg'],
   }))
+}
+
+/**
+ * The root layout's viewport: app/layout.tsx does
+ * `export function generateViewport() { return rootViewport(getTheme()) }`
+ * so the first-paint chrome colour follows the admin's worlds.
+ */
+export function rootViewport(theme: Theme): Viewport {
+  return {
+    width: 'device-width',
+    initialScale: 1,
+    viewportFit: 'cover',
+    colorScheme: 'light dark',
+    themeColor: themeColors(theme),
+  }
 }

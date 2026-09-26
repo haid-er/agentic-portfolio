@@ -8,7 +8,9 @@
       "detail": "Graphic-design credit at PUCIT, the craft behind this site's two printed worlds.",
       "kind": "award",
       "stamp": true,
-      "demoSlugs": ["design-studio"]
+      "demoSlugs": [
+        "design-studio"
+      ]
     },
     {
       "id": "appfest-codepunks",
@@ -17,7 +19,9 @@
       "title": "AppFest: 8th place, CMS development",
       "detail": "Ranked 8th with team CodePunks.",
       "kind": "competition",
-      "demoSlugs": ["layered-api-lab"]
+      "demoSlugs": [
+        "layered-api-lab"
+      ]
     },
     {
       "id": "github-badges",
@@ -27,7 +31,9 @@
       "detail": "Pair Extraordinaire, Pull Shark ×2, YOLO.",
       "url": "https://github.com/haid-er",
       "kind": "badge",
-      "demoSlugs": ["ci-pipeline"]
+      "demoSlugs": [
+        "ci-pipeline"
+      ]
     },
     {
       "id": "pucon-25-robotics-head",
@@ -37,7 +43,9 @@
       "title": "Head of the Robotics Competition, PUCon '25",
       "date": "2025",
       "kind": "leadership",
-      "demoSlugs": ["live-telemetry"]
+      "demoSlugs": [
+        "live-telemetry"
+      ]
     },
     {
       "id": "byte-camp-cp-talk",
@@ -47,7 +55,10 @@
       "title": "Speaker, BYTE CAMP",
       "detail": "Second talk on competitive programming.",
       "kind": "talk",
-      "demoSlugs": ["code-judge", "algo-visualizer"]
+      "demoSlugs": [
+        "code-judge",
+        "algo-visualizer"
+      ]
     },
     {
       "id": "leetcode-365-badge",
@@ -56,7 +67,9 @@
       "source": "LinkedIn feed snippet only ⚠️; no LeetCode profile found",
       "title": "365-day LeetCode badge",
       "kind": "badge",
-      "demoSlugs": ["code-judge"]
+      "demoSlugs": [
+        "code-judge"
+      ]
     },
     {
       "id": "pucon-25-cp-2nd",
@@ -66,7 +79,9 @@
       "title": "2nd place, Competitive Programming, PUCon '25",
       "date": "2025",
       "kind": "competition",
-      "demoSlugs": ["code-judge"]
+      "demoSlugs": [
+        "code-judge"
+      ]
     }
   ]
 }

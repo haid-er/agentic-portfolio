@@ -23,11 +23,19 @@ const squash = (s: string) => s.toLowerCase().replace(/\s+/g, ' ')
 
 export function ChunkLab({ embedMany, embedderLabel }: { embedMany: EmbedMany; embedderLabel: string }) {
   const [strategy, setStrategy] = useState<Strategy>('fixed')
+  // sizeLive follows the slider; size (which triggers chunking + embedding) settles 250 ms after the last move.
+  const [sizeLive, setSizeLive] = useState(200)
   const [size, setSize] = useState(200)
   const [qi, setQi] = useState(0)
   const [rows, setRows] = useState<Row[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   const question = CHUNK_QUESTIONS[qi] ?? CHUNK_QUESTIONS[0]
+
+  useEffect(() => {
+    if (sizeLive === size) return
+    const t = window.setTimeout(() => setSize(sizeLive), 250)
+    return () => window.clearTimeout(t)
+  }, [sizeLive, size])
 
   const all = useMemo(
     () => STRATEGIES.map((s) => ({ strategy: s.value, chunks: chunk(CHUNK_DOC, s.value, size) })),
@@ -65,14 +73,15 @@ export function ChunkLab({ embedMany, embedderLabel }: { embedMany: EmbedMany; e
             {CHUNK_QUESTIONS.map((q, i) => <option key={q.q} value={i}>{q.q}</option>)}
           </Select>
           <label className="grid gap-1">
-            <span className="mono text-ink-2">Max chunk size · <span className="nums">{size}</span> chars</span>
+            <span className="mono text-ink-2">Max chunk size · <span className="nums">{sizeLive}</span> chars</span>
             <input
               type="range"
               min={80}
               max={480}
               step={20}
-              value={size}
-              onChange={(e) => setSize(Number(e.target.value))}
+              value={sizeLive}
+              onChange={(e) => setSizeLive(Number(e.target.value))}
+              onPointerUp={(e) => setSize(Number(e.currentTarget.value))}
               className="w-full min-h-tap accent-[var(--accent)]"
             />
           </label>

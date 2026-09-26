@@ -1,5 +1,6 @@
 /** Turn an uploaded image or PDF into a vision-ready data URL, entirely in the browser. */
 import { imageToDataUrl } from '@/lib/ai'
+import { loadPdfjs } from '@/lib/pdf'
 
 export interface Prepared { dataUrl: string; note: string }
 
@@ -10,11 +11,13 @@ export async function prepareFile(file: File): Promise<Prepared> {
     const dataUrl = await imageToDataUrl(file, { maxSide: 1600 })
     return { dataUrl, note: `${file.name} · downscaled in your browser` }
   }
-  const pdfjs = await import('pdfjs-dist')
-  pdfjs.GlobalWorkerOptions.workerSrc = `https://cdn.jsdelivr.net/npm/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`
+  // Worker is bundled from the installed package (no CDN), so PDF reading works offline.
+  const pdfjs = await loadPdfjs()
   const task = pdfjs.getDocument({ data: new Uint8Array(await file.arrayBuffer()) })
   try {
-    const doc = await task.promise
+    const doc = await task.promise.catch((e: unknown) => {
+      throw new Error(`Could not start the PDF reader or open this file (${e instanceof Error ? e.message : String(e)}). Try a PNG or JPEG screenshot.`)
+    })
     const page = await doc.getPage(1)
     const base = page.getViewport({ scale: 1 })
     const scale = Math.min(3, 1600 / Math.max(base.width, base.height))

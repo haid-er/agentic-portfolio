@@ -26,20 +26,6 @@ import type { SectionProps } from './types'
 /* plate data                                                          */
 /* ------------------------------------------------------------------ */
 
-/**
- * Which content items become layers ("collection:id"). Order does not matter: layers
- * are sorted newest on top. `site.hero.plateLayers` overrides this when present.
- */
-const DEFAULT_PLATE = [
-  'research:humcareadl',
-  'experience:euthyna',
-  'experience:piron-labs',
-  'project:motioniq',
-  'experience:webox-systems',
-  'project:c-cpp-foundations',
-  'education:pucit-bs-it',
-] as const
-
 interface PlateLayer {
   key: string
   /** Sort key (partial date). */
@@ -80,7 +66,7 @@ function resolveLayer(ref: string): PlateLayer | null {
     return {
       key: ref, when: p.start ?? '', year: year(p.start), label: p.title, marker: false,
       note: p.tags.slice(0, 2).join(' · '),
-      range: p.start ? formatRange(p.start, p.end ?? '') : '',
+      range: !p.start ? '' : p.end ? formatRange(p.start, p.end) : p.ongoing ? formatRange(p.start, '') : formatPartialDate(p.start),
       slug: firstVisible(p.demoSlugs),
     }
   }
@@ -107,8 +93,31 @@ function resolveLayer(ref: string): PlateLayer | null {
   return null
 }
 
+/**
+ * Layer refs ("collection:id") chosen in content via `site.hero.plateLayers`. Read
+ * defensively so the plate keeps working whether or not the schema carries the field.
+ */
+function contentRefs(hero: HeroContent): string[] {
+  if (!('plateLayers' in hero) || !Array.isArray(hero.plateLayers)) return []
+  return hero.plateLayers.filter((r): r is string => typeof r === 'string')
+}
+
+/**
+ * With no explicit list, the plate is derived from content: every enabled experience,
+ * education and research item, plus featured projects that have a start date and a demo.
+ */
+function derivedRefs(): string[] {
+  return [
+    ...getExperience().map((x) => `experience:${x.id}`),
+    ...getProjects().filter((p) => p.featured && p.start && p.demoSlugs.length).map((p) => `project:${p.slug}`),
+    ...getEducation().map((e) => `education:${e.id}`),
+    ...getResearch().items.map((r) => `research:${r.id}`),
+  ]
+}
+
 function plateLayers(hero: HeroContent): PlateLayer[] {
-  const refs = (hero as HeroContent & { plateLayers?: string[] }).plateLayers ?? DEFAULT_PLATE
+  const chosen = contentRefs(hero)
+  const refs = [...new Set(chosen.length ? chosen : derivedRefs())]
   return refs
     .map(resolveLayer)
     .filter((l): l is PlateLayer => !!l && !!l.label)
@@ -266,6 +275,10 @@ ${drillRules}
 .gtp-anim .gtp-value{animation:fade-in 420ms var(--ease-out) both;animation-delay:calc(1800ms + ${n} * var(--stagger))}
 .gtp-dots{opacity:0}
 html[data-hero-seen] .gtp-anim *{animation:none!important}
+/* world switch: the shell sets html[data-settle] for ~1.4s; the drill runs the core once more */
+@media (prefers-reduced-motion:no-preference){
+  html[data-settle] .gtp-anim .gtp-drill-intro{animation:gtp-drill-run 820ms var(--ease-press) 160ms both!important}
+}
 @media (prefers-reduced-motion:reduce){
   .gtp-anim *,.gtp-over{animation:none!important}
   .gtp-band,.gtp-edge,.gtp-label,.gtp-drill,.gtp-go{transition:none!important}

@@ -11,69 +11,19 @@
 import { useEffect, useState, type CSSProperties } from 'react'
 import { Plus, RotateCcw, Trash2 } from 'lucide-react'
 import { Badge, Button, Segmented, controlClasses } from '@/components/ui'
-import { THEME_KEYS, type Theme, type ThemeKey } from '@/lib/content/schema'
+import type { Theme } from '@/lib/content/schema'
+import { isThemeKey, THEME_KEYS, type ThemeKey } from '@/lib/theme/keys'
 import { DEFAULT_COLORS, isSafeTokenValue, type ColorToken } from '@/lib/theme'
 import { cx } from '@/lib/utils'
 import { useEditor } from '../EditorContext'
-import { REVEAL_EVENT, type ExtraCheck, type ExtraIssue } from '../EditorShell'
+import { REVEAL_EVENT } from '../EditorShell'
 import { SegmentedField } from '../fields/Choice'
 import { ColorField } from '../fields/Color'
 import { FieldGrid, Group } from '../fields/Group'
 import { TextField } from '../fields/Text'
-import { contrast } from '../lib/contrast'
+import { COLOR_NAMES, effective, GROUPS, PAIRS, ratioOf, themeCheck } from '../lib/themeCheck'
 
-const GROUPS: { title: string; tokens: { name: ColorToken; label: string }[] }[] = [
-  { title: 'Paper', tokens: [{ name: '--bg', label: 'Background' }, { name: '--bg-2', label: 'Inset sheet' }, { name: '--surface', label: 'Surface (cards)' }] },
-  { title: 'Ink', tokens: [{ name: '--ink', label: 'Ink' }, { name: '--ink-2', label: 'Secondary ink' }, { name: '--ink-3', label: 'Meta ink' }] },
-  { title: 'Accents', tokens: [{ name: '--accent', label: 'Accent' }, { name: '--accent-2', label: 'Second accent' }, { name: '--accent-ink', label: 'Accent for small text' }, { name: '--on-accent', label: 'Text on accent' }] },
-  { title: 'Rules and data', tokens: [{ name: '--rule', label: 'Rule / control border' }, { name: '--data-1', label: 'Data 1' }, { name: '--data-2', label: 'Data 2' }, { name: '--data-3', label: 'Data 3' }, { name: '--data-4', label: 'Data 4' }] },
-]
-const COLOR_NAMES = new Set<string>(GROUPS.flatMap((g) => g.tokens.map((t) => t.name)))
-
-/** Pairs that must stay readable. `min` 4.5 = text, 3 = UI / graphics. */
-const PAIRS: { fg: ColorToken; bg: ColorToken; min: number; use: string }[] = [
-  { fg: '--ink', bg: '--bg', min: 4.5, use: 'Body text' },
-  { fg: '--ink', bg: '--surface', min: 4.5, use: 'Text on cards' },
-  { fg: '--ink-2', bg: '--bg', min: 4.5, use: 'Secondary text' },
-  { fg: '--ink-2', bg: '--bg-2', min: 4.5, use: 'Secondary on inset' },
-  { fg: '--ink-3', bg: '--bg', min: 4.5, use: 'Meta, folios' },
-  { fg: '--ink-3', bg: '--bg-2', min: 4.5, use: 'Meta on inset' },
-  { fg: '--ink-3', bg: '--surface', min: 4.5, use: 'Meta on cards' },
-  { fg: '--accent', bg: '--bg', min: 4.5, use: 'Links, emphasis' },
-  { fg: '--accent-ink', bg: '--bg', min: 4.5, use: 'Small accent text' },
-  { fg: '--accent-ink', bg: '--bg-2', min: 4.5, use: 'Folios on inset' },
-  { fg: '--on-accent', bg: '--accent', min: 4.5, use: 'Text on accent' },
-  { fg: '--rule', bg: '--bg', min: 3, use: 'Control borders' },
-  { fg: '--rule', bg: '--surface', min: 3, use: 'Borders on cards' },
-  { fg: '--accent-2', bg: '--bg', min: 3, use: 'Decoration, graphics' },
-  { fg: '--data-1', bg: '--surface', min: 3, use: 'Chart ink 1' },
-  { fg: '--data-2', bg: '--surface', min: 3, use: 'Chart ink 2' },
-  { fg: '--data-3', bg: '--surface', min: 3, use: 'Chart ink 3' },
-  { fg: '--data-4', bg: '--surface', min: 3, use: 'Chart ink 4' },
-]
-
-const effective = (theme: Theme, key: ThemeKey, name: ColorToken) => theme.themes[key].tokens[name] ?? DEFAULT_COLORS[key][name]
-
-/** Contrast failures block the save; the issue points at the token that was changed. */
-export const themeCheck: ExtraCheck = (raw) => {
-  const theme = raw as Theme
-  const out: ExtraIssue[] = []
-  if (!theme?.themes) return out
-  for (const key of THEME_KEYS) {
-    const tokens = theme.themes[key]?.tokens ?? {}
-    for (const p of PAIRS) {
-      const ratio = contrast(effective(theme, key, p.fg), effective(theme, key, p.bg))
-      if (ratio === null || ratio >= p.min) continue
-      const at = tokens[p.fg] !== undefined ? p.fg : tokens[p.bg] !== undefined ? p.bg : null
-      if (!at) continue // the shipped defaults are checked in DESIGN.md
-      out.push({ path: ['themes', key, 'tokens', at], message: `${p.use}: ${p.fg} on ${p.bg} is ${ratio.toFixed(2)}:1; needs ${p.min}:1.` })
-    }
-    for (const [name, value] of Object.entries(tokens)) {
-      if (!isSafeTokenValue(value)) out.push({ path: ['themes', key, 'tokens', name], message: 'Not a usable CSS value.' })
-    }
-  }
-  return out
-}
+export { themeCheck }
 
 export function ThemeEditor() {
   const ed = useEditor()
@@ -93,6 +43,7 @@ export function ThemeEditor() {
 
   return (
     <>
+      <ThemeLabDraft onLoad={setWorld} />
       <Group title="Default world" description="What a first-time visitor sees. “Follow the device” picks by what each world reads as.">
         <SegmentedField
           path={['default']}
@@ -276,7 +227,7 @@ function Specimen({ world, theme }: { world: ThemeKey; theme: Theme }) {
 
 function ContrastTable({ world, theme }: { world: ThemeKey; theme: Theme }) {
   const rows = PAIRS.map((p) => {
-    const ratio = contrast(effective(theme, world, p.fg), effective(theme, world, p.bg))
+    const ratio = ratioOf(theme, world, p)
     return { ...p, ratio, ok: ratio === null ? null : ratio >= p.min }
   })
   const failing = rows.filter((r) => r.ok === false).length
@@ -303,5 +254,64 @@ function ContrastTable({ world, theme }: { world: ThemeKey; theme: Theme }) {
         ))}
       </ul>
     </details>
+  )
+}
+
+/* ------------------------------------------------------------------ */
+/* Theme lab draft import (the /playground/theme-lab demo writes it)   */
+/* ------------------------------------------------------------------ */
+
+const DRAFT_KEY = 'ghp:theme-lab:draft'
+
+interface Draft { world: ThemeKey; tokens: Partial<Record<ColorToken, string>>; savedAt: string }
+
+function readDraft(): Draft | null {
+  try {
+    const raw = window.localStorage.getItem(DRAFT_KEY)
+    if (!raw) return null
+    const d = JSON.parse(raw) as { world?: unknown; tokens?: unknown; savedAt?: unknown }
+    if (!isThemeKey(d.world) || !d.tokens || typeof d.tokens !== 'object') return null
+    const known = DEFAULT_COLORS[d.world]
+    const tokens: Partial<Record<ColorToken, string>> = {}
+    for (const [k, v] of Object.entries(d.tokens as Record<string, unknown>)) {
+      if (k in known && typeof v === 'string' && isSafeTokenValue(v)) tokens[k as ColorToken] = v
+    }
+    if (!Object.keys(tokens).length) return null
+    return { world: d.world, tokens, savedAt: typeof d.savedAt === 'string' ? d.savedAt : '' }
+  } catch {
+    return null
+  }
+}
+
+function forgetDraft() {
+  try { window.localStorage.removeItem(DRAFT_KEY) } catch { /* storage blocked */ }
+}
+
+function ThemeLabDraft({ onLoad }: { onLoad: (w: ThemeKey) => void }) {
+  const ed = useEditor()
+  const theme = ed.data as Theme
+  const [draft, setDraft] = useState<Draft | null>(null)
+  useEffect(() => { setDraft(readDraft()) }, [])
+  if (!draft) return null
+  const label = theme.themes[draft.world].label || draft.world
+  const when = draft.savedAt && !Number.isNaN(Date.parse(draft.savedAt)) ? new Date(draft.savedAt).toLocaleString() : ''
+  const n = Object.keys(draft.tokens).length
+  const load = () => {
+    ed.set(['themes', draft.world, 'tokens'], (prev: unknown) => ({ ...(prev as Record<string, string> | undefined), ...draft.tokens }))
+    onLoad(draft.world)
+    forgetDraft()
+    setDraft(null)
+  }
+  const dismiss = () => { forgetDraft(); setDraft(null) }
+  return (
+    <div role="region" aria-label="Theme lab draft" className="flex flex-wrap items-center justify-between gap-s3 border border-accent bg-surface p-s4">
+      <p className="m-0 text-0 min-w-0">
+        A Theme lab draft for <strong>{label}</strong> ({n} colour{n === 1 ? '' : 's'}){when ? `, saved ${when}` : ''}. Loading it adds unsaved edits; the contrast check still runs before you save.
+      </p>
+      <div className="flex flex-wrap gap-2">
+        <Button size="sm" onClick={load}>Load Theme lab draft for {label}</Button>
+        <Button size="sm" variant="ghost" onClick={dismiss}>Dismiss</Button>
+      </div>
+    </div>
   )
 }

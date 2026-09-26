@@ -2,14 +2,36 @@
 /**
  * "Edit as JSON": the escape hatch for anything the form does not cover.
  * Applying replaces the form state (still validated, still needs Save).
+ * JSON that passes the schema is applied as is; JSON that does not is applied
+ * only if it keeps the shape the form reads (same objects, lists and text
+ * fields), so the form can show the problems instead of crashing.
  */
 import { useState } from 'react'
 import { Button, Icon, useToast } from '@/components/ui'
 import { controlClasses } from '@/components/ui'
 import { cx } from '@/lib/utils'
+import { SCHEMAS, type CollectionName } from '@/lib/content/schema'
 import { useEditor } from './EditorContext'
 
-export function RawJson() {
+const isObject = (v: unknown): v is Record<string, unknown> => typeof v === 'object' && v !== null && !Array.isArray(v)
+
+/** First place where `next` breaks the structure of `current`, or null if it keeps it. */
+function shapeBreak(current: unknown, next: unknown, at = ''): string | null {
+  if (Array.isArray(current)) return Array.isArray(next) ? null : `${at || 'the top level'} must be a list`
+  if (typeof current === 'string') return typeof next === 'string' ? null : `${at} must be text`
+  if (!isObject(current)) return null
+  if (!isObject(next)) return `${at || 'the top level'} must be an object`
+  for (const [k, v] of Object.entries(current)) {
+    if (v === undefined || (!isObject(v) && !Array.isArray(v) && typeof v !== 'string')) continue
+    const path = at ? `${at}.${k}` : k
+    if (!(k in next)) return `${path} is missing`
+    const hit = shapeBreak(v, next[k], path)
+    if (hit) return hit
+  }
+  return null
+}
+
+export function RawJson({ name }: { name: CollectionName }) {
   const ed = useEditor()
   const toast = useToast()
   const [open, setOpen] = useState(false)
@@ -26,9 +48,16 @@ export function RawJson() {
   const apply = () => {
     try {
       const next: unknown = JSON.parse(text)
+      const res = SCHEMAS[name].safeParse(next)
+      const broken = res.success ? null : shapeBreak(ed.data, next)
+      if (broken && !res.success) {
+        const issues = res.error.issues.slice(0, 5).map((i) => `${i.path.join('.') || '(root)'}: ${i.message}`)
+        setError(`Not applied: ${broken}, which the form needs. ${issues.join(' · ')}`)
+        return
+      }
       ed.set([], next)
       setError(null)
-      toast('JSON applied to the form. Review, then save.', { tone: 'ok' })
+      toast(res.success ? 'JSON applied to the form. Review, then save.' : 'JSON applied with problems; the form marks them.', { tone: res.success ? 'ok' : 'warn' })
     } catch (e) {
       setError(e instanceof Error ? e.message : 'Not valid JSON')
     }

@@ -90,7 +90,7 @@ function JobCard({ job: j, now, idle, selected, onSelect }: { job: JobRun; now: 
       className={cx(
         'w-full min-h-tap text-left grid gap-2 p-3 border rounded-1 bg-bg transition-colors duration-[var(--dur-fast)]',
         selected ? 'border-ink ring-1 ring-ink' : 'border-rule-soft hover:border-rule',
-        skippedByIf && 'border-dashed opacity-80',
+        skippedByIf && 'border-dashed',
       )}
     >
       <span className="flex flex-wrap items-center justify-between gap-2">

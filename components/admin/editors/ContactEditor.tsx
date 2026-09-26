@@ -1,6 +1,8 @@
 'use client'
 /** site.contact, socials, form endpoint and masthead furniture. */
 import type { Social } from '@/lib/content/schema'
+import { endpointHost, endpointMailto, WEB3FORMS_HOST } from '@/app/resume/_client/formEndpoint'
+import { useField } from '../EditorContext'
 import { Icon, socialIcon } from '@/components/ui'
 import { ToggleField } from '../fields/Choice'
 import { FieldGrid, Group } from '../fields/Group'
@@ -17,7 +19,14 @@ export function ContactEditor() {
         <TextAreaField path={['contact', 'blurb']} label="Blurb" rows={3} recommend={{ max: 280 }} />
         <TextField path={['contact', 'availability']} label="Availability" optional hint="Optional, e.g. open to remote roles. Empty hides it." />
         <ToggleField path={['contact', 'formEnabled']} label="Show the contact form" hint="Needs the form endpoint below; otherwise the mailto fallback is used." />
-        <TextField path={['contactFormEndpoint']} label="Form endpoint" hint="Web3Forms or Formspree URL. Empty = mailto only." inputMode="url" mono />
+        <TextField
+          path={['contactFormEndpoint']}
+          label="Form endpoint"
+          hint="Free form service URL. Web3Forms: https://api.web3forms.com/submit?access_key=YOUR_KEY (the key is public by design) · Formspree: https://formspree.io/f/FORM_ID · a mailto: address also works. Empty = the visitor's mail app, addressed to your profile email."
+          inputMode="url"
+          mono
+        />
+        <EndpointCheck />
       </Group>
 
       <Group id="socials" title="Social links" layer={2} description="Header, contents sheet, footer and the Person structured data.">
@@ -55,4 +64,17 @@ export function ContactEditor() {
       </Group>
     </>
   )
+}
+
+/** Inline warning when the endpoint would be ignored by the site (same rule as the form). */
+function EndpointCheck() {
+  const f = useField<string | undefined>(['contactFormEndpoint'])
+  const v = (f.value ?? '').trim()
+  if (!v || endpointHost(v) || endpointMailto(v)) return null
+  let msg = 'The site ignores this value and falls back to the mail app: use an https:// URL or a mailto: address.'
+  try {
+    const u = new URL(v)
+    if (u.hostname.replace(/^www\./, '') === WEB3FORMS_HOST && u.protocol === 'https:') msg = 'Web3Forms needs ?access_key=YOUR_KEY in the URL; without it every submission fails, so the site uses the mail app instead.'
+  } catch { /* not a URL */ }
+  return <p role="status" className="m-0 text-0 text-warn">{msg}</p>
 }

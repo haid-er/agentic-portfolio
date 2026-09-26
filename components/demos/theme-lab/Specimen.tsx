@@ -7,7 +7,7 @@
  */
 import type { CSSProperties } from 'react'
 import { Badge, Button, Tag } from '@/components/ui'
-import type { ThemeKey } from '@/lib/content/schema'
+import type { ThemeKey } from '@/lib/theme/keys'
 import type { Palette } from './tokens'
 
 export type Vision = 'none' | 'protan' | 'deutan' | 'tritan' | 'achroma'

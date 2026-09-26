@@ -7,7 +7,11 @@
       "title": "Full-stack product engineering",
       "summary": "From schema to screen: React and Next.js frontends on Node, NestJS and PostgreSQL, with payments, real-time chat and the performance work that takes a 27s response down to 3.5s.",
       "icon": "Layers",
-      "demoSlugs": ["stripe-connect-flow", "web-perf-lab", "dispatch-board"]
+      "demoSlugs": [
+        "stripe-connect-flow",
+        "web-perf-lab",
+        "dispatch-board"
+      ]
     },
     {
       "id": "backend-platform",
@@ -16,7 +20,11 @@
       "title": "Backend and platform architecture",
       "summary": "Layered APIs (routes → controller → service → repository), Zod contracts, CASL permissions, audit trails and background queues that stay readable as the team grows.",
       "icon": "Server",
-      "demoSlugs": ["layered-api-lab", "rbac-audit-lab", "bullmq-jobs"]
+      "demoSlugs": [
+        "layered-api-lab",
+        "rbac-audit-lab",
+        "bullmq-jobs"
+      ]
     },
     {
       "id": "ai-agents",
@@ -25,7 +33,11 @@
       "title": "AI systems and autonomous agents",
       "summary": "LLM pipelines that return validated, structured data rather than prose, plus multi-agent workflows with tools, tracing and budgets.",
       "icon": "Bot",
-      "demoSlugs": ["agent-orchestra", "mcp-tool-lab", "esg-gap-checker"]
+      "demoSlugs": [
+        "agent-orchestra",
+        "mcp-tool-lab",
+        "esg-gap-checker"
+      ]
     },
     {
       "id": "rag-search",
@@ -34,7 +46,11 @@
       "title": "RAG and vector search",
       "summary": "Retrieval over your own documents with Pinecone-style vector search, so answers cite sources instead of guessing.",
       "icon": "Search",
-      "demoSlugs": ["legal-rag-assistant", "vector-space-explorer", "ask-malik"]
+      "demoSlugs": [
+        "legal-rag-assistant",
+        "vector-space-explorer",
+        "ask-malik"
+      ]
     },
     {
       "id": "cloud-delivery",
@@ -43,7 +59,10 @@
       "title": "Cloud deployment and production delivery",
       "summary": "Shipping to AWS, Azure and Vercel with pipelines that test before they deploy.",
       "icon": "CloudUpload",
-      "demoSlugs": ["ci-pipeline", "system-design-canvas"]
+      "demoSlugs": [
+        "ci-pipeline",
+        "system-design-canvas"
+      ]
     }
   ]
 }

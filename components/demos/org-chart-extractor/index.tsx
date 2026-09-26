@@ -16,7 +16,7 @@ import { prepareFile } from './files'
 import { newId, type Person, removePerson, sanitize, stats, toNested } from './model'
 import { parseOutline } from './outline'
 import { SAMPLE_ORG, SAMPLE_OUTLINE } from './sample'
-import { OrgExtraction, SYSTEM, toPeople, USER_TEXT } from './schema'
+import { MAX_PEOPLE, OrgExtraction, SYSTEM, toPeople, USER_TEXT } from './schema'
 import { Inspector, OutlineView, TableView } from './Views'
 
 export { notes } from './notes'
@@ -102,7 +102,11 @@ export default function Demo({ slug }: DemoProps) {
     } catch (e) {
       if (ctrl.current !== c) return
       if (e instanceof AiError && e.code === 'aborted') return
-      setError({ message: aiErrorMessage(e), quota: isQuotaError(e) })
+      const tooBig = e instanceof AiError && e.code === 'invalid_output'
+      setError({
+        message: tooBig ? `The model's answer did not fit the expected shape. Large charts can overflow the output limit (about ${MAX_PEOPLE} people): crop to one section and try again.` : aiErrorMessage(e),
+        quota: isQuotaError(e),
+      })
     } finally {
       if (ctrl.current === c) { ctrl.current = null; setPhase('idle') }
     }

@@ -87,7 +87,16 @@
     ],
     "plateTitle": "Plate 1 · Core sample of a career",
     "plateNote": "newest on top",
-    "showGridReading": true
+    "showGridReading": true,
+    "plateLayers": [
+      "research:humcareadl",
+      "experience:euthyna",
+      "experience:piron-labs",
+      "project:motioniq",
+      "experience:webox-systems",
+      "project:c-cpp-foundations",
+      "education:pucit-bs-it"
+    ]
   },
   "about": {
     "body": [
@@ -99,7 +108,7 @@
   },
   "contact": {
     "blurb": "Hiring for full-stack, AI or platform work, or want to talk ESG data, sensor pipelines or agents? Email is fastest.",
-    "formEnabled": false
+    "formEnabled": true
   },
   "socials": [
     {
@@ -268,9 +277,7 @@
       "https://github.com/haid-er",
       "https://www.linkedin.com/in/haid-er/",
       "https://twitter.com/itzhaidermalik",
-      "https://malikhaider.vercel.app/",
-      "https://www.facebook.com/haiderfb1",
-      "https://www.instagram.com/haiderfb1"
+      "https://malikhaider.vercel.app/"
     ],
     "twitterHandle": "@itzhaidermalik"
   },

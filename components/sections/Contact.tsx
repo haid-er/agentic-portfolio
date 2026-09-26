@@ -3,9 +3,12 @@
  * dot leaders, and a message slip that posts to the admin-set free endpoint
  * (Web3Forms / Formspree) or falls back to the visitor's own mail app.
  * `site.contact.formEnabled` shows the slip; `site.contactFormEndpoint` picks the mode.
+ * Only a usable https endpoint posts; otherwise the slip needs an address
+ * (profile email, or a `mailto:` endpoint) or it is not shown at all.
  */
 import { ContactForm } from '@/app/resume/_client/ContactForm'
 import { CopyEmail } from '@/app/resume/_client/CopyEmail'
+import { endpointHost, endpointMailto } from '@/app/resume/_client/formEndpoint'
 import { Badge, Card, Icon, SectionShell, socialIcon, type IconName } from '@/components/ui'
 import { getProfile, getSite, getSocials } from '@/lib/content'
 import { cx } from '@/lib/utils'
@@ -59,7 +62,9 @@ export default function Contact({ section, folio }: SectionProps) {
   const { contact, contactFormEndpoint } = site
   const p = getProfile()
   const rows = lines()
-  const showForm = contact.formEnabled && Boolean(p.email || contactFormEndpoint)
+  const endpoint = endpointHost(contactFormEndpoint) ? contactFormEndpoint : undefined
+  const mailTo = endpointMailto(contactFormEndpoint) || p.email
+  const showForm = contact.formEnabled && Boolean(endpoint || mailTo)
 
   return (
     <SectionShell id={section.id} folio={folio} title={section.title || 'Contact'} note={section.note}>
@@ -112,7 +117,7 @@ export default function Contact({ section, folio }: SectionProps) {
               <h3 className="text-3">Write a message</h3>
               <Icon name="register" size={22} className="text-accent-2" />
             </div>
-            <ContactForm endpoint={contactFormEndpoint || undefined} to={p.email} recipient={p.name} />
+            <ContactForm endpoint={endpoint} to={mailTo} recipient={p.name} />
           </Card>
         ) : null}
       </div>

@@ -2,11 +2,12 @@
  * POST /api/admin/login. Owner: admin-core.
  * Accepts JSON ({ password, next }) from the login island, or a plain form post
  * (works without JavaScript: answers with a 303 redirect).
- * Failed attempts are rate limited per IP (5 / 15 min) and globally.
+ * Attempts are counted before the password check (per IP, 5 / 15 min) and
+ * failures globally; a success clears the IP's count.
  */
 import { NextResponse } from 'next/server'
 import { safeNext } from '@/lib/admin/redirect'
-import { clientIp, loginFailures, loginFailuresGlobal } from '@/lib/admin/rate-limit'
+import { clientIp, LOGIN_FAILURE_LIMIT as LOCAL_LIMIT, loginFailures, loginFailuresGlobal } from '@/lib/admin/rate-limit'
 import { passwordMatches, SESSION_COOKIE, sessionCookieOptions, sessionSecret, signSession } from '@/lib/admin/session'
 
 export const runtime = 'nodejs'
@@ -30,39 +31,49 @@ async function readCredentials(req: Request): Promise<{ password: string; next: 
   return { password: typeof pw === 'string' ? pw : '', next: safeNext(f?.get('next')), form: true }
 }
 
+function rateLimited(retryAfterSec: number): Outcome {
+  return { ok: false, status: 429, code: 'rate_limited', retryAfterSec, message: `Too many attempts. Try again in ${Math.ceil(retryAfterSec / 60)} min.` }
+}
+
 async function attempt(req: Request, password: string, next: string): Promise<Outcome> {
   const secret = sessionSecret()
   if (!process.env.ADMIN_PASSWORD || !secret) {
     return { ok: false, status: 503, code: 'unconfigured', message: 'Admin sign-in is not configured on this deployment (ADMIN_PASSWORD / ADMIN_SECRET).' }
   }
-  const ip = clientIp(req.headers)
-  const local = loginFailures.peek(ip)
-  const global = loginFailuresGlobal.peek('*')
-  if (!local.allowed || !global.allowed) {
-    const retryAfterSec = Math.max(local.retryAfterSec, global.retryAfterSec)
-    return { ok: false, status: 429, code: 'rate_limited', retryAfterSec, message: `Too many attempts. Try again in ${Math.ceil(retryAfterSec / 60)} min.` }
-  }
   if (!password || password.length > MAX_PASSWORD) {
     return { ok: false, status: 400, code: 'bad_request', message: 'Enter the admin password.' }
   }
 
+  // Check and count synchronously, before any await, so parallel requests see
+  // each other's attempts (no burst slips past the limit while hashing).
+  const ip = clientIp(req.headers)
+  const local = loginFailures.peek(ip)
+  const global = loginFailuresGlobal.peek('*')
+  // The global ceiling only refuses IPs that already failed: a distributed
+  // attacker cannot lock the owner out, and gets at most one guess per IP.
+  const globalBlocks = !global.allowed && local.remaining < LOCAL_LIMIT
+  if (!local.allowed || globalBlocks) {
+    return rateLimited(Math.max(local.retryAfterSec, globalBlocks ? global.retryAfterSec : 0))
+  }
+  const after = loginFailures.hit(ip)
+  loginFailuresGlobal.hit('*')
+
   if (await passwordMatches(password, process.env.ADMIN_PASSWORD)) {
     loginFailures.reset(ip)
+    loginFailuresGlobal.undo('*')
     return { ok: true, next }
   }
 
-  const after = loginFailures.hit(ip)
-  loginFailuresGlobal.hit('*')
   await new Promise((r) => setTimeout(r, FAIL_DELAY_MS))
-  if (!after.allowed) {
-    return { ok: false, status: 429, code: 'rate_limited', retryAfterSec: after.retryAfterSec, message: `Too many attempts. Try again in ${Math.ceil(after.retryAfterSec / 60)} min.` }
-  }
+  if (!after.allowed) return rateLimited(after.retryAfterSec)
+  // Under the global ceiling this IP now has a failure, so it is paused next time.
+  const remaining = loginFailuresGlobal.peek('*').allowed ? after.remaining : 0
   return {
     ok: false,
     status: 401,
     code: 'invalid_password',
-    remaining: after.remaining,
-    message: `That password is not right. ${after.remaining} attempt${after.remaining === 1 ? '' : 's'} left before a pause.`,
+    remaining,
+    message: `That password is not right. ${remaining} attempt${remaining === 1 ? '' : 's'} left before a pause.`,
   }
 }
 

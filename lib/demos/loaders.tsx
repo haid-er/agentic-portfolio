@@ -51,7 +51,7 @@ export const DEMO_LOADERS: Record<DemoSlug, ComponentType<DemoProps>> = {
 }
 
 /** Renders the demo for `slug` (used by /playground/[slug] and previews). */
-export function DemoRenderer({ slug }: DemoProps) {
+export function DemoRenderer({ slug, data }: DemoProps) {
   const Demo = DEMO_LOADERS[slug]
-  return <Demo slug={slug} />
+  return <Demo slug={slug} data={data} />
 }

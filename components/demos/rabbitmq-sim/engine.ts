@@ -72,15 +72,19 @@ export interface Stats {
   lost: number
 }
 
+/** Snapshot copies: `ready` / `buffer` are trimmed for listing, the counts are exact. */
+export interface QueueView extends QueueState { depth: number }
+export interface ConsumerView extends ConsumerState { unacked: number }
+
 export interface Snapshot {
   now: number
   exchange: ExchangeType
   rate: number
   dlx: boolean
   producers: ProducerState[]
-  queues: QueueState[]
-  dlq: QueueState
-  consumers: ConsumerState[]
+  queues: QueueView[]
+  dlq: QueueView
+  consumers: ConsumerView[]
   transits: Transit[]
   stats: Stats
   log: LogLine[]
@@ -314,9 +318,9 @@ export class Broker {
       rate: this.rate,
       dlx: this.dlx,
       producers: this.producers.map((p) => ({ ...p })),
-      queues: this.queues.map((q) => ({ ...q, ready: q.ready.slice(0, 40) })),
-      dlq: { ...this.dlq, ready: this.dlq.ready.slice(-12) },
-      consumers: this.consumers.map((c) => ({ ...c, buffer: c.buffer.slice(0, 12) })),
+      queues: this.queues.map((q) => ({ ...q, ready: q.ready.slice(0, 40), depth: q.ready.length })),
+      dlq: { ...this.dlq, ready: this.dlq.ready.slice(-12), depth: this.dlq.ready.length },
+      consumers: this.consumers.map((c) => ({ ...c, buffer: c.buffer.slice(0, 12), unacked: this.unacked(c) })),
       transits: this.transits.slice(),
       stats: { ...this.stats },
       log: this.log.slice(-LOG_KEEP),

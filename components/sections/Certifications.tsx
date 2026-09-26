@@ -9,7 +9,7 @@
  *
  * All copy comes from content/certifications.json and the demo registry.
  */
-import { ButtonLink, Card, Mono, ProofRow, SectionShell, type Layer } from '@/components/ui'
+import { ButtonLink, Card, CopyButton, Mono, ProofRow, SectionShell, type Layer } from '@/components/ui'
 import { getCertifications, type Certification } from '@/lib/content'
 import { isDemoEnabled } from '@/lib/demos'
 import { formatPartialDate } from '@/lib/utils'
@@ -79,6 +79,7 @@ function Slip({ c, n }: { c: Certification; n: number }) {
               <dd className="m-0 font-mono text-0 text-ink nums [overflow-wrap:anywhere] select-all">{c.credentialId}</dd>
             </dl>
           ) : <span />}
+          {c.credentialId ? <CopyButton text={c.credentialId} label="Copy ID" variant="ghost" /> : null}
           {verify ? (
             <ButtonLink
               href={verify}

@@ -76,7 +76,7 @@ const KIND_TONE: Partial<Record<LogKind, string>> = {
 export function EventLog({ log }: { log: LogEntry[] }) {
   if (!log.length) return <p className="m-0 text-0 text-ink-3">No events yet.</p>
   return (
-    <ol className="m-0 p-0 list-none grid gap-2 max-h-[340px] overflow-y-auto pr-1" aria-label="Cache events, newest first">
+    <ol tabIndex={0} className="m-0 p-0 list-none grid gap-2 max-h-[340px] overflow-y-auto pr-1" aria-label="Cache events, newest first">
       {log.map((e) => (
         <li key={e.id} className="grid grid-cols-[auto_1fr] gap-x-3 text-0">
           <span className="mono text-ink-3 nums">{new Date(e.at).toLocaleTimeString([], { hour12: false })}</span>

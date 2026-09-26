@@ -8,12 +8,12 @@
 import { useEffect, useRef, useState } from 'react'
 import { Badge, Button, DemoPanel, DemoToolbar, ErrorState, Loading, useToast } from '@/components/ui'
 import type { DemoProps } from '@/lib/demos/types'
-import { useLocalStorage } from '@/lib/hooks'
 import { Board } from './Board'
 import {
   cardCount, emptyBoard, exportSchema, firstIssue, insertCard, locate, newId, removeCard, sampleBoard, vaultSchema,
-  type Board as BoardData, type Card, type VaultRecord,
+  type Board as BoardData, type Card,
 } from './model'
+import { addVault, removeVault, updateVault, useVaults, vaultExists } from './store'
 import { cipherBytes, createVault, cryptoAvailable, deriveKey, PBKDF2_ITERATIONS, seal, unseal, WrongPassphrase } from './vault'
 import { VaultGate } from './VaultGate'
 
@@ -37,7 +37,7 @@ const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(
 
 export default function Demo(_props: DemoProps) {
   const toast = useToast()
-  const [vaults, setVaults] = useLocalStorage<VaultRecord[]>('kanban-board:vaults', [])
+  const { vaults: validVaults, refresh } = useVaults()
   const [ready, setReady] = useState(false)
   useEffect(() => { setReady(true) }, [])
   const [supported] = useState(() => cryptoAvailable())
@@ -50,7 +50,6 @@ export default function Demo(_props: DemoProps) {
   const [peek, setPeek] = useState(false)
   const importRef = useRef<HTMLInputElement>(null)
 
-  const validVaults = vaults.filter((v) => vaultSchema.safeParse(v).success)
   const vault = session ? validVaults.find((v) => v.id === session.vaultId) : undefined
 
   /* ---------- encrypted autosave ---------- */
@@ -66,7 +65,9 @@ export default function Demo(_props: DemoProps) {
       try {
         const { iv, data } = await seal(key, board)
         if (cancelled) return
-        setVaults((vs) => vs.map((v) => (v.id === vaultId ? { ...v, iv, data, updatedAt: Date.now() } : v)))
+        const ok = updateVault(vaultId, { iv, data, updatedAt: Date.now() })
+        refresh()
+        if (!ok) { setSave((s) => ({ ...s, phase: 'error' })); return }
         dirty.current = false
         setSave({ phase: 'saved', at: Date.now() })
       } catch {
@@ -74,7 +75,15 @@ export default function Demo(_props: DemoProps) {
       }
     }, 400)
     return () => { cancelled = true; clearTimeout(t) }
-  }, [board, key, vaultId, setVaults])
+  }, [board, key, vaultId, refresh])
+
+  // The open vault was deleted in another tab: close it rather than resurrect it.
+  useEffect(() => {
+    if (!session || vault || busy) return
+    setSession(null)
+    setUndo(null)
+    toast('This vault was deleted in another tab.', { tone: 'warn' })
+  }, [session, vault, busy, toast])
 
   const change = (next: BoardData, why: string) => {
     if (why !== 'delete') setUndo(null)
@@ -108,7 +117,11 @@ export default function Demo(_props: DemoProps) {
     try {
       const b = sample ? sampleBoard() : emptyBoard()
       const { record, key: k } = await createVault(name, passphrase, b)
-      setVaults((vs) => [...vs, record])
+      if (!addVault(record)) {
+        setGateError('Could not save the vault: browser storage is full or blocked. Nothing was stored.')
+        return
+      }
+      refresh()
       dirty.current = false
       setSession({ vaultId: record.id, key: k, board: b })
       setSave({ phase: 'saved', at: record.updatedAt })
@@ -124,9 +137,13 @@ export default function Demo(_props: DemoProps) {
     if (session && dirty.current) {
       try {
         const { iv, data } = await seal(session.key, session.board)
-        setVaults((vs) => vs.map((v) => (v.id === session.vaultId ? { ...v, iv, data, updatedAt: Date.now() } : v)))
+        const ok = updateVault(session.vaultId, { iv, data, updatedAt: Date.now() })
+        refresh()
+        if (!ok) throw new Error('write failed')
         dirty.current = false
+        setSave({ phase: 'saved', at: Date.now() })
       } catch {
+        setSave((s) => ({ ...s, phase: 'error' }))
         toast('Could not seal the latest changes. The vault stays unlocked.', { tone: 'danger' })
         return
       }
@@ -138,8 +155,9 @@ export default function Demo(_props: DemoProps) {
   }
 
   const remove = (id: string) => {
-    setVaults((vs) => vs.filter((v) => v.id !== id))
-    toast('Vault deleted from this browser.', { tone: 'neutral' })
+    const ok = removeVault(id)
+    refresh()
+    toast(ok ? 'Vault deleted from this browser.' : 'Could not delete the vault: browser storage is blocked.', { tone: ok ? 'neutral' : 'danger' })
   }
 
   async function restore(file: File) {
@@ -149,7 +167,10 @@ export default function Demo(_props: DemoProps) {
       const parsed = vaultSchema.safeParse(JSON.parse(await file.text()))
       if (!parsed.success) throw new Error(`Not an encrypted vault backup (${firstIssue(parsed.error)}).`)
       const rec = parsed.data
-      setVaults((vs) => [...vs, vs.some((v) => v.id === rec.id) ? { ...rec, id: newId(), name: `${rec.name} (restored)`.slice(0, 40) } : rec])
+      const copy = vaultExists(rec.id) ? { ...rec, id: newId(), name: `${rec.name} (restored)`.slice(0, 40) } : rec
+      const ok = addVault(copy)
+      refresh()
+      if (!ok) throw new Error('Could not save the restored vault: browser storage is full or blocked.')
       toast(`Restored ${rec.name}. Unlock it with its original passphrase.`, { tone: 'ok' })
     } catch (e) {
       setGateError(e instanceof SyntaxError ? 'That file is not JSON.' : e instanceof Error ? e.message : 'Restore failed.')

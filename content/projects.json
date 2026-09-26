@@ -42,7 +42,8 @@
         "ownership-extractor",
         "ghg-calculator",
         "rbac-audit-lab"
-      ]
+      ],
+      "ongoing": true
     },
     {
       "id": "terra-internal-tools",
@@ -79,7 +80,8 @@
         "data-grid",
         "kanban-board",
         "layered-api-lab"
-      ]
+      ],
+      "ongoing": true
     },
     {
       "id": "motioniq",

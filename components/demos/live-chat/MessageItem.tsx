@@ -5,10 +5,10 @@ import { cx } from '@/lib/utils'
 import { REACTIONS, type Message, type Reaction } from './protocol'
 
 const INK = {
-  1: 'border-data-1 text-data-1',
-  2: 'border-data-2 text-data-2',
-  3: 'border-data-3 text-data-3',
-  4: 'border-data-4 text-data-4',
+  1: 'border-data-1',
+  2: 'border-data-2',
+  3: 'border-data-3',
+  4: 'border-data-4',
 } as const
 
 const hhmm = (ts: number) => new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
@@ -36,7 +36,7 @@ export const MessageItem = memo(function MessageItem({ msg, me, names, receipt, 
   return (
     <li className={cx('group grid grid-cols-[36px_minmax(0,1fr)] gap-x-3', grouped ? 'mt-1' : 'mt-4 first:mt-0')}>
       {grouped ? <span aria-hidden="true" /> : (
-        <span aria-hidden="true" className={cx('grid place-items-center size-9 border-2 rounded-1 font-mono text-00 bg-surface', INK[msg.ink])}>
+        <span aria-hidden="true" className={cx('grid place-items-center size-9 border-2 rounded-1 font-mono text-00 bg-surface text-ink', INK[msg.ink])}>
           {initials(msg.authorName)}
         </span>
       )}

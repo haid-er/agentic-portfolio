@@ -2,9 +2,11 @@
  * Web app manifest. Owner: seo-theme.
  * Names come from content/site.json; colours from the Almanac world's tokens
  * (admin overrides included), so an installed app opens on the same cream stock.
+ * Icons are served by app/icon.tsx (/icon/192, /icon/512) and app/apple-icon.tsx.
  */
 import type { MetadataRoute } from 'next'
 import { getProfile, getSection, getSeo, getTheme } from '@/lib/content'
+import { manifestIcons } from '@/lib/seo/icon'
 import { worldTokens } from '@/lib/theme'
 
 export default function manifest(): MetadataRoute.Manifest {
@@ -29,6 +31,7 @@ export default function manifest(): MetadataRoute.Manifest {
     orientation: 'any',
     background_color: paper['--bg'],
     theme_color: paper['--bg'],
+    icons: manifestIcons(),
     categories: ['portfolio', 'developer', 'education'],
     shortcuts: [...shortcut('playground', '/playground'), ...shortcut('resume', '/resume')],
   }

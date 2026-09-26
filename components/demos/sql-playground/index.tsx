@@ -123,7 +123,7 @@ export default function Demo(_props: DemoProps) {
         action={<Button variant="secondary" icon="refresh" onClick={() => void boot()}>Try again</Button>}
       >
         <p className="m-0">{status.message}</p>
-        <p className="m-0 mt-1">The engine is a WebAssembly file loaded from this site, with a CDN fallback. Nothing was run.</p>
+        <p className="m-0 mt-1">The engine is a WebAssembly file, loaded from this site when available and otherwise from jsDelivr. Nothing was run.</p>
       </ErrorState>
     )
   }

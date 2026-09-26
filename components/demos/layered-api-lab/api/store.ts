@@ -35,6 +35,12 @@ export class SessionStore {
     return { db, fresh: true }
   }
 
+  /** True when this session already has live data (does not create or touch it). */
+  has(sessionId: string, now = Date.now()): boolean {
+    const hit = this.dbs.get(sessionId)
+    return !!hit && now - hit.touched <= this.ttlMs
+  }
+
   reset(sessionId: string) {
     this.dbs.delete(sessionId)
   }

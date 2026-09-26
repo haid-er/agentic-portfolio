@@ -153,6 +153,12 @@ function MultiProofChip({ item, group, layer }: { item: ProvenSkill; group: stri
         <ul className="list-none m-0 p-1 grid divide-y divide-rule-soft">
           {proofs.map((d) => <ProofRowLink key={d.slug} demo={d} />)}
         </ul>
+        <p className="m-0 px-3 pb-3 pt-1">
+          <Link href={`/playground?skill=${encodeURIComponent(skill.id)}`} className="mono inline-flex items-center gap-1 min-h-tap text-accent-ink underline underline-offset-4">
+            {`All ${skill.name} proofs in the playground`}
+            <Icon name="arrow" size={14} />
+          </Link>
+        </p>
       </div>
     </details>
   )
