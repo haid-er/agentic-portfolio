@@ -75,8 +75,8 @@
         "variant": "primary"
       },
       {
-        "label": "Read the working record",
-        "href": "#experience",
+        "label": "Get in touch",
+        "href": "#contact",
         "variant": "secondary"
       },
       {
@@ -197,7 +197,8 @@
     {
       "id": "projects",
       "enabled": true,
-      "title": "Projects"
+      "title": "Projects",
+      "navLabel": "Projects"
     },
     {
       "id": "research",
@@ -226,7 +227,7 @@
     },
     {
       "id": "services",
-      "enabled": true,
+      "enabled": false,
       "title": "Services"
     },
     {
@@ -247,7 +248,8 @@
     {
       "id": "contact",
       "enabled": true,
-      "title": "Contact"
+      "title": "Contact",
+      "navLabel": "Contact"
     }
   ],
   "seo": {

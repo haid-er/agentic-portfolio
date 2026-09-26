@@ -76,8 +76,8 @@ export function Header() {
 
           <div className="flex flex-none items-center gap-2">
             <IndexButton label={UI.index} />
-            <div className="hidden lg:block"><ThemeSwitch labels={labels} /></div>
-            <div className="lg:hidden"><ThemeSwitch labels={labels} compact /></div>
+            <div className="hidden xl:block"><ThemeSwitch labels={labels} /></div>
+            <div className="xl:hidden"><ThemeSwitch labels={labels} compact /></div>
           </div>
         </div>
         {/* reading depth: fills as the page scrolls (CSS scroll timeline only) */}

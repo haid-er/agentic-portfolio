@@ -54,12 +54,12 @@ export default function PlaygroundPage() {
   )
 }
 
-/** A small colophon of counts (derived, never invented): demos, pillars, skills proven. */
+/** A small colophon of counts (derived, never invented): demos, pillars, skills mapped to a demo. */
 function CatalogueStats({ demos, pillars, skills }: { demos: number; pillars: number; skills: number }) {
   const rows = [
     { label: 'Specimens', value: demos },
     { label: 'Pillars', value: pillars },
-    { label: 'Skills proven', value: skills },
+    { label: 'Skills mapped', value: skills },
   ].filter((r) => r.value > 0)
   if (!rows.length) return null
   return (

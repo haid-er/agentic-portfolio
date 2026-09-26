@@ -7,7 +7,7 @@
 import type { ReactNode } from 'react'
 import { WORLD_FONTS } from '@/app/fonts'
 import { Icon, socialIcon } from '@/components/ui/Icon'
-import { getProfile, getSite, getSocials } from '@/lib/content'
+import { getProfile, getSite, getSocials, getTheme } from '@/lib/content'
 import { cx } from '@/lib/utils'
 import { themeLabels } from './nav'
 import { WorldText } from './WorldText'
@@ -33,6 +33,8 @@ export function Footer() {
   const profile = getProfile()
   const { masthead } = getSite()
   const labels = themeLabels()
+  const { themes } = getTheme()
+  const reads = (w: 'almanac' | 'strata') => `${themes[w].reads === 'dark' ? 'Dark' : 'Light'} edition of two`
   const email = profile.email
   const socials = getSocials().filter((s) => s.url && s.url !== `mailto:${email}`)
 
@@ -55,15 +57,16 @@ export function Footer() {
               <WorldText almanac={labels.almanac.label} strata={labels.strata.label} />
             </p>
             <p className="m-0 mt-1 text-ink-2">
-              <WorldText almanac={labels.almanac.swapLabel} strata={labels.strata.swapLabel} />
+              {/* The swap label only makes sense mid-transition; here, say which way the world reads. */}
+              <WorldText almanac={reads('almanac')} strata={reads('strata')} />
             </p>
           </Cell>
 
           <Cell label={UI.contact} className="col-span-2 lg:col-span-1">
-            <ul className="m-0 grid list-none gap-1 p-0">
+            <ul className="m-0 grid list-none gap-0 p-0">
               {email ? (
                 <li>
-                  <a href={`mailto:${email}`} className="inline-flex min-h-[32px] max-w-full items-center gap-2 [overflow-wrap:anywhere] decoration-accent-ink">
+                  <a href={`mailto:${email}`} className="inline-flex min-h-tap max-w-full items-center gap-2 [overflow-wrap:anywhere] decoration-accent-ink">
                     <Icon name="mail" size={16} className="text-ink-3" />
                     <span className="min-w-0">{email}</span>
                   </a>
@@ -76,7 +79,7 @@ export function Footer() {
                     <a
                       href={s.url}
                       {...(external ? { target: '_blank', rel: 'me noopener noreferrer' } : {})}
-                      className="inline-flex min-h-[32px] max-w-full items-center gap-2 [overflow-wrap:anywhere] decoration-accent-ink"
+                      className="inline-flex min-h-tap max-w-full items-center gap-2 [overflow-wrap:anywhere] decoration-accent-ink"
                     >
                       <Icon name={socialIcon(s.icon || s.id)} size={16} className="text-ink-3" />
                       <span className="min-w-0">

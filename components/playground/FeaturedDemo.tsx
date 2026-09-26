@@ -47,7 +47,7 @@ export default function FeaturedDemo({ section, folio }: SectionProps) {
             card.proves.length ? (
               <ChipRow label="Proves">
                 {card.proves.slice(0, 4).map((s) => (
-                  <li key={s.id} className="max-w-full"><SkillLinkChip id={s.id} name={s.name} layer={card.layer} /></li>
+                  <li key={s.id} className="max-w-full"><SkillLinkChip id={s.id} name={s.name} demos={s.demos} layer={card.layer} /></li>
                 ))}
               </ChipRow>
             ) : null

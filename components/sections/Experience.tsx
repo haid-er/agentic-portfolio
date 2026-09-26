@@ -120,7 +120,8 @@ function Timeline({ entries }: { entries: Entry[] }) {
   const hasPresent = bars.some((b) => !b.entry.item.end)
 
   return (
-    <nav aria-label="Timeline of roles" className="mb-s7">
+    // Below 768px the strip is too narrow to label; the ledger cards below carry the dates.
+    <nav aria-label="Timeline of roles" className="mb-s7 hidden md:block">
       <div className="relative grid gap-1 py-s3 border-y border-rule strata:border-rule-soft">
         {/* year gridlines, behind the bars */}
         {ticks.map((y) => (

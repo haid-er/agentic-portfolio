@@ -14,7 +14,7 @@ function pageCopy() {
   const section = getSection('projects')
   const title = section?.title || 'Projects'
   const name = getProfile().name
-  const description = section?.note || `${title} by ${name}. Every project links to a working demo in the playground.`
+  const description = section?.note || `${title} by ${name}: real work first, learning builds after. Each links to the playground demos that show the same skills, where one exists.`
   return { title, description }
 }
 
@@ -40,7 +40,7 @@ export default function ProjectsIndexPage() {
       </header>
 
       {projects.length ? (
-        <ProjectGrid projects={projects} pillars={getPillarOptions(projects)} headingLevel="h2" />
+        <ProjectGrid projects={projects} pillars={getPillarOptions(projects)} headingLevel="h2" grouped />
       ) : null}
     </div>
   )

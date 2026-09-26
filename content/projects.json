@@ -373,7 +373,8 @@
       "featured": false,
       "demoSlugs": [
         "sql-playground"
-      ]
+      ],
+      "learning": true
     },
     {
       "id": "cricket-game-c",
@@ -399,7 +400,8 @@
       "featured": false,
       "demoSlugs": [
         "cricket-sim"
-      ]
+      ],
+      "learning": true
     },
     {
       "id": "c-cpp-foundations",
@@ -431,7 +433,8 @@
       "demoSlugs": [
         "code-judge",
         "algo-visualizer"
-      ]
+      ],
+      "learning": true
     },
     {
       "id": "early-web-builds",
@@ -461,7 +464,8 @@
       },
       "private": false,
       "featured": false,
-      "demoSlugs": []
+      "demoSlugs": [],
+      "learning": true
     },
     {
       "id": "autonomous-coding-pipeline",

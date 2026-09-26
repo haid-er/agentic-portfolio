@@ -31,15 +31,22 @@ export function ChipBody({ name, tail, active }: { name: string; tail: string; a
   )
 }
 
-export function SkillLinkChip({ id, name, layer = 1, tail = '→ all proofs' }: { id: string; name: string; layer?: number; tail?: string }) {
+/**
+ * A skill this demo proves. When other demos prove it too, the chip links to the
+ * skill landing and says how many more; when this is the only proof, it is a plain tag
+ * (a link back to a list of one would say nothing).
+ */
+export function SkillLinkChip({ id, name, demos = 1, layer = 1 }: { id: string; name: string; demos?: number; layer?: number }) {
+  if (demos <= 1) return <Tag>{name}</Tag>
+  const more = demos - 1
   return (
     <Link
       href={skillHref(id)}
       className={chipClasses}
       style={{ ['--chip-layer' as string]: `var(--layer-${layer})` }}
-      aria-label={`${name}: see every demo that proves it`}
+      aria-label={`${name}: ${more} more ${more === 1 ? 'demo proves' : 'demos prove'} it`}
     >
-      <ChipBody name={name} tail={tail} />
+      <ChipBody name={name} tail={`+${more} ${more === 1 ? 'demo' : 'demos'}`} />
     </Link>
   )
 }

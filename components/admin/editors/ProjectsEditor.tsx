@@ -47,11 +47,13 @@ export function ProjectsEditor() {
               <TextField path={[...p, 'role']} label="Role" optional />
               <TextField path={[...p, 'outcome']} label="Outcome" optional hint="Only outcomes stated in the sources." />
               <DateField path={[...p, 'start']} label="Start" optional />
-              <DateField path={[...p, 'end']} label="End" optional hint="Empty = ongoing" />
+              <DateField path={[...p, 'end']} label="End" optional hint="Empty = the start date is shown alone. Use Ongoing for “– Present”." />
               <TextField path={[...p, 'links', 'live']} label="Live URL" hint={HREF_HINT} optional inputMode="url" mono />
               <TextField path={[...p, 'links', 'repo']} label="Repository URL" hint={item.private ? 'Private: this link is never rendered.' : HREF_HINT} optional inputMode="url" mono />
               <ToggleField path={[...p, 'private']} label="Private repository" hint="Hides the repo link everywhere." />
               <ToggleField path={[...p, 'featured']} label="Featured" hint="Larger card, listed first." />
+              <ToggleField path={[...p, 'ongoing']} label="Ongoing" hint="Shows “– Present” after the start date." />
+              <ToggleField path={[...p, 'learning']} label="Learning build" hint="Coursework or practice: listed under “Learning builds”, after the real work." />
             </FieldGrid>
             <ListField<string>
               path={[...p, 'story']}

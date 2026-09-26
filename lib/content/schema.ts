@@ -297,6 +297,8 @@ export const Project = ItemBase.extend({
   end: PartialDate.optional(),
   /** Still running: shows "– Present" instead of an end date. */
   ongoing: z.boolean().optional(),
+  /** Coursework or practice build: listed under "Learning builds", after the real work. */
+  learning: z.boolean().optional(),
   outcome: z.string().optional(),
   links: z.object({ live: Href.optional(), repo: Href.optional() }),
   /** Private repo: the repo link is never rendered and never quoted. */
@@ -437,6 +439,12 @@ export const PlaygroundDemo = z.object({
   title: z.string().optional(),
   summary: z.string().optional(),
   mirrors: z.string().optional(),
+  /** Replaces the registry's skill tags ("Also exercises"). Empty = registry tags. */
+  skills: z.array(z.string().min(1)).optional(),
+  /** Non-empty = "best on desktop" with this reason; empty = the registry's phone note. */
+  mobileNote: z.string().optional(),
+  /** Replaces the "Honest limits" list on the demo page. Empty = the demo's own notes. */
+  limits: z.array(z.string().min(1)).optional(),
 })
 export type PlaygroundDemo = z.infer<typeof PlaygroundDemo>
 

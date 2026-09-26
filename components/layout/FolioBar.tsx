@@ -64,7 +64,7 @@ export function FolioBar({ items, spyIds, label, contentsLabel }: {
         <li className="min-w-0">
           <button type="button" onClick={openContents} aria-haspopup="dialog" className={cx(ITEM, 'w-full')}>
             <Edge on={false} />
-            <Icon name="leaders" size={22} />
+            <Icon name="menu" size={22} />
             <span className="block max-w-full truncate tracking-normal">{contentsLabel}</span>
           </button>
         </li>

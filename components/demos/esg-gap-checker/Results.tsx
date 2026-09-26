@@ -49,8 +49,10 @@ export function Coverage({ findings, frameworks }: { findings: Record<string, Fi
 export function Matrix({ findings, frameworks, onJump }: { findings: Record<string, Finding>; frameworks: Framework[]; onJump: (id: string) => void }) {
   const cols = FRAMEWORKS.filter((f) => frameworks.includes(f.id))
   return (
+    <>
+    <p aria-hidden="true" className="mono text-00 text-ink-3 m-0 mb-1 sm:hidden">Swipe the table sideways for every framework →</p>
     <TableWrap label="Requirement by framework matrix">
-      <Table>
+      <Table className="min-w-[30rem]">
         <thead>
           <tr>
             <Th>Requirement</Th>
@@ -83,6 +85,7 @@ export function Matrix({ findings, frameworks, onJump }: { findings: Record<stri
         </tbody>
       </Table>
     </TableWrap>
+    </>
   )
 }
 

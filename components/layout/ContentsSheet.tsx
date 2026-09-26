@@ -103,8 +103,8 @@ export function ContentsSheet({ sections, spyIds, labels, socials, title }: {
         </ol>
       </nav>
 
-      <div className="wrap grid gap-3 border-t border-rule-soft py-4">
-        <div className="grid grid-cols-1 gap-3 xs:grid-cols-2">
+      <div className="wrap grid gap-2 border-t border-rule-soft py-3">
+        <div className="grid grid-cols-2 gap-2">
           <ThemeSwitch labels={labels} block />
           <button
             type="button"
@@ -116,7 +116,8 @@ export function ContentsSheet({ sections, spyIds, labels, socials, title }: {
           </button>
         </div>
         {socials.length ? (
-          <ul className="m-0 flex list-none flex-wrap gap-2 p-0">
+          // One compact row of icons, so the section list keeps most of the sheet.
+          <ul className="m-0 flex list-none flex-wrap justify-center gap-1 p-0">
             {socials.map((s) => {
               const external = /^https?:\/\//.test(s.url)
               return (
@@ -124,11 +125,11 @@ export function ContentsSheet({ sections, spyIds, labels, socials, title }: {
                   <a
                     href={s.url}
                     {...(external ? { target: '_blank', rel: 'me noopener noreferrer' } : {})}
-                    className="inline-flex min-h-tap items-center gap-2 rounded-pill border border-rule px-3 text-0 text-ink-2 no-underline hover:bg-bg-2 hover:text-ink"
+                    aria-label={`${s.label}${external ? ' (opens in a new tab)' : ''}`}
+                    title={s.label}
+                    className="inline-flex size-tap items-center justify-center rounded-pill border border-rule text-ink-2 no-underline hover:bg-bg-2 hover:text-ink"
                   >
-                    <Icon name={s.icon} size={16} />
-                    {s.label}
-                    {external ? <span className="sr-only"> (opens in a new tab)</span> : null}
+                    <Icon name={s.icon} size={18} />
                   </a>
                 </li>
               )

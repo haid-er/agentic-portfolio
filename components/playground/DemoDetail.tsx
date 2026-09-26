@@ -22,7 +22,7 @@ export function DetailHead({ id, kicker, title, className }: { id: string; kicke
 }
 
 /** The story plate: which real work this mirrors, and the skills it proves. */
-export function SpecimenLabel({ card, proves }: { card: DemoCardModel; proves: { id: string; name: string }[] }) {
+export function SpecimenLabel({ card, proves }: { card: DemoCardModel; proves: DemoCardModel['proves'] }) {
   // Registry skills that are not already content skills (case-insensitive).
   const named = new Set(proves.map((p) => p.name.toLowerCase()))
   const extra = card.skills.filter((s) => !named.has(s.toLowerCase()))
@@ -41,7 +41,7 @@ export function SpecimenLabel({ card, proves }: { card: DemoCardModel; proves: {
       {proves.length ? (
         <ChipRow label="Skills it proves">
           {proves.map((s) => (
-            <li key={s.id} className="max-w-full"><SkillLinkChip id={s.id} name={s.name} layer={card.layer} /></li>
+            <li key={s.id} className="max-w-full"><SkillLinkChip id={s.id} name={s.name} demos={s.demos} layer={card.layer} /></li>
           ))}
         </ChipRow>
       ) : null}

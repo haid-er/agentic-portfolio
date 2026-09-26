@@ -224,6 +224,7 @@ function heroCss(n: number): string {
 /* name + overprint */
 .gtp-name{position:relative;isolation:isolate}
 .gtp-name>.gtp-ink{position:relative;z-index:1}
+.gtp-over::before{content:attr(data-text)}
 .gtp-over{position:absolute;inset:0;z-index:0;pointer-events:none;user-select:none;color:var(--overprint);translate:.045em .035em;mix-blend-mode:var(--blend);animation:var(--accent-motion)}
 :where([data-theme="strata"]) .gtp-over{display:none}
 /* Strata: a lichen band through the bottom ~38% of the letters, line by line */
@@ -389,7 +390,7 @@ function GridReadingSlot({ reading }: { reading: GridReading | null }) {
             {reading.basis === 'actual' ? 'Measured' : 'Forecast'}
             {time ? <> · as of <time dateTime={reading.at}>{time} UTC</time></> : null}
             {' · '}
-            <a href="https://carbonintensity.org.uk/" target="_blank" rel="noopener noreferrer" className="underline decoration-rule-soft hover:text-ink">
+            <a href="https://carbonintensity.org.uk/" target="_blank" rel="noopener noreferrer" className="inline-flex items-center min-h-tap underline decoration-rule-soft hover:text-ink">
               carbonintensity.org.uk
             </a>
           </>
@@ -433,7 +434,7 @@ export const DEFAULT_TITLE = ''
 export const shouldRender = (): boolean => true
 
 export default async function Hero({ section }: SectionProps) {
-  const { hero, profile } = getSite()
+  const { hero, profile, masthead } = getSite()
   const layers = plateLayers(hero)
   // undefined = reading switched off in content; null = feed failed (said so honestly).
   const reading = hero.showGridReading ? await getGridReading() : undefined
@@ -447,10 +448,11 @@ export default async function Hero({ section }: SectionProps) {
           <Kicker parts={hero.kicker} />
           <h1 id="hero-title" className="gtp-name text-hero [overflow-wrap:anywhere]">
             <span className="gtp-ink">{profile.name}</span>
-            <span className="gtp-over" aria-hidden="true">{profile.name}</span>
+            {/* The overprint copy is CSS-generated text, so the h1 text (and innerText) holds the name once. */}
+            <span className="gtp-over" aria-hidden="true" data-text={profile.name} />
           </h1>
           {hero.role ? (
-            <p className="display text-3 m-0 almanac:italic max-w-[24ch] [text-wrap:balance]">
+            <p className="display text-3 m-0 almanac:italic strata:text-[clamp(1.75rem,3.2vw,2.5rem)] strata:leading-[1.08] max-w-[24ch] [text-wrap:balance]">
               <Emphasis text={hero.role} />
             </p>
           ) : profile.headline ? (
@@ -464,7 +466,8 @@ export default async function Hero({ section }: SectionProps) {
               ))}
             </div>
           ) : null}
-          {profile.location ? (
+          {/* The masthead strip already prints the location; say it once per fold. */}
+          {profile.location && profile.location !== masthead.location ? (
             <p className="mono m-0 text-ink-3 inline-flex items-center gap-2">
               <Icon name="globe" size={16} />
               {profile.location}

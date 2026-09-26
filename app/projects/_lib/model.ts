@@ -35,6 +35,7 @@ export interface ProjectCardData {
   repo?: string
   private: boolean
   featured: boolean
+  learning: boolean
   proofs: DemoSlug[]
 }
 
@@ -99,13 +100,15 @@ export function toCardData(p: Project): ProjectCardData {
     repo: links.repo,
     private: p.private,
     featured: p.featured,
+    learning: Boolean(p.learning),
     proofs: visibleProofs(p),
   }
 }
 
-/** Every enabled project as card data, in content order. */
+/** Every enabled project as card data: real work first, learning builds last, otherwise content order. */
 export function getProjectCards(): ProjectCardData[] {
-  return getProjects().map(toCardData)
+  const cards = getProjects().map(toCardData)
+  return [...cards.filter((c) => !c.learning), ...cards.filter((c) => c.learning)]
 }
 
 /** Pillars that have at least one project, in schema order, with counts. */

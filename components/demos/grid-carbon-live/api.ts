@@ -49,8 +49,23 @@ export function halfHourIso(d = new Date()): string {
 
 export const OUTCODE = /^[A-Z]{1,2}\d[A-Z\d]?$/
 
+/**
+ * Browser first (the API allows CORS); if the request itself fails (blocked host,
+ * intercepting proxy, dropped connection), retry once through this site's
+ * whitelisted proxy (app/api/demos/carbon). HTTP errors are not retried.
+ */
+async function fetchFeed(url: string, signal?: AbortSignal): Promise<Response> {
+  const init = { signal, headers: { Accept: 'application/json' } }
+  try {
+    return await fetch(url, init)
+  } catch (e) {
+    if (signal?.aborted || !url.startsWith(BASE)) throw e
+    return fetch(`/api/demos/carbon?path=${encodeURIComponent(url.slice(BASE.length))}`, init)
+  }
+}
+
 async function getJson(url: string, signal?: AbortSignal): Promise<unknown> {
-  const res = await fetch(url, { signal, headers: { Accept: 'application/json' } })
+  const res = await fetchFeed(url, signal)
   if (!res.ok) {
     if (res.status === 400) throw new FeedError('That postcode area was not recognised.', 'postcode')
     throw new FeedError(`The grid feed returned ${res.status}.`, 'upstream')

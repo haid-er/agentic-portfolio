@@ -18,6 +18,7 @@ const fraunces = Fraunces({
   style: ['normal', 'italic'],
   axes: ['opsz', 'SOFT', 'WONK'],
   variable: '--ff-fraunces',
+  preload: false, // preloaded per world by app/fontPreload.ts
 })
 const newsreader = Newsreader({
   subsets: ['latin'],
@@ -25,6 +26,7 @@ const newsreader = Newsreader({
   style: ['normal', 'italic'],
   axes: ['opsz'],
   variable: '--ff-newsreader',
+  preload: false, // preloaded per world by app/fontPreload.ts
 })
 const dmMono = DM_Mono({
   subsets: ['latin'],

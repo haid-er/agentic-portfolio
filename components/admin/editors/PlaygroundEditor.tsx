@@ -13,6 +13,7 @@ import { cx } from '@/lib/utils'
 import { useEditor } from '../EditorContext'
 import { DemoSelectField } from '../fields/Demos'
 import { Group } from '../fields/Group'
+import { TagsField } from '../fields/Tags'
 import { TextAreaField, TextField } from '../fields/Text'
 
 const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
@@ -86,7 +87,7 @@ export function PlaygroundEditor() {
                   const on = isOn(d.slug)
                   const i = entry(d.slug)
                   const o = i === -1 ? undefined : data.demos[i]
-                  const custom = Boolean(o?.title || o?.summary || o?.mirrors)
+                  const custom = Boolean(o?.title || o?.summary || o?.mirrors || o?.skills?.length || o?.mobileNote || o?.limits?.length)
                   const open = openSlug === d.slug
                   return (
                     <li key={d.slug} className={cx('border rounded-1', on ? 'bg-surface border-rule' : 'bg-bg-2 border-rule-soft', i !== -1 && ed.errorsUnder(['demos', i]) > 0 && 'border-danger')}>
@@ -127,6 +128,9 @@ export function PlaygroundEditor() {
                           <TextField path={['demos', i, 'title']} label="Title" placeholder={d.title} optional />
                           <TextAreaField path={['demos', i, 'summary']} label="Summary" placeholder={d.summary} optional rows={2} />
                           <TextAreaField path={['demos', i, 'mirrors']} label="Mirrors (real work)" placeholder={d.mirrors} optional rows={2} />
+                          <TagsField path={['demos', i, 'skills']} label="Skill tags" optional hint={`Shown as “Also exercises”. Empty = registry tags: ${d.skills.join(', ')}.`} />
+                          <TextField path={['demos', i, 'mobileNote']} label="Best-on-desktop reason" optional placeholder={d.mobile.ok ? 'Works on phone' : d.mobile.reason} hint="Fill in to mark the demo “best on desktop” with this reason. Empty = the registry note." />
+                          <TagsField path={['demos', i, 'limits']} label="Honest limits" optional hint="Replaces the demo page’s limits list, one item per entry. Empty = the demo’s own notes." />
                         </div>
                       ) : null}
                     </li>

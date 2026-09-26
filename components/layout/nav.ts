@@ -9,7 +9,7 @@ import { getDemos, PILLAR_GLYPH } from '@/lib/demos'
 import { folio } from '@/lib/utils'
 import type { IndexEntry, IndexGroup, NavModel, NavSection, ThemeLabels } from './types'
 import { socialIcon } from '@/components/ui/Icon'
-import { SECTIONS } from '@/components/sections/registry'
+import { renderedSections, SECTIONS } from '@/components/sections/registry'
 
 /** One glyph per section (UI furniture only). */
 const SECTION_ICON: Record<SectionId, IconName> = {
@@ -30,9 +30,8 @@ const SECTION_ICON: Record<SectionId, IconName> = {
   contact: 'mail',
 }
 
-/** Fallback title and "has content" test come from each section module (same test as its early `return null`). */
+/** Fallback title comes from each section module; the "has content" test lives in renderedSections(). */
 const DEFAULT_TITLE = (id: SectionId): string => SECTIONS[id].defaultTitle
-const hasContent = (id: SectionId): boolean => SECTIONS[id].shouldRender()
 
 /** Mobile folio bar holds 3 sections plus Contents (DESIGN 6.6). */
 const FOLIO_BAR_MAX = 3
@@ -45,8 +44,9 @@ const sectionHref = (id: SectionId) => (id === 'playground' ? '/playground' : `/
 export function getNavModel(): NavModel {
   const all = getSections()
   const sections: NavSection[] = []
-  all.forEach((s, i) => {
-    if (s.id === 'hero' || !hasContent(s.id)) return
+  // Folios follow the rendered order (same list as app/page.tsx), so they never skip a number.
+  renderedSections().forEach((s, i) => {
+    if (s.id === 'hero') return
     const label = (s.navLabel || s.title).trim() || DEFAULT_TITLE(s.id)
     if (!label) return
     sections.push({

@@ -11,6 +11,7 @@ import { getTheme } from '@/lib/content'
 import { buildMetadata, jsonLdString, personJsonLd } from '@/lib/seo'
 import { SiteAnalytics } from '@/lib/seo/SiteAnalytics'
 import { noFlashScript, rootViewport, themeOverridesCss } from '@/lib/theme'
+import { fontPreloadScript } from './fontPreload'
 import { fontVariables } from './fonts'
 import './globals.css'
 
@@ -22,11 +23,14 @@ export function generateViewport(): Viewport {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   const theme = getTheme()
+  const fontPreload = fontPreloadScript()
   return (
     <html lang="en" data-theme="almanac" className={fontVariables} suppressHydrationWarning>
       <head>
         {/* Runs before paint: picks the world (DESIGN.md 3). */}
         <script dangerouslySetInnerHTML={{ __html: noFlashScript(theme) }} />
+        {/* Then preloads only that world's display + body fonts (no late swap, no CLS). */}
+        {fontPreload ? <script dangerouslySetInnerHTML={{ __html: fontPreload }} /> : null}
         <style id="theme-overrides" dangerouslySetInnerHTML={{ __html: themeOverridesCss(theme) }} />
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(personJsonLd()) }} />
       </head>

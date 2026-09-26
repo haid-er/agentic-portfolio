@@ -19,9 +19,7 @@
       "title": "AppFest: 8th place, CMS development",
       "detail": "Ranked 8th with team CodePunks.",
       "kind": "competition",
-      "demoSlugs": [
-        "layered-api-lab"
-      ]
+      "demoSlugs": []
     },
     {
       "id": "github-badges",
@@ -31,9 +29,7 @@
       "detail": "Pair Extraordinaire, Pull Shark ×2, YOLO.",
       "url": "https://github.com/haid-er",
       "kind": "badge",
-      "demoSlugs": [
-        "ci-pipeline"
-      ]
+      "demoSlugs": []
     },
     {
       "id": "pucon-25-robotics-head",
@@ -43,9 +39,7 @@
       "title": "Head of the Robotics Competition, PUCon '25",
       "date": "2025",
       "kind": "leadership",
-      "demoSlugs": [
-        "live-telemetry"
-      ]
+      "demoSlugs": []
     },
     {
       "id": "byte-camp-cp-talk",
@@ -55,10 +49,7 @@
       "title": "Speaker, BYTE CAMP",
       "detail": "Second talk on competitive programming.",
       "kind": "talk",
-      "demoSlugs": [
-        "code-judge",
-        "algo-visualizer"
-      ]
+      "demoSlugs": []
     },
     {
       "id": "leetcode-365-badge",

@@ -91,14 +91,25 @@ export function ProjectCard({ project: p, headingLevel = 'h3', onTag, activeTag,
       ) : null}
 
       <footer className="mt-auto grid gap-s3 pt-s3 border-t border-rule-soft">
-        {firstProof ? (
-          <div className="flex flex-wrap items-center gap-x-3">
-            <ProofLink slug={firstProof} />
-            {moreProofs.length ? (
-              <span className="mono text-ink-3">+{moreProofs.length} more</span>
-            ) : null}
-          </div>
-        ) : null}
+        {/* Same row on every card: the proof (or an honest "no demo yet") and the private-code badge. */}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          {firstProof ? (
+            <>
+              <ProofLink slug={firstProof} />
+              {moreProofs.length ? (
+                <span className="mono text-ink-3 whitespace-nowrap">+{moreProofs.length} more</span>
+              ) : null}
+            </>
+          ) : (
+            <span className="mono text-ink-3">No demo yet</span>
+          )}
+          {p.private ? (
+            <Badge className="ml-auto shrink-0">
+              <Icon name="lock" size={12} />
+              Private code
+            </Badge>
+          ) : null}
+        </div>
         <div className="flex flex-wrap items-center gap-2">
           <Link href={`/projects/${p.slug}`} className={buttonClasses({ variant: 'secondary', size: 'sm' })}>
             Case notes
@@ -118,12 +129,6 @@ export function ProjectCard({ project: p, headingLevel = 'h3', onTag, activeTag,
               Repo
               <span className="sr-only"> of {p.title} (opens in a new tab)</span>
             </a>
-          ) : null}
-          {p.private ? (
-            <Badge className="ml-auto">
-              <Icon name="lock" size={12} />
-              Private code
-            </Badge>
           ) : null}
         </div>
       </footer>

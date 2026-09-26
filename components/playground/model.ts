@@ -50,7 +50,7 @@ export interface DemoCardModel {
   usesAI: boolean
   mobile: Demo['mobile']
   /** Content skills that name this demo as proof (chips). */
-  proves: Pick<SkillRef, 'id' | 'name'>[]
+  proves: Array<Pick<SkillRef, 'id' | 'name'> & { demos: number }>
   /** Registry skills (free text), shown when no content skill points here. */
   skills: string[]
   stack: string[]
@@ -96,11 +96,18 @@ export function posterOf(d: Pick<Demo, 'glyph' | 'pillar' | 'slug'>): PosterKind
 
 export function getSkillRefs(): SkillRef[] {
   // Only skills with a proof: an unproven skill has nothing to land on in the gallery.
-  return getSkills().filter((s) => s.demoSlugs.length > 0).map((s) => ({ id: s.id, name: s.name, pillar: s.pillar, slugs: s.demoSlugs }))
+  const visible = new Set<string>(getDemos().map((d) => d.slug))
+  return getSkills()
+    .map((s) => ({ id: s.id, name: s.name, pillar: s.pillar, slugs: s.demoSlugs.filter((d) => visible.has(d)) }))
+    .filter((s) => s.slugs.length > 0)
 }
 
 export function toCardModel(d: Demo, no: number, skills = getSkillRefs()): DemoCardModel {
-  const proves = skills.filter((s) => s.slugs.includes(d.slug)).map(({ id, name }) => ({ id, name }))
+  // Skills from the demo's own pillar first (the ESG checker leads with ESG, not Zod).
+  const proves = skills
+    .filter((s) => s.slugs.includes(d.slug))
+    .sort((a, b) => Number(b.pillar === d.pillar) - Number(a.pillar === d.pillar))
+    .map(({ id, name, slugs }) => ({ id, name, demos: slugs.length }))
   const label = pillarLabel(d.pillar)
   const search = [d.title, d.summary, d.mirrors, label, d.slug, ...d.skills, ...proves.map((p) => p.name), ...d.notes.stack]
     .join(' ')

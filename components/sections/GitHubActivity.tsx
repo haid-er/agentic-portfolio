@@ -151,7 +151,7 @@ function Feed({ events }: { events: Activity['events'] }) {
             <time dateTime={e.createdAt} className="mono nums text-accent-ink pt-[3px]">{safe(fmtDay, e.createdAt)}</time>
             <p className="m-0 text-0 text-ink-2 min-w-0 [overflow-wrap:anywhere]">
               {e.verb}{' '}
-              <a href={e.repoUrl} target="_blank" rel="noopener noreferrer" className="mono text-ink underline decoration-accent-ink underline-offset-4 hover:text-accent-ink">
+              <a href={e.repoUrl} target="_blank" rel="noopener noreferrer" className="mono text-ink inline-flex items-center min-h-tap underline decoration-accent-ink underline-offset-4 hover:text-accent-ink">
                 {e.repo}
               </a>
               {e.ref && !isExcluded(e.ref) ? <> <Tag className="ml-1 align-middle">{e.ref}</Tag></> : null}

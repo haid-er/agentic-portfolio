@@ -5,7 +5,7 @@
  * offers an anchor that is not on the page and never omits one that is.
  */
 import type { ReactNode } from 'react'
-import type { SectionId } from '@/lib/content'
+import { getSections, type SectionId } from '@/lib/content'
 import FeaturedDemo, * as playground from '@/components/playground/FeaturedDemo'
 import About, * as about from './About'
 import Achievements, * as achievements from './Achievements'
@@ -53,4 +53,12 @@ export const SECTIONS: Record<SectionId, SectionEntry> = {
   github: entry(GitHubActivity, github),
   resume: entry(Resume, resume),
   contact: entry(Contact, contact),
+}
+
+/**
+ * Enabled sections that actually have something to show, in content order. Folio
+ * numbers come from this list, so a hidden or empty section never leaves a gap.
+ */
+export function renderedSections() {
+  return getSections().filter((s) => SECTIONS[s.id].shouldRender())
 }

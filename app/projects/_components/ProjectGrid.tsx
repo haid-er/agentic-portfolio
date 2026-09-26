@@ -26,6 +26,12 @@ import { cx } from '@/lib/utils'
 import type { PillarOption, ProjectCardData } from '../_lib/model'
 import { ProjectCard } from './ProjectCard'
 
+/** Headings for the grouped index (UI furniture; which group comes from content `learning`). */
+const GROUPS = [
+  { key: 'work', title: 'Work and projects', learning: false },
+  { key: 'learning', title: 'Learning builds', learning: true },
+] as const
+
 const Q_PILLAR = 'projects'
 const Q_TAG = 'projects-tag'
 
@@ -38,18 +44,20 @@ export interface ProjectGridProps {
   headingLevel?: 'h2' | 'h3'
   /** Link shown next to the count, e.g. to the full /projects index. */
   indexHref?: string
+  /** Split the list into real work and learning builds, each under its own heading (h2). */
+  grouped?: boolean
 }
 
 type PillarFilter = Pillar | 'all'
 
-export function ProjectGrid({ projects, pillars, limit = 0, headingLevel = 'h3', indexHref }: ProjectGridProps) {
+export function ProjectGrid({ projects, pillars, limit = 0, headingLevel = 'h3', indexHref, grouped = false }: ProjectGridProps) {
   const uid = useId()
   const [pillar, setPillar] = useState<PillarFilter>('all')
   const [tag, setTag] = useState('')
   const [expanded, setExpanded] = useState(false)
   const [run, setRun] = useState(0)
   const focusSlug = useRef<string | null>(null)
-  const listRef = useRef<HTMLUListElement>(null)
+  const listRef = useRef<HTMLDivElement>(null)
 
   /* read a shared filter once, after hydration (the server always renders "all") */
   useEffect(() => {
@@ -132,7 +140,7 @@ export function ProjectGrid({ projects, pillars, limit = 0, headingLevel = 'h3',
   /* replay the stagger on every filter change without remounting the cards */
   useLayoutEffect(() => {
     if (run === 0 || !listRef.current) return
-    const items = Array.from(listRef.current.children) as HTMLElement[]
+    const items = Array.from(listRef.current.querySelectorAll<HTMLElement>('[data-card]'))
     for (const li of items) li.style.animationName = 'none'
     void listRef.current.offsetWidth // one reflow so the animations restart
     for (const li of items) li.style.animationName = ''
@@ -150,7 +158,8 @@ export function ProjectGrid({ projects, pillars, limit = 0, headingLevel = 'h3',
       {/* ---------------- filter bar ---------------- */}
       <div className="grid gap-s4 mid:grid-cols-[1fr_auto] mid:items-end">
         {pillars.length > 1 ? (
-          <div role="group" aria-label="Filter projects by pillar" className="flex flex-wrap gap-2">
+          // One swipeable row on phones (no stacked chip rows); wraps from 900px.
+          <div role="group" aria-label="Filter projects by pillar" className="scroll-x flex gap-2 pb-1 -mb-1 mid:flex-wrap mid:overflow-visible mid:[mask-image:none] [&>*]:shrink-0">
             <PillarButton label="All" count={projects.length} pressed={pillar === 'all'} onClick={() => choosePillar('all')} />
             {pillars.map((o) => (
               <PillarButton
@@ -211,26 +220,41 @@ export function ProjectGrid({ projects, pillars, limit = 0, headingLevel = 'h3',
 
       {/* ---------------- grid ---------------- */}
       {shown.length ? (
-        <ul ref={listRef} className="m-0 p-0 list-none grid gap-s5 md:grid-cols-2 xl:grid-cols-3">
-          {shown.map((p, i) => (
-            <li
-              key={p.slug}
-              className={cx(
-                'min-w-0',
-                run > 0 && 'motion-safe:almanac:animate-[print-in_var(--dur-med)_var(--ease-out)_both] motion-safe:strata:animate-[settle_var(--dur-med)_var(--ease-out)_both]',
-              )}
-              style={run > 0 ? ({ animationDelay: `${Math.min(i, 8) * 60}ms` } as CSSProperties) : undefined}
-            >
-              <ProjectCard
-                project={p}
-                headingLevel={headingLevel}
-                onTag={chooseTag}
-                activeTag={tag}
-                titleId={`${uid}-${p.slug}`}
-              />
-            </li>
-          ))}
-        </ul>
+        <div ref={listRef} className="grid gap-s7">
+          {(grouped ? GROUPS.map((g) => ({ ...g, items: shown.filter((p) => p.learning === g.learning) })) : [{ key: 'all', title: '', learning: false, items: shown }])
+            .filter((g) => g.items.length)
+            .map((g) => (
+              <section key={g.key} aria-labelledby={g.title ? `${uid}-${g.key}` : undefined} className="grid gap-s4">
+                {g.title ? (
+                  <h2 id={`${uid}-${g.key}`} className="mono text-ink-2 font-normal m-0 flex items-baseline gap-3 [font-variation-settings:normal] [font-stretch:100%]">
+                    {g.title}
+                    <span className="nums text-ink-3">{g.items.length}</span>
+                  </h2>
+                ) : null}
+                <ul className="m-0 p-0 list-none grid gap-s5 md:grid-cols-2 xl:grid-cols-3">
+                  {g.items.map((p, i) => (
+                    <li
+                      key={p.slug}
+                      data-card=""
+                      className={cx(
+                        'min-w-0',
+                        run > 0 && 'motion-safe:almanac:animate-[print-in_var(--dur-med)_var(--ease-out)_both] motion-safe:strata:animate-[settle_var(--dur-med)_var(--ease-out)_both]',
+                      )}
+                      style={run > 0 ? ({ animationDelay: `${Math.min(i, 8) * 60}ms` } as CSSProperties) : undefined}
+                    >
+                      <ProjectCard
+                        project={p}
+                        headingLevel={grouped ? 'h3' : headingLevel}
+                        onTag={chooseTag}
+                        activeTag={tag}
+                        titleId={`${uid}-${p.slug}`}
+                      />
+                    </li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+        </div>
       ) : (
         <EmptyState
           title="No project matches this filter."

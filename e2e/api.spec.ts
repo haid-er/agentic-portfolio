@@ -69,3 +69,8 @@ test('admin pages are noindex and gated', async ({ request }) => {
   const api = await request.post('/api/admin/content/site', { data: {} })
   expect([401, 403]).toContain(api.status())
 })
+
+test('carbon feed proxy only forwards whitelisted paths', async ({ request }) => {
+  expect((await request.get('/api/demos/carbon?path=/intensity/stats/2020-01-01/2020-01-02')).status()).toBe(400)
+  expect((await request.get(`/api/demos/carbon?path=${encodeURIComponent('https://evil.example/')}`)).status()).toBe(400)
+})

@@ -92,7 +92,7 @@ export default function Contact({ section, folio }: SectionProps) {
               <div className="flex flex-wrap items-center gap-x-s3 gap-y-s2">
                 <a
                   href={`mailto:${p.email}`}
-                  className="display text-[clamp(1.35rem,5.2vw,2.25rem)] leading-[1.1] text-ink no-underline [overflow-wrap:anywhere] hover:text-accent-ink hover:underline decoration-1"
+                  className="display inline-flex items-center min-h-tap text-[clamp(1.35rem,5.2vw,2.25rem)] leading-[1.1] text-ink no-underline [overflow-wrap:anywhere] hover:text-accent-ink hover:underline decoration-1"
                 >
                   {p.email}
                 </a>
