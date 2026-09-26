@@ -16,10 +16,13 @@ export const DEMO_PAGES = DEMO_SLUGS.filter((s) => !hidden.has(s))
 const isLocal = (url: string) => /^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/|data:|blob:|about:)/.test(url) || url === ''
 
 /**
- * Collects page errors and console errors. Requests to other origins are aborted
- * (the sandbox has no reliable outbound network, and tests must not depend on third
- * parties); the browser's own "Failed to load resource" line for those is ignored,
- * and so is a 503 from a mocked AI route. Anything else is a failure.
+ * Collects page errors and console errors. Other origins are unreachable: the
+ * browser is launched with a host-resolver rule (playwright.config.ts) so the
+ * sandbox never depends on third parties, without request interception (routing
+ * every request through Playwright slows and reorders delivery enough to make
+ * hydration timing unrepresentative). The browser's own "Failed to load resource"
+ * line for those hosts is ignored, and so is a 503 from a mocked AI route.
+ * Anything else is a failure.
  */
 export async function watch(page: Page, opts: { blockExternal?: boolean; mockAi?: boolean } = {}) {
   const errors: string[] = []
@@ -30,12 +33,9 @@ export async function watch(page: Page, opts: { blockExternal?: boolean; mockAi?
     const at = m.location().url ?? ''
     if (/Failed to load resource/.test(text) && (!isLocal(at) || (opts.mockAi && /\/api\/ai\//.test(at)))) return
     // A blocked third-party fetch surfaces as a network TypeError in some libraries' logs.
-    if (opts.blockExternal !== false && /net::ERR_FAILED|ERR_BLOCKED_BY_CLIENT|Failed to fetch/.test(text)) return
+    if (opts.blockExternal !== false && /net::ERR_FAILED|ERR_BLOCKED_BY_CLIENT|ERR_NAME_NOT_RESOLVED|Failed to fetch/.test(text)) return
     errors.push(`console: ${text}${at ? ` @ ${at}` : ''}`)
   })
-  if (opts.blockExternal !== false) {
-    await page.route((url) => !isLocal(url.toString()), (route) => route.abort('blockedbyclient'))
-  }
   if (opts.mockAi) {
     // Never spend real provider quota from e2e: the gateway answers "unavailable",
     // which every AI demo must handle honestly (CONTRACTS 5).

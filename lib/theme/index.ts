@@ -97,7 +97,7 @@ if(!t){try{var s=localStorage.getItem(C.s);if(ok(s))t=s}catch(e){}}
 if(!t&&ok(C.d))t=C.d;
 if(!t){var dark=K.filter(function(k){return C.r[k]==='dark'})[0]||'strata',light=K.filter(function(k){return C.r[k]==='light'})[0]||'almanac';
 t=window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches?dark:light}
-d.setAttribute('data-theme',t);d.style.colorScheme=C.r[t];
+d.setAttribute('data-theme',t);window.__ghpTheme=t;d.style.colorScheme=C.r[t];
 var m=document.querySelector('meta[name="color-scheme"]');if(m)m.setAttribute('content',C.r[t]);
 document.querySelectorAll('meta[name="theme-color"]').forEach(function(n){n.setAttribute('content',C.c[t])});
 }catch(e){}})();`

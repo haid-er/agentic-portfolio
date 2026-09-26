@@ -5,6 +5,7 @@
 import type { Metadata, Viewport } from 'next'
 import type { ReactNode } from 'react'
 import { Footer, Header, PublicOnly, SkipLink } from '@/components/layout'
+import { ThemeKeeper } from '@/components/layout/ThemeKeeper'
 import { ToastProvider } from '@/components/ui/Toast'
 import { getTheme } from '@/lib/content'
 import { buildMetadata, jsonLdString, personJsonLd } from '@/lib/seo'
@@ -30,6 +31,7 @@ export default function RootLayout({ children }: { children: ReactNode }) {
         <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: jsonLdString(personJsonLd()) }} />
       </head>
       <body>
+        <ThemeKeeper />
         <ToastProvider>
           <PublicOnly>
             <SkipLink />

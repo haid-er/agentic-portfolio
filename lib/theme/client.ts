@@ -8,6 +8,19 @@ import { useSyncExternalStore } from 'react'
 import { THEME_EVENT, THEME_STORAGE_KEY } from './index'
 import { isThemeKey as isKey, type ThemeKey } from './keys'
 
+/** The world the no-flash script (or the last setTheme) chose, kept outside the DOM. */
+type ThemeWindow = Window & { __ghpTheme?: string }
+
+/**
+ * If React ever has to re-render the root on the client (a recoverable hydration
+ * error, seen on very slow connections), <html> gets the server's data-theme back.
+ * Put the chosen world back; no-op in the normal case.
+ */
+export function restoreChosenTheme() {
+  const t = (window as ThemeWindow).__ghpTheme
+  if (isKey(t ?? null) && getThemeKey() !== t) setTheme(t as ThemeKey, { persist: false })
+}
+
 export function getThemeKey(): ThemeKey {
   if (typeof document === 'undefined') return 'almanac'
   const t = document.documentElement.getAttribute('data-theme')
@@ -22,6 +35,7 @@ export function getThemeKey(): ThemeKey {
 export function setTheme(key: ThemeKey, opts: { persist?: boolean } = {}) {
   const d = document.documentElement
   d.setAttribute('data-theme', key)
+  ;(window as ThemeWindow).__ghpTheme = key
   d.style.colorScheme = '' // drop the previous inline value so the world's own color-scheme is read
   const cs = getComputedStyle(d)
   const scheme = cs.getPropertyValue('color-scheme').trim() || (key === 'strata' ? 'dark' : 'light')
