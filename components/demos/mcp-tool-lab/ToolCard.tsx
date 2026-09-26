@@ -21,6 +21,10 @@ export function ToolCard({ spec, config, onChange, onTry, tryState, disabled }: 
   const [draft, setDraft] = useState(pretty)
   const [error, setError] = useState<string | undefined>()
   useEffect(() => { setDraft(pretty); setError(undefined) }, [pretty])
+  // Description edits stay local until blur, so one edit sends one list_changed notification.
+  const [desc, setDesc] = useState(config.description)
+  useEffect(() => { setDesc(config.description) }, [config.description])
+  const commitDesc = () => { if (desc !== config.description) onChange({ ...config, description: desc }) }
 
   const edited = config.description !== spec.description || JSON.stringify(config.inputSchema) !== JSON.stringify(spec.inputSchema)
   const dirty = draft !== pretty
@@ -46,9 +50,10 @@ export function ToolCard({ spec, config, onChange, onTry, tryState, disabled }: 
       <Textarea
         label="Description (the model reads this)"
         rows={3}
-        value={config.description}
+        value={desc}
         maxLength={600}
-        onChange={(e) => onChange({ ...config, description: e.target.value })}
+        onChange={(e) => setDesc(e.target.value)}
+        onBlur={commitDesc}
         disabled={disabled}
         className="text-0"
       />

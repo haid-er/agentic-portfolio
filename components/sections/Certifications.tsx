@@ -99,11 +99,17 @@ function Slip({ c, n }: { c: Certification; n: number }) {
   )
 }
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Certifications'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export const shouldRender = (): boolean => getCertifications().length > 0
+
 export default function Certifications({ section, folio }: SectionProps) {
   const items = byDateDesc(getCertifications())
   if (!items.length) return null
   return (
-    <SectionShell id={section.id} folio={folio} title={section.title || 'Certifications'} note={section.note}>
+    <SectionShell id={section.id} folio={folio} title={section.title || DEFAULT_TITLE} note={section.note}>
       <ol className="m-0 p-0 list-none grid gap-s5 md:grid-cols-2">
         {items.map((c, i) => (
           <li key={c.id} className="grid min-w-0">

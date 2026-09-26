@@ -9,6 +9,7 @@ import type { Face, Ink, Item, Poster } from './engine'
 export type Inks = Record<Ink, string> & { blend: 'multiply' | 'screen' }
 export type Fonts = Record<Face, string>
 
+/** XML-escape text and attribute values (inks come from admin-editable CSS tokens, so they are escaped too). */
 const esc = (s: string) =>
   s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
 
@@ -19,19 +20,19 @@ function gridSvg(p: Poster, color: string) {
   let d = ''
   for (const x of p.colX) d += `M${x.toFixed(1)} ${p.margin}V${p.h - p.margin}M${(x + p.colW).toFixed(1)} ${p.margin}V${p.h - p.margin}`
   for (const y of p.rowY) d += `M${p.margin} ${y.toFixed(1)}H${p.w - p.margin}M${p.margin} ${(y + p.rowH).toFixed(1)}H${p.w - p.margin}`
-  return `<path d="${d}" fill="none" stroke="${color}" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.7"/>`
+  return `<path d="${d}" fill="none" stroke="${esc(color)}" stroke-width="0.5" stroke-dasharray="2 2" opacity="0.7"/>`
 }
 
 function itemSvg(it: Item, inks: Inks, fonts: Fonts): string {
   if (it.k === 'path') {
-    const fill = it.fill ? inks[it.fill] : 'none'
-    const stroke = it.stroke ? ` stroke="${inks[it.stroke]}" stroke-width="${it.sw ?? 1}" stroke-linejoin="round"` : ''
+    const fill = it.fill ? esc(inks[it.fill]) : 'none'
+    const stroke = it.stroke ? ` stroke="${esc(inks[it.stroke])}" stroke-width="${it.sw ?? 1}" stroke-linejoin="round"` : ''
     const op = it.opacity !== undefined ? ` opacity="${it.opacity}"` : ''
     return `<path d="${it.d}" fill="${fill}"${stroke}${op}/>`
   }
   const tr = it.rot ? ` transform="rotate(${it.rot} ${it.x} ${it.y})"` : ''
   const track = it.tracking ? ` letter-spacing="${(it.tracking * it.size).toFixed(2)}"` : ''
-  return `<text x="${it.x.toFixed(1)}" y="${it.y.toFixed(1)}" font-family="${fontAttr(fonts[it.face])}" font-size="${it.size.toFixed(2)}" font-weight="${it.weight}"${it.italic ? ' font-style="italic"' : ''}${track} text-anchor="${it.anchor}" fill="${inks[it.fill]}"${tr}>${esc(it.text)}</text>`
+  return `<text x="${it.x.toFixed(1)}" y="${it.y.toFixed(1)}" font-family="${fontAttr(fonts[it.face])}" font-size="${it.size.toFixed(2)}" font-weight="${it.weight}"${it.italic ? ' font-style="italic"' : ''}${track} text-anchor="${it.anchor}" fill="${esc(inks[it.fill])}"${tr}>${esc(it.text)}</text>`
 }
 
 export function posterSvg(p: Poster, inks: Inks, fonts: Fonts, opts: { grid?: boolean; title?: string } = {}): string {
@@ -42,7 +43,7 @@ export function posterSvg(p: Poster, inks: Inks, fonts: Fonts, opts: { grid?: bo
   const title = opts.title ? `<title>${esc(opts.title)}</title>` : ''
   return (
     `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${p.w} ${p.h}" width="${p.w}" height="${p.h}">${title}` +
-    `<rect width="${p.w}" height="${p.h}" fill="${inks.paper}"/>${body}${opts.grid ? gridSvg(p, inks.spot1) : ''}</svg>`
+    `<rect width="${p.w}" height="${p.h}" fill="${esc(inks.paper)}"/>${body}${opts.grid ? gridSvg(p, inks.spot1) : ''}</svg>`
   )
 }
 

@@ -12,7 +12,7 @@ function bold(text: string, key: string): ReactNode[] {
   )
 }
 
-export function Rich({ text, max, idPrefix, titles, onCite }: {
+export function Rich({ text, max, idPrefix, titles, onCite, onJump }: {
   text: string
   /** Number of sources (citations above this render as text). */
   max: number
@@ -20,6 +20,8 @@ export function Rich({ text, max, idPrefix, titles, onCite }: {
   idPrefix: string
   titles: string[]
   onCite?: (n: number | null) => void
+  /** Runs before the browser jumps to a source, e.g. to expand a collapsed list. */
+  onJump?: () => void
 }) {
   const blocks: Array<{ list: boolean; lines: string[] }> = []
   let cur: { list: boolean; lines: string[] } | null = null
@@ -40,6 +42,7 @@ export function Rich({ text, max, idPrefix, titles, onCite }: {
         <a
           key={`${key}-${i}`}
           href={`#${idPrefix}-${seg.n}`}
+          onClick={onJump}
           onMouseEnter={() => onCite?.(seg.n)}
           onMouseLeave={() => onCite?.(null)}
           onFocus={() => onCite?.(seg.n)}

@@ -82,11 +82,17 @@ function Entry({ e, n, feature, span }: { e: EducationItem; n: number; feature: 
   )
 }
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Education'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export const shouldRender = (): boolean => getEducation().length > 0
+
 export default function Education({ section, folio }: SectionProps) {
   const items = getEducation()
   if (!items.length) return null
   return (
-    <SectionShell id={section.id} folio={folio} title={section.title || 'Education'} note={section.note}>
+    <SectionShell id={section.id} folio={folio} title={section.title || DEFAULT_TITLE} note={section.note}>
       <div className="grid gap-s5 mid:grid-cols-3 mid:items-stretch">
         {items.map((e, i) => (
           <Entry key={e.id} e={e} n={i + 1} feature={i === 0} span={i > 0 ? 1 : items.length === 1 ? 3 : 2} />

@@ -97,7 +97,7 @@ export function SpanDetail({ span, now }: { span: Span; now: number }) {
   const st = STATUS[span.status]
   const attrs = Object.entries(span.attrs)
   return (
-    <div className="grid gap-3 p-3 border border-rule-soft rounded-1 bg-bg-2 min-w-0" aria-live="polite">
+    <div className="grid gap-3 p-3 border border-rule-soft rounded-1 bg-bg-2 min-w-0">
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-semibold [overflow-wrap:anywhere]">{span.name}</span>
         <Badge tone={st.tone}>{st.label}</Badge>

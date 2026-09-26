@@ -4,13 +4,13 @@
  * marketplace form, replay them by dispatching real DOM events back, and export the
  * recording as a Puppeteer script. Nothing leaves the browser.
  */
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Badge, Button, DemoGrid, DemoPanel, DemoToolbar, ErrorState, Loading, Segmented, Toggle } from '@/components/ui'
 import type { DemoProps } from '@/lib/demos/types'
 import { useLocalStorage, useReducedMotion } from '@/lib/hooks'
 import { cx } from '@/lib/utils'
 import { EMPTY_SITE, MockSite, validate, type Build, type SiteState } from './site'
-import { STRATEGIES, find, labelFor, sampleSteps, selectorOf, setNativeValue, stepId, targetsFor, type Step, type Strategy } from './recorder'
+import { STRATEGIES, find, labelFor, sampleSteps, selectorOf, setNativeValue, stepId, targetsFor, toStrategy, toSteps, type Step, type Strategy } from './recorder'
 import { StepList, type StepStatus } from './StepList'
 import { ScriptPanel } from './ScriptPanel'
 
@@ -28,8 +28,14 @@ const SELECTOR_TIMEOUT = 1500
 
 export default function Demo(_props: DemoProps) {
   const reduced = useReducedMotion()
-  const [steps, setSteps] = useLocalStorage<Step[]>('automation-recorder:steps', [])
-  const [strategy, setStrategy] = useLocalStorage<Strategy>('automation-recorder:strategy', 'testid')
+  // Stored values are checked before use: storage can hold an older schema or hand edits.
+  const [storedSteps, setStoredSteps] = useLocalStorage<unknown>('automation-recorder:steps', [])
+  const [storedStrategy, setStrategy] = useLocalStorage<unknown>('automation-recorder:strategy', 'testid')
+  const steps = useMemo(() => toSteps(storedSteps), [storedSteps])
+  const strategy = toStrategy(storedStrategy)
+  const setSteps = useCallback((v: Step[] | ((prev: Step[]) => Step[])) => {
+    setStoredSteps((prev: unknown) => (typeof v === 'function' ? v(toSteps(prev)) : v))
+  }, [setStoredSteps])
   const [site, setSite] = useState<SiteState>(EMPTY_SITE)
   const [build, setBuild] = useState<Build>('a1')
   const [recording, setRecording] = useState(false)

@@ -6,13 +6,12 @@
  */
 import { useCallback, useEffect, useMemo, useState, type KeyboardEvent } from 'react'
 import { Button, DemoGrid, DemoPanel, ErrorState, Loading, useToast } from '@/components/ui'
-import { getTheme } from '@/lib/content'
 import type { DemoProps } from '@/lib/demos/types'
 import { useLocalStorage, useReducedMotion } from '@/lib/hooks'
-import { themeLabels } from '@/lib/theme'
 import { useThemeKey } from '@/lib/theme/client'
 import { cx } from '@/lib/utils'
 import { Controls } from './Controls'
+import { labelsFromData } from './labels'
 import { approxMeasure, makePoster, randomSeed, STYLES, type PosterParams } from './engine'
 import { exportPng, exportSvg, loadFaces } from './exporters'
 import { DEFAULTS, fileName, fromUrl, sameParams, sanitize, shareUrl } from './params'
@@ -25,11 +24,11 @@ export { notes } from './notes'
 const HISTORY = 8
 const KEPT = 12
 
-export default function Demo(_props: DemoProps) {
+export default function Demo({ data }: DemoProps) {
   const toast = useToast()
   const reduced = useReducedMotion()
   const themeKey = useThemeKey()
-  const labels = useMemo(() => themeLabels(getTheme()), [])
+  const labels = useMemo(() => labelsFromData(data), [data])
 
   const [stored, setStored] = useLocalStorage<PosterParams>('design-studio:params', DEFAULTS)
   const [kept, setKept] = useLocalStorage<PosterParams[]>('design-studio:kept', [])

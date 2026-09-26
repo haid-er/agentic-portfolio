@@ -33,6 +33,17 @@ const TICK_MS = 100
 
 interface HistoryRow { number: number; sha: string; branch: Branch; target: Target; result: RunResult; time: number; runner: number; hits: number; misses: number }
 
+const toLock = (v: unknown) => (typeof v === 'number' && Number.isInteger(v) && v > 0 ? v : 1)
+const toCacheKeys = (v: unknown): string[] => (Array.isArray(v) ? v.filter((k): k is string => typeof k === 'string') : [])
+const RESULTS: readonly string[] = ['success', 'failed', 'cancelled', 'running']
+function isHistoryRow(v: unknown): v is HistoryRow {
+  if (!v || typeof v !== 'object') return false
+  const r = v as HistoryRow
+  return [r.number, r.time, r.runner, r.hits, r.misses].every(Number.isFinite) &&
+    typeof r.sha === 'string' && typeof r.branch === 'string' && typeof r.target === 'string' && RESULTS.includes(r.result)
+}
+const toHistory = (v: unknown): HistoryRow[] => (Array.isArray(v) ? v.filter(isHistoryRow) : [])
+
 export default function Demo(_props: DemoProps) {
   const visible = usePageVisible()
   const [viewRef, inView] = useInView<HTMLDivElement>({ rootMargin: '160px' })
@@ -42,9 +53,13 @@ export default function Demo(_props: DemoProps) {
   const [runners, setRunners] = useState('3')
   const [autoRetry, setAutoRetry] = useState(true)
   const [speed, setSpeed] = useState<Speed>('3')
-  const [lockVersion, setLockVersion] = useLocalStorage('ci-pipeline:lock', 1)
-  const [cacheKeys, setCacheKeys] = useLocalStorage<string[]>('ci-pipeline:cache', [])
-  const [history, setHistory] = useLocalStorage<HistoryRow[]>('ci-pipeline:history', [])
+  // Stored values are checked before use: storage can hold an older schema or hand edits.
+  const [storedLock, setLockVersion] = useLocalStorage<unknown>('ci-pipeline:lock', 1)
+  const [storedCache, setCacheKeys] = useLocalStorage<unknown>('ci-pipeline:cache', [])
+  const [storedHistory, setHistory] = useLocalStorage<unknown>('ci-pipeline:history', [])
+  const lockVersion = toLock(storedLock)
+  const cacheKeys = useMemo(() => toCacheKeys(storedCache), [storedCache])
+  const history = useMemo(() => toHistory(storedHistory), [storedHistory])
   const [snap, setSnap] = useState<Snapshot | null>(null)
   const [selected, setSelected] = useState('lint')
   const [crash, setCrash] = useState<string | null>(null)
@@ -115,7 +130,7 @@ export default function Demo(_props: DemoProps) {
       number: snap.number, sha: snap.sha, branch: snap.cfg.branch, target: snap.cfg.target, result: snap.result,
       time: snap.time, runner: snap.runnerSeconds, hits: snap.cacheHits, misses: snap.cacheMisses,
     }
-    setHistory((h) => [row, ...h.filter((r) => r.number !== row.number)].slice(0, 8))
+    setHistory((h: unknown) => [row, ...toHistory(h).filter((r) => r.number !== row.number)].slice(0, 8))
     setAnnounce(`Run ${snap.number} ${snap.result === 'success' ? 'passed' : snap.result} in ${fmt(snap.time)} of simulated time.`)
   }, [snap, setCacheKeys, setHistory])
 
@@ -183,7 +198,7 @@ export default function Demo(_props: DemoProps) {
               variant="ghost"
               icon="doc"
               disabled={running}
-              onClick={() => { setLockVersion((v) => v + 1); setAnnounce('package-lock.json changed: every cache key is new, so the next run misses.') }}
+              onClick={() => { setLockVersion((v: unknown) => toLock(v) + 1); setAnnounce('package-lock.json changed: every cache key is new, so the next run misses.') }}
             >
               Change package-lock.json
             </Button>

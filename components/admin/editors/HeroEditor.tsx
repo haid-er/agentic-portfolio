@@ -41,7 +41,7 @@ export function HeroEditor() {
         <ListField<string>
           path={['hero', 'plateLayers']}
           label="Core-sample layers"
-          hint="Ordered collection:id refs, e.g. experience:euthyna, project:motioniq, education:pucit-bs-it, research:humcareadl. The plate sorts them by date. Empty = every enabled role, education and research item plus featured projects."
+          hint="Ordered collection:id refs, e.g. experience:acme, project:my-app, education:bs-cs, research:my-paper. The plate sorts them by date. Empty = every enabled role, education and research item plus featured projects."
           collapsible={false}
           addLabel="Add layer"
           max={12}

@@ -114,6 +114,12 @@ export class QueryClient {
     }
   }
 
+  /** Replace the fetcher of an existing entry (its own latest closure; never another key's). */
+  setFetcher<T>(key: string, fn: Fetcher<T>) {
+    const inner = this.internals.get(key)
+    if (inner) inner.fn = fn as Fetcher<unknown>
+  }
+
   /** A component starts reading `key`. Returns the unsubscribe function. */
   observe<T>(key: string, label: string, fn: Fetcher<T>): () => void {
     this.ensure(key, label, fn as Fetcher<unknown>)

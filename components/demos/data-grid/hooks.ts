@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useRef, useState, useSyncExternalStore } from 'react'
+import { useEffect, useState, useSyncExternalStore } from 'react'
 import type { LogEntry, QueryClient, QueryState } from './queryClient'
 
 /** Read one cache entry and keep it observed while mounted. */
@@ -9,10 +9,13 @@ export function useQuery<T>(
   label: string,
   fn: (signal: AbortSignal) => Promise<T>,
 ): { state: QueryState<T> | undefined; data: T | undefined; isPlaceholder: boolean } {
-  const fnRef = useRef(fn)
-  useEffect(() => { fnRef.current = fn })
   const state = useSyncExternalStore(client.subscribe, () => client.getState<T>(key), () => undefined)
-  useEffect(() => client.observe(key, label, (s) => fnRef.current(s)), [client, key, label])
+  // Each key keeps its own fetcher: a shared ref would let an old key's retry or refetch
+  // run the current key's request and store the wrong rows under the old key.
+  // eslint-disable-next-line react-hooks/exhaustive-deps -- `fn` is read once per key; setFetcher keeps it current
+  useEffect(() => client.observe(key, label, fn), [client, key, label])
+  // Refresh this key's fetcher every render (latest latency / failure settings), only for this key.
+  useEffect(() => { client.setFetcher(key, fn) })
 
   // keepPreviousData: while a new key loads, keep showing the last data we rendered.
   const [previous, setPrevious] = useState<T | undefined>(undefined)

@@ -13,11 +13,17 @@ import type { SectionProps } from './types'
 
 const HOME_LIMIT = 6
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Projects'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export const shouldRender = (): boolean => getProjectCards().length > 0
+
 export default function Projects({ section, folio }: SectionProps) {
   const projects = getProjectCards()
   if (!projects.length) return null
   return (
-    <SectionShell id={section.id} folio={folio} title={section.title || 'Projects'} note={section.note}>
+    <SectionShell id={section.id} folio={folio} title={section.title || DEFAULT_TITLE} note={section.note}>
       <ProjectGrid
         projects={projects}
         pillars={getPillarOptions(projects)}

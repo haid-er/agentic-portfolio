@@ -9,7 +9,7 @@ import { DemoRenderer } from '@/lib/demos/loaders'
 import { DemoBoundary } from './DemoBoundary'
 import { runsInLabel } from './slug'
 
-export function DemoStage({ slug, title, no, glyph, runsIn, usesAI, data }: {
+export function DemoStage({ slug, title, no, glyph, runsIn, data }: {
   slug: DemoSlug
   /** Server-resolved data passed through to the demo (DemoProps.data). */
   data?: unknown
@@ -17,7 +17,6 @@ export function DemoStage({ slug, title, no, glyph, runsIn, usesAI, data }: {
   no: number
   glyph: GlyphId
   runsIn: 'browser' | 'edge' | 'server' | 'browser + ai'
-  usesAI: boolean
 }) {
   return (
     <figure className="m-0 min-w-0 border border-rule bg-surface rounded-2 strata:border-0 strata:shadow-plate">
@@ -31,7 +30,7 @@ export function DemoStage({ slug, title, no, glyph, runsIn, usesAI, data }: {
         <span>{runsInLabel(runsIn)}</span>
       </figcaption>
       <div className="min-w-0 p-s3 xs:p-s4 md:p-s5">
-        <DemoBoundary title={title} localOnly={runsIn === 'browser' && !usesAI}>
+        <DemoBoundary title={title}>
           <DemoRenderer slug={slug} data={data} />
         </DemoBoundary>
       </div>

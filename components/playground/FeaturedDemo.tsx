@@ -14,13 +14,19 @@ import { getGalleryModel, toCardModel } from './model'
 import { ChipRow, SkillLinkChip } from './SkillChips'
 import { SpecimenCard } from './SpecimenCard'
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Playground'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export const shouldRender = (): boolean => Boolean(getFeaturedDemo())
+
 export default function FeaturedDemo({ section, folio }: SectionProps) {
   const demo = getFeaturedDemo()
   if (!demo) return null
   const { intro } = getPlayground()
   const { cards, pillars } = getGalleryModel()
   const card = cards.find((c) => c.slug === demo.slug) ?? toCardModel(demo, 1)
-  const title = section.title || 'Playground'
+  const title = section.title || DEFAULT_TITLE
 
   return (
     <SectionShell

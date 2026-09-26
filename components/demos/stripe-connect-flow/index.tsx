@@ -63,9 +63,16 @@ export default function Demo(_props: DemoProps) {
 
   /** Every API call gets a short, labelled, simulated latency so the loading state is honest. */
   const callApi = (label: string, fn: (s: SimState) => SimState) => {
-    if (busy) return
+    if (timer.current) return
     setBusy(label)
-    timer.current = setTimeout(() => { setSim(fn); setBusy(null) }, 420)
+    timer.current = setTimeout(() => { timer.current = null; setSim(fn); setBusy(null) }, 420)
+  }
+
+  const reset = () => {
+    if (timer.current) clearTimeout(timer.current)
+    timer.current = null
+    setBusy(null)
+    setSim((s) => initialState(417 + s.seq))
   }
 
   // auto-deliver queued webhooks while the demo is on screen
@@ -136,7 +143,7 @@ export default function Demo(_props: DemoProps) {
                     Deliver next
                   </Button>
                 </DemoToolbar>
-                <p className="m-0 text-00 text-ink-3" aria-live="polite">
+                <p className="m-0 text-00 text-ink-3">
                   {due
                     ? `${sim.queue.length} queued · next at ${simTime(due.dueAt)}${due.n > 1 ? ` (attempt ${due.n})` : ''}`
                     : sim.events.length ? `Queue empty · ${paidCount} deliveries handled` : 'Queue empty'}
@@ -158,7 +165,7 @@ export default function Demo(_props: DemoProps) {
         <DemoPanel
           title="Marketplace"
           meta="simulated · no keys"
-          actions={<Button size="sm" variant="ghost" icon="refresh" onClick={() => { setSim(initialState(417 + sim.seq)); setBusy(null) }}>Reset</Button>}
+          actions={<Button size="sm" variant="ghost" icon="refresh" onClick={reset}>Reset</Button>}
         >
           <div className="grid gap-5">
             <DemoToolbar>

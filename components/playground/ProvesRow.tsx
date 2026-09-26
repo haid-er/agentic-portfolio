@@ -17,7 +17,7 @@ export function ProvesRow({ proves, activeId, layer, countFor, onPick }: {
 }) {
   const [open, setOpen] = useState(false)
   const list = open ? proves : proves.slice(0, VISIBLE)
-  const hidden = proves.length - list.length
+  const extra = proves.length - VISIBLE
   return (
     <ChipRow label="Proves">
       {list.map((s) => {
@@ -35,15 +35,17 @@ export function ProvesRow({ proves, activeId, layer, countFor, onPick }: {
           </li>
         )
       })}
-      {hidden > 0 ? (
+      {extra > 0 ? (
         <li>
+          {/* One toggle that stays mounted, so keyboard focus never drops to <body>. */}
           <button
             type="button"
-            onClick={() => setOpen(true)}
+            onClick={() => setOpen((o) => !o)}
+            aria-expanded={open}
             className="mono inline-flex min-h-tap items-center border border-dashed border-rule rounded-1 px-3 text-ink-2 hover:text-ink"
-            aria-label={`Show ${hidden} more skills`}
+            aria-label={open ? 'Show fewer skills' : `Show ${extra} more skills`}
           >
-            +{hidden}
+            {open ? 'Show fewer' : `+${extra}`}
           </button>
         </li>
       ) : null}

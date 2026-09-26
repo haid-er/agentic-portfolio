@@ -161,38 +161,55 @@ export interface RecordMention {
   href?: string
 }
 
-const anchor = (id: SectionId) => (isSectionEnabled(id) ? `/#${id}` : undefined)
+const anchor = (id: SectionId) => `/#${id}`
 /** The section's own title from content (falls back to a plain label). */
 const sectionLabel = (id: SectionId, fallback: string) => getSection(id)?.title || fallback
 
-/** Every enabled content item that names this demo as its proof. */
+/**
+ * Every visible content item that names this demo as its proof. Items inside a
+ * section the admin has switched off never show up here.
+ */
 export function getRecordMentions(slug: DemoSlug): RecordMention[] {
   const out: RecordMention[] = []
-  for (const e of getExperience()) {
-    const hits = e.highlights.filter((h) => h.proofDemo === slug)
-    hits.forEach((h, i) => out.push({ key: `exp-${e.id}-${i}`, kind: e.org, title: e.role, detail: h.text, href: anchor('experience') }))
+  if (isSectionEnabled('experience')) {
+    for (const e of getExperience()) {
+      const hits = e.highlights.filter((h) => h.proofDemo === slug)
+      hits.forEach((h, i) => out.push({ key: `exp-${e.id}-${i}`, kind: e.org, title: e.role, detail: h.text, href: anchor('experience') }))
+    }
   }
-  for (const p of getProjects()) {
-    if (p.demoSlugs.includes(slug)) out.push({ key: `proj-${p.id}`, kind: sectionLabel('projects', 'Project'), title: p.title, detail: p.summary || undefined, href: `/projects/${p.slug}` })
+  if (isSectionEnabled('projects')) {
+    for (const p of getProjects()) {
+      if (p.demoSlugs.includes(slug)) out.push({ key: `proj-${p.id}`, kind: sectionLabel('projects', 'Project'), title: p.title, detail: p.summary || undefined, href: `/projects/${p.slug}` })
+    }
   }
-  const research = getResearch()
-  for (const r of research.items) {
-    if (r.demoSlugs.includes(slug)) out.push({ key: `res-${r.id}`, kind: [r.venue, r.year].filter(Boolean).join(' · '), title: r.title, href: anchor('research') })
+  if (isSectionEnabled('research')) {
+    const research = getResearch()
+    for (const r of research.items) {
+      if (r.demoSlugs.includes(slug)) out.push({ key: `res-${r.id}`, kind: [r.venue, r.year].filter(Boolean).join(' · '), title: r.title, href: anchor('research') })
+    }
+    if (research.pipeline.enabled && research.pipeline.demoSlug === slug && research.pipeline.title) {
+      out.push({ key: 'res-pipeline', kind: sectionLabel('research', ''), title: research.pipeline.title, detail: research.pipeline.note || undefined, href: anchor('research') })
+    }
   }
-  if (research.pipeline.enabled && research.pipeline.demoSlug === slug && research.pipeline.title) {
-    out.push({ key: 'res-pipeline', kind: sectionLabel('research', ''), title: research.pipeline.title, detail: research.pipeline.note || undefined, href: anchor('research') })
+  if (isSectionEnabled('education')) {
+    for (const ed of getEducation()) {
+      if (ed.demoSlugs?.includes(slug)) out.push({ key: `edu-${ed.id}`, kind: ed.institution, title: [ed.degree, ed.field].filter(Boolean).join(', '), href: anchor('education') })
+    }
   }
-  for (const ed of getEducation()) {
-    if (ed.demoSlugs?.includes(slug)) out.push({ key: `edu-${ed.id}`, kind: ed.institution, title: [ed.degree, ed.field].filter(Boolean).join(', '), href: anchor('education') })
+  if (isSectionEnabled('certifications')) {
+    for (const c of getCertifications()) {
+      if (c.demoSlugs?.includes(slug)) out.push({ key: `cert-${c.id}`, kind: c.issuer, title: c.name, href: anchor('certifications') })
+    }
   }
-  for (const c of getCertifications()) {
-    if (c.demoSlugs?.includes(slug)) out.push({ key: `cert-${c.id}`, kind: c.issuer, title: c.name, href: anchor('certifications') })
+  if (isSectionEnabled('achievements')) {
+    for (const a of getAchievements()) {
+      if (a.demoSlugs?.includes(slug)) out.push({ key: `ach-${a.id}`, kind: sectionLabel('achievements', ''), title: a.title, detail: a.detail || undefined, href: anchor('achievements') })
+    }
   }
-  for (const a of getAchievements()) {
-    if (a.demoSlugs?.includes(slug)) out.push({ key: `ach-${a.id}`, kind: sectionLabel('achievements', ''), title: a.title, detail: a.detail || undefined, href: anchor('achievements') })
-  }
-  for (const s of getServices()) {
-    if (s.demoSlugs.includes(slug)) out.push({ key: `svc-${s.id}`, kind: sectionLabel('services', ''), title: s.title, detail: s.summary || undefined, href: anchor('services') })
+  if (isSectionEnabled('services')) {
+    for (const s of getServices()) {
+      if (s.demoSlugs.includes(slug)) out.push({ key: `svc-${s.id}`, kind: sectionLabel('services', ''), title: s.title, detail: s.summary || undefined, href: anchor('services') })
+    }
   }
   return out
 }

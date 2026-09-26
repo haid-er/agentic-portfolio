@@ -4,15 +4,12 @@
  * about Malik; labels come from content or the demo registry.
  */
 import type { IconName } from '@/components/ui/Icon'
-import {
-  getAchievements, getCertifications, getEducation, getExperience, getProfile, getProjects,
-  getResearch, getResume, getSection, getSections, getServices, getSkills, getSocials, getTestimonials, getTheme,
-  type SectionId,
-} from '@/lib/content'
-import { getDemos, getFeaturedDemo, PILLAR_GLYPH } from '@/lib/demos'
+import { getProfile, getProjects, getResume, getSection, getSections, getSocials, getTheme, type SectionId } from '@/lib/content'
+import { getDemos, PILLAR_GLYPH } from '@/lib/demos'
 import { folio } from '@/lib/utils'
 import type { IndexEntry, IndexGroup, NavModel, NavSection, ThemeLabels } from './types'
 import { socialIcon } from '@/components/ui/Icon'
+import { SECTIONS } from '@/components/sections/registry'
 
 /** One glyph per section (UI furniture only). */
 const SECTION_ICON: Record<SectionId, IconName> = {
@@ -33,26 +30,9 @@ const SECTION_ICON: Record<SectionId, IconName> = {
   contact: 'mail',
 }
 
-/**
- * Sections whose component renders nothing when their collection is empty.
- * The nav must not offer an anchor that is not on the page.
- */
-function hasContent(id: SectionId): boolean {
-  switch (id) {
-    case 'experience': return getExperience().length > 0
-    case 'skills': return getSkills().length > 0
-    case 'projects': return getProjects().length > 0
-    case 'playground': return Boolean(getFeaturedDemo())
-    case 'research': return getResearch().items.length > 0
-    case 'education': return getEducation().length > 0
-    case 'certifications': return getCertifications().length > 0
-    case 'achievements': return getAchievements().length > 0
-    case 'services': return getServices().length > 0
-    case 'testimonials': return getTestimonials().length > 0
-    case 'resume': return getResume().enabled
-    default: return true
-  }
-}
+/** Fallback title and "has content" test come from each section module (same test as its early `return null`). */
+const DEFAULT_TITLE = (id: SectionId): string => SECTIONS[id].defaultTitle
+const hasContent = (id: SectionId): boolean => SECTIONS[id].shouldRender()
 
 /** Mobile folio bar holds 3 sections plus Contents (DESIGN 6.6). */
 const FOLIO_BAR_MAX = 3
@@ -67,7 +47,7 @@ export function getNavModel(): NavModel {
   const sections: NavSection[] = []
   all.forEach((s, i) => {
     if (s.id === 'hero' || !hasContent(s.id)) return
-    const label = (s.navLabel || s.title).trim()
+    const label = (s.navLabel || s.title).trim() || DEFAULT_TITLE(s.id)
     if (!label) return
     sections.push({
       id: s.id,
@@ -98,7 +78,7 @@ export function getNavModel(): NavModel {
     ...sections.map<IndexEntry>((s) => ({
       key: `section:${s.id}`,
       group: 'section',
-      label: all.find((x) => x.id === s.id)?.title || s.label,
+      label: all.find((x) => x.id === s.id)?.title.trim() || s.label,
       hint: s.folio,
       icon: s.icon,
       // In the index the playground section is an anchor; the gallery is a page below.

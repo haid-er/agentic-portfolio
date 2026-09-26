@@ -15,6 +15,14 @@ const ROWS: Array<{ label: string; get: (l: Ledger) => string | number }> = [
 export function LedgerTable({ truth, handler, inFlight }: { truth: Ledger; handler: Ledger; inFlight: number }) {
   const drift = ROWS.filter((r) => r.get(truth) !== r.get(handler))
   const overcount = handler.gross > truth.gross
+  // Announce only settled outcomes, never the per-delivery "in flight" counter.
+  const settled = overcount
+    ? `Ledger double counted ${money(handler.gross - truth.gross)}`
+    : drift.length === 0
+      ? 'Ledger in sync'
+      : inFlight > 0
+        ? ''
+        : `Ledger: ${drift.length} field${drift.length === 1 ? '' : 's'} differ`
   return (
     <div className="grid gap-3">
       <TableWrap label="Ledger comparison">
@@ -39,7 +47,8 @@ export function LedgerTable({ truth, handler, inFlight }: { truth: Ledger; handl
           </tbody>
         </Table>
       </TableWrap>
-      <p className="m-0 flex flex-wrap items-center gap-2 text-0" aria-live="polite">
+      <p className="sr-only" aria-live="polite">{settled}</p>
+      <p className="m-0 flex flex-wrap items-center gap-2 text-0">
         {overcount ? (
           <Badge tone="danger">double counted {money(handler.gross - truth.gross)}</Badge>
         ) : drift.length === 0 ? (

@@ -20,11 +20,21 @@ export { notes } from './notes'
 
 const GROUP_MS = 4 * 60 * 1000
 
-function receiptFor(msg: Message, state: ChatState, me: string, names: Record<string, string>): string {
-  const readers = Object.entries(state.reads)
+/** Names only readers who are here now (open tabs or the bot); older tab sessions are counted. */
+function receiptFor(msg: Message, state: ChatState, me: string, names: Record<string, string>, online: Set<string>): string {
+  const ids = Object.entries(state.reads)
     .filter(([id, r]) => id !== me && (r[msg.channel] ?? 0) >= msg.ts)
-    .map(([id]) => names[id] ?? 'someone')
-  if (readers.length) return `Read by ${readers.slice(0, 3).join(', ')}${readers.length > 3 ? ` +${readers.length - 3}` : ''}`
+    .map(([id]) => id)
+  const current = ids.filter((id) => id === BOT_ID || online.has(id)).map((id) => names[id] ?? 'someone')
+  const earlier = ids.length - current.length
+  if (ids.length) {
+    const parts = [
+      current.slice(0, 3).join(', '),
+      current.length > 3 ? `+${current.length - 3}` : '',
+      earlier ? `${current.length ? '+ ' : ''}${earlier} earlier ${earlier === 1 ? 'session' : 'sessions'}` : '',
+    ].filter(Boolean)
+    return `Read by ${parts.join(' ')}`
+  }
   if (msg.deliveredTo.length) return `Delivered to ${msg.deliveredTo.length} ${msg.deliveredTo.length === 1 ? 'tab' : 'tabs'}`
   return 'Sent'
 }
@@ -105,6 +115,7 @@ export default function Demo(_props: DemoProps) {
     .filter(([id, t]) => id !== me.id && t.channel === channel)
     .map(([id]) => names[id] ?? 'Someone')
   const peerList = Object.values(chat.peers)
+  const online = new Set(Object.keys(chat.peers))
   const topic = CHANNELS.find((c) => c.id === channel)?.topic ?? ''
 
   const openTab = () => { window.open(window.location.href, '_blank', 'noopener') }
@@ -229,7 +240,7 @@ export default function Demo(_props: DemoProps) {
                           me={me.id}
                           names={names}
                           grouped={grouped}
-                          receipt={m.id === lastMine ? receiptFor(m, state, me.id, names) : null}
+                          receipt={m.id === lastMine ? receiptFor(m, state, me.id, names, online) : null}
                           onReact={chat.react}
                         />
                       )

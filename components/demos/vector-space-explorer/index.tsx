@@ -110,6 +110,12 @@ export default function Demo(_props: DemoProps) {
     setDraft('')
   }
 
+  // The "Yours" filter option disappears with the last custom sentence, so fall back to all topics.
+  const setMine = (next: string[]) => {
+    setCustom(next)
+    if (!next.length && filter === 'custom') setFilter('all')
+  }
+
   return (
     <div className="grid gap-4">
       <DemoGrid
@@ -158,7 +164,7 @@ export default function Demo(_props: DemoProps) {
                 />
                 <div className="flex flex-wrap gap-2">
                   <Button type="submit" size="sm" icon="plus" disabled={!draft.trim() || custom.length >= MAX_CUSTOM}>Upsert</Button>
-                  {custom.length ? <Button size="sm" variant="ghost" icon="refresh" onClick={() => setCustom([])}>Remove mine</Button> : null}
+                  {custom.length ? <Button size="sm" variant="ghost" icon="refresh" onClick={() => setMine([])}>Remove mine</Button> : null}
                 </div>
               </form>
               {custom.length ? (
@@ -166,7 +172,7 @@ export default function Demo(_props: DemoProps) {
                   {custom.map((t, i) => (
                     <li key={t} className="flex items-center gap-2 text-0">
                       <button type="button" className="flex-1 min-h-tap text-left hover:text-accent-ink" onClick={() => pickDoc(`my-${i + 1}`)}>{t}</button>
-                      <Button size="sm" variant="ghost" icon="close" aria-label={`Remove “${t}”`} onClick={() => setCustom(custom.filter((x) => x !== t))} />
+                      <Button size="sm" variant="ghost" icon="close" aria-label={`Remove “${t}”`} onClick={() => setMine(custom.filter((x) => x !== t))} />
                     </li>
                   ))}
                 </ul>

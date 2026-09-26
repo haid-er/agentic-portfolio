@@ -41,9 +41,15 @@ export interface PageMeta {
   description?: string
   /** Canonical path, e.g. "/projects/foo". Defaults to "/". */
   path?: string
-  /** Share image path or URL. Defaults to admin `seo.ogImage`, then the generated card. */
+  /** Share image path or URL. Defaults to admin `seo.ogImage`, then the generated site card (see `segmentImage`). */
   image?: string
   imageAlt?: string
+  /**
+   * The route has its own `opengraph-image.tsx` (project and demo pages). Leaves the
+   * `images` keys out so Next's file convention supplies that card (with its alt and
+   * size), and X falls back to it too. Ignored when `image` is set.
+   */
+  segmentImage?: boolean
   type?: 'website' | 'article' | 'profile'
   /** Keep the page out of search results (admin, drafts). */
   noIndex?: boolean
@@ -77,6 +83,8 @@ export function buildMetadata(page: PageMeta = {}): Metadata {
   const image = page.image || seo.ogImage || '/opengraph-image'
   const imageAlt = page.imageAlt || fullTitle
   const images = [{ url: image, width: OG_SIZE.width, height: OG_SIZE.height, alt: imageAlt }]
+  // Next only uses a segment's file-based card when this level has no `images` key.
+  const imageFields = page.segmentImage && !page.image ? {} : { images }
   const handle = twitterHandle()
   const keywords = Array.from(new Set([...seo.keywords, ...(page.keywords ?? [])])).filter(Boolean)
 
@@ -99,7 +107,7 @@ export function buildMetadata(page: PageMeta = {}): Metadata {
       description,
       siteName: profile.name,
       locale: 'en',
-      images,
+      ...imageFields,
     },
     twitter: {
       card: 'summary_large_image',
@@ -107,7 +115,7 @@ export function buildMetadata(page: PageMeta = {}): Metadata {
       description,
       site: handle,
       creator: handle,
-      images,
+      ...imageFields,
     },
     robots: page.noIndex
       ? { index: false, follow: false, googleBot: { index: false, follow: false } }
@@ -127,5 +135,6 @@ export function demoMetadata(d: { slug: string; title: string; summary: string; 
     path: `/playground/${d.slug}`,
     keywords: d.skills,
     type: 'article',
+    segmentImage: true,
   })
 }

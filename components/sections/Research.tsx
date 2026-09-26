@@ -292,6 +292,15 @@ function Pipeline({ title, note, steps, demoSlug }: { title: string; note: strin
 /* section                                                             */
 /* ------------------------------------------------------------------ */
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Research'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export function shouldRender(): boolean {
+  const { items, pipeline } = getResearch()
+  return items.length > 0 || (pipeline.enabled && pipeline.steps.length > 0)
+}
+
 export default function Research({ section, folio }: SectionProps) {
   const { items, pipeline } = getResearch()
   const showPipeline = pipeline.enabled && pipeline.steps.length > 0
@@ -299,7 +308,7 @@ export default function Research({ section, folio }: SectionProps) {
   const { name } = getProfile()
 
   return (
-    <SectionShell id={section.id} folio={folio} title={section.title || 'Research'} note={section.note}>
+    <SectionShell id={section.id} folio={folio} title={section.title || DEFAULT_TITLE} note={section.note}>
       <div className="grid gap-s7">
         {items.map((r, i) => <Paper key={r.id} r={r} name={name} index={i} />)}
       </div>

@@ -6,13 +6,13 @@
  */
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, DemoGrid, DemoPanel, Loading, Segmented, Toggle } from '@/components/ui'
-import { getTheme } from '@/lib/content'
 import { THEME_KEYS, type ThemeKey } from '@/lib/theme/keys'
 import type { DemoProps } from '@/lib/demos/types'
 import { useLocalStorage } from '@/lib/hooks'
-import { DEFAULT_COLORS, themeLabels, type ColorToken } from '@/lib/theme'
+import { DEFAULT_COLORS, type ColorToken } from '@/lib/theme'
 import { readTokens, setTheme, useThemeKey } from '@/lib/theme/client'
 import { normalize } from './color'
+import { labelsFromData } from './labels'
 import { ContrastBoard } from './ContrastBoard'
 import { Output } from './Output'
 import { Range } from './Range'
@@ -45,10 +45,9 @@ function clean(e: unknown): Edits {
   return out
 }
 
-export default function Demo(_props: DemoProps) {
+export default function Demo({ data }: DemoProps) {
   const pageTheme = useThemeKey()
-  const theme = useMemo(() => getTheme(), [])
-  const labels = useMemo(() => themeLabels(theme), [theme])
+  const labels = useMemo(() => labelsFromData(data), [data])
   const [world, setWorld] = useState<ThemeKey>(pageTheme)
   const [stored, setStored] = useLocalStorage<AllEdits>('theme-lab:edits', NO_EDITS)
   const [, setDraft] = useLocalStorage<unknown>('theme-lab:draft', null)

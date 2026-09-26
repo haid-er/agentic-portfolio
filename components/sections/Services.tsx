@@ -116,11 +116,17 @@ function ServiceCard({ service, index, total, feature }: { service: Service; ind
   )
 }
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Services'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export const shouldRender = (): boolean => getServices().length > 0
+
 export default function Services({ section, folio }: SectionProps) {
   const items = getServices()
   if (!items.length) return null
   return (
-    <SectionShell id={section.id} folio={folio} title={section.title || 'Services'} note={section.note}>
+    <SectionShell id={section.id} folio={folio} title={section.title || DEFAULT_TITLE} note={section.note}>
       <ul role="list" className="m-0 p-0 list-none grid gap-s5 md:grid-cols-2 lg:grid-cols-3">
         {items.map((service, i) => (
           <ServiceCard

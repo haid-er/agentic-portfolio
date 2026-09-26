@@ -274,7 +274,8 @@ ${drillRules}
 .gtp-anim .gtp-dots{animation:gtp-resolve 500ms linear both;animation-delay:calc(1500ms + ${n} * var(--stagger))}
 .gtp-anim .gtp-value{animation:fade-in 420ms var(--ease-out) both;animation-delay:calc(1800ms + ${n} * var(--stagger))}
 .gtp-dots{opacity:0}
-html[data-hero-seen] .gtp-anim *{animation:none!important}
+/* entrance only: the overprint's ambient drift (DESIGN 8) keeps running */
+html[data-hero-seen] .gtp-anim *:not(.gtp-over){animation:none!important}
 /* world switch: the shell sets html[data-settle] for ~1.4s; the drill runs the core once more */
 @media (prefers-reduced-motion:no-preference){
   html[data-settle] .gtp-anim .gtp-drill-intro{animation:gtp-drill-run 820ms var(--ease-press) 160ms both!important}
@@ -424,6 +425,12 @@ function CorePlate({ hero, layers, reading }: { hero: HeroContent; layers: Plate
     </figure>
   )
 }
+
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = ''
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export const shouldRender = (): boolean => true
 
 export default async function Hero({ section }: SectionProps) {
   const { hero, profile } = getSite()

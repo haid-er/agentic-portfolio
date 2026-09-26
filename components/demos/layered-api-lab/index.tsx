@@ -104,19 +104,19 @@ export default function Demo(_props: DemoProps) {
         >
           <TraceView trace={current?.trace ?? []} status={current?.status ?? null} selected={layer} onSelect={setLayer} runKey={current?.id ?? 0} />
         </DemoPanel>
-
-        <DemoPanel
-          title={`Source · ${LAYER_LABEL[layer]}`}
-          actions={<Segmented<Flavour> label="Flavour" options={[{ value: 'express', label: 'Express' }, { value: 'nest', label: 'NestJS' }]} value={flavour} onChange={setFlavour} />}
-        >
-          <pre className="m-0 p-3 bg-bg-2 rounded-0 font-mono text-00 leading-relaxed overflow-auto max-h-96" tabIndex={0} aria-label={`${LAYER_LABEL[layer]} source, ${flavour === 'nest' ? 'NestJS' : 'Express'}`}>
-            <code>{SOURCES[layer][flavour]}</code>
-          </pre>
-          <p className="m-0 mt-2 text-00 text-ink-3">
-            {flavour === 'express' ? 'Mirrors the TypeScript that actually handled your request.' : 'The same layer shaped as a NestJS provider; illustrative, not executed.'}
-          </p>
-        </DemoPanel>
       </DemoGrid>
+
+      <DemoPanel
+        title={`Source · ${LAYER_LABEL[layer]}`}
+        actions={<Segmented<Flavour> label="Flavour" options={[{ value: 'express', label: 'Express' }, { value: 'nest', label: 'NestJS' }]} value={flavour} onChange={setFlavour} />}
+      >
+        <pre className="m-0 p-3 bg-bg-2 rounded-0 font-mono text-00 leading-relaxed overflow-auto max-h-96" tabIndex={0} aria-label={`${LAYER_LABEL[layer]} source, ${flavour === 'nest' ? 'NestJS' : 'Express'}`}>
+          <code>{SOURCES[layer][flavour]}</code>
+        </pre>
+        <p className="m-0 mt-2 text-00 text-ink-3">
+          {flavour === 'express' ? 'Mirrors the TypeScript that actually handled your request.' : 'The same layer shaped as a NestJS provider; illustrative, not executed.'}
+        </p>
+      </DemoPanel>
 
       {lab.history.length > 1 ? (
         <DemoPanel title="History" meta={`${lab.history.length} requests`}>

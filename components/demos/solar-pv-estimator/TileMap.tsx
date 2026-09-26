@@ -3,6 +3,8 @@
  * A deliberately tiny slippy map (no map library): Web Mercator maths, OpenStreetMap
  * raster tiles as <img>, pointer drag to pan, tap/click to pick, buttons and keys to zoom.
  * Keyboard: arrows pan, + / - zoom, Enter picks the centre (crosshair shown on focus).
+ * touch-action is none so a finger drag pans in both directions (the box has a fixed height,
+ * so the page still scrolls outside it); pinch is not handled, the +/- buttons zoom instead.
  * Tiles are toned into the current world with a CSS filter; if they fail (offline) the
  * graticule ground stays and the search / coordinate inputs still work.
  */
@@ -143,7 +145,7 @@ export function TileMap({ center, zoom, marker, onView, onPick, className }: {
         onPointerUp={onUp}
         onPointerCancel={() => { drag.current = null }}
         onDoubleClick={(e) => { const { px, py } = local(e as unknown as PointerEvent); setZoom(zoom + 1, { px, py }) }}
-        className="relative h-[260px] md:h-[340px] overflow-hidden bg-bg-2 border border-rule rounded-1 cursor-crosshair select-none touch-pan-y"
+        className="relative h-[260px] md:h-[340px] overflow-hidden bg-bg-2 border border-rule rounded-1 cursor-crosshair select-none touch-none"
         style={{ backgroundImage: 'var(--pattern)' }}
       >
         <div aria-hidden="true" className="absolute inset-0 almanac:[filter:grayscale(1)_sepia(.4)_contrast(.92)_brightness(1.02)] strata:[filter:grayscale(1)_invert(.92)_sepia(.45)_brightness(.85)_contrast(1.1)]">

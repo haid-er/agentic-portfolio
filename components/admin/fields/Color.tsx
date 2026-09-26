@@ -33,7 +33,7 @@ export function ColorField({ path, label, fallback, hint }: { path: Path; label:
     >
       {({ id, describedBy, invalid }) => (
         <div className="flex items-stretch gap-2 min-w-0">
-          <label className="relative flex-none size-[44px] border border-rule rounded-0 overflow-hidden cursor-pointer" style={{ background: effective }}>
+          <label className="relative flex-none size-[44px] border border-rule rounded-0 overflow-hidden cursor-pointer focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-focus" style={{ background: effective }}>
             <span className="sr-only">Pick {label}</span>
             <input
               type="color"

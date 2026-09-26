@@ -27,11 +27,15 @@ export function FieldFrame({ label, hint, error, changed, aside, className, as =
   const errId = error ? `${id}-err` : undefined
   const describedBy = [errId, hintId].filter(Boolean).join(' ') || undefined
   const Tag = as
-  const Label = as === 'fieldset' ? 'legend' : 'label'
+  const isGroup = as === 'fieldset'
+  // A <legend> must be the fieldset's first child to name the group, so groups get an
+  // sr-only legend and a visual-only label row; plain fields use a real <label>.
+  const Label = isGroup ? 'span' : 'label'
   return (
     <Tag className={cx('flex flex-col gap-1 min-w-0 border-0 p-0 m-0', className)}>
+      {isGroup ? <legend className="sr-only">{label}</legend> : null}
       <div className="flex items-end justify-between gap-2 min-w-0">
-        <Label {...(as === 'div' ? { htmlFor: id } : {})} className="mono text-ink-2 flex items-center gap-2 p-0">
+        <Label {...(isGroup ? { 'aria-hidden': true } : { htmlFor: id })} className="mono text-ink-2 flex items-center gap-2 p-0">
           {label}
           {changed ? (
             <span className="inline-flex items-center gap-1 text-accent-ink normal-case tracking-normal font-body text-00">

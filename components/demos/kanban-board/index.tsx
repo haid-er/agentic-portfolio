@@ -5,7 +5,7 @@
  * in localStorage. Unlocked boards live only in memory. Drag with a pointer or the keyboard,
  * export and import JSON, or back up the encrypted vault itself.
  */
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { Badge, Button, DemoPanel, DemoToolbar, ErrorState, Loading, useToast } from '@/components/ui'
 import type { DemoProps } from '@/lib/demos/types'
 import { Board } from './Board'
@@ -57,25 +57,52 @@ export default function Demo(_props: DemoProps) {
   const key = session?.key
   const vaultId = session?.vaultId
   const dirty = useRef(false)
+  const latest = useRef<Session | null>(null)
+  useEffect(() => { latest.current = session }, [session])
+
+  /**
+   * Seal the latest board and write it. Returns false if the write failed. A board that
+   * changed while sealing stays dirty, so the next flush writes the newer one instead.
+   */
+  const persist = useCallback(async (): Promise<boolean> => {
+    const s = latest.current
+    if (!s || !dirty.current) return true
+    const { iv, data } = await seal(s.key, s.board)
+    if (latest.current && latest.current.board !== s.board) return true
+    const ok = updateVault(s.vaultId, { iv, data, updatedAt: Date.now() })
+    if (ok) dirty.current = false
+    return ok
+  }, [])
+
   useEffect(() => {
     if (!board || !key || !vaultId || !dirty.current) return
     setSave((s) => ({ ...s, phase: 'saving' }))
     let cancelled = false
     const t = setTimeout(async () => {
       try {
-        const { iv, data } = await seal(key, board)
+        const ok = await persist()
         if (cancelled) return
-        const ok = updateVault(vaultId, { iv, data, updatedAt: Date.now() })
         refresh()
-        if (!ok) { setSave((s) => ({ ...s, phase: 'error' })); return }
-        dirty.current = false
-        setSave({ phase: 'saved', at: Date.now() })
+        setSave(ok ? { phase: 'saved', at: Date.now() } : (s) => ({ ...s, phase: 'error' }))
       } catch {
         if (!cancelled) setSave((s) => ({ ...s, phase: 'error' }))
       }
     }, 400)
     return () => { cancelled = true; clearTimeout(t) }
-  }, [board, key, vaultId, refresh])
+  }, [board, key, vaultId, refresh, persist])
+
+  // Never drop the last edits: flush when the tab is hidden or closed, and when the demo unmounts.
+  useEffect(() => {
+    const flush = () => { persist().catch(() => {}) }
+    const onVis = () => { if (document.visibilityState === 'hidden') flush() }
+    window.addEventListener('pagehide', flush)
+    document.addEventListener('visibilitychange', onVis)
+    return () => {
+      window.removeEventListener('pagehide', flush)
+      document.removeEventListener('visibilitychange', onVis)
+      flush()
+    }
+  }, [persist])
 
   // The open vault was deleted in another tab: close it rather than resurrect it.
   useEffect(() => {
@@ -136,11 +163,9 @@ export default function Demo(_props: DemoProps) {
     // Flush a pending autosave first, so locking right after an edit never loses it.
     if (session && dirty.current) {
       try {
-        const { iv, data } = await seal(session.key, session.board)
-        const ok = updateVault(session.vaultId, { iv, data, updatedAt: Date.now() })
+        const ok = await persist()
         refresh()
         if (!ok) throw new Error('write failed')
-        dirty.current = false
         setSave({ phase: 'saved', at: Date.now() })
       } catch {
         setSave((s) => ({ ...s, phase: 'error' }))

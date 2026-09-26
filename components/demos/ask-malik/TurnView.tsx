@@ -1,6 +1,7 @@
 'use client'
 /** One question + streamed answer + its numbered sources. */
 import Link from 'next/link'
+import { useRef } from 'react'
 import { Badge, Button } from '@/components/ui'
 import { Icon } from '@/components/ui/Icon'
 import { BROWSER_MODEL_DOWNLOAD, type AiMeta } from '@/lib/ai'
@@ -54,6 +55,9 @@ export function TurnView({ turn, active, onCite, onDevice, busy }: {
   const prefix = `${turn.id}-src`
   const route = routeLine(turn.meta)
   const live = turn.status !== 'done'
+  const sourcesRef = useRef<HTMLDetailsElement>(null)
+  // Open the sources before the fragment jump, so a citation always lands on something visible.
+  const openSources = () => { if (sourcesRef.current) sourcesRef.current.open = true }
 
   return (
     <article className="grid gap-3 [animation:fade-in_var(--dur-med)_var(--ease-out)] motion-reduce:[animation:none]" aria-busy={live}>
@@ -74,7 +78,7 @@ export function TurnView({ turn, active, onCite, onDevice, busy }: {
 
         {turn.answer ? (
           <div className="text-1 leading-[var(--lh-body)] [overflow-wrap:anywhere]">
-            <Rich text={turn.answer} max={turn.hits.length} idPrefix={prefix} titles={titles} onCite={onCite} />
+            <Rich text={turn.answer} max={turn.hits.length} idPrefix={prefix} titles={titles} onCite={onCite} onJump={openSources} />
             {turn.status === 'streaming' ? <span aria-hidden="true" className="inline-block w-[.55em] h-[1em] align-[-.15em] bg-accent" /> : null}
           </div>
         ) : turn.status === 'thinking' ? (
@@ -104,7 +108,7 @@ export function TurnView({ turn, active, onCite, onDevice, busy }: {
         ) : null}
 
         {turn.hits.length ? (
-          <details className="group border-t border-rule-soft pt-2" open={turn.hits.length <= 3}>
+          <details ref={sourcesRef} className="group border-t border-rule-soft pt-2" open={turn.hits.length <= 3}>
             <summary className="flex min-h-tap cursor-pointer list-none items-center gap-2 mono text-ink-2 [&::-webkit-details-marker]:hidden">
               <Icon name="plus" size={14} className="transition-transform group-open:rotate-45 motion-reduce:transition-none" />
               Sources ({cited.size ? `${cited.size} cited of ${turn.hits.length}` : turn.hits.length})

@@ -61,7 +61,12 @@ export async function orchestrate(rec: Recorder<WorkflowResult>, o: WorkflowOpti
       work: s.status === 'fulfilled' ? s.value.value : null,
       ...(s.status === 'rejected' ? { error: s.reason instanceof Error ? s.reason.message : String(s.reason) } : {}),
     }))
-    if (!outputs.some((x) => x.work)) throw new Error('Every worker failed; nothing to review.')
+    if (!outputs.some((x) => x.work)) {
+      // Keep the underlying cause (e.g. quota exhausted) so the UI can offer simulated agents.
+      const first = settled.find((s) => s.status === 'rejected')
+      const reason: unknown = first?.status === 'rejected' ? first.reason : undefined
+      throw new ActivityFailure('every worker', reason instanceof ActivityFailure ? reason.cause : reason)
+    }
 
     const reviewOnce = (final: boolean, fault?: Fault) => runActivity(rec, {
       ...base, name: final ? 'reviewer · final' : 'reviewer', activityType: 'ReviewAndMerge', fault,

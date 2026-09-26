@@ -453,6 +453,7 @@ function bowlBall(m: Match, delivery: Delivery, userShot: Shot | null, timing: T
     const text = `${delText}: ${pickOf(m, LINES.wd ?? [])}.`
     pushBall(m, inn, { over, ball: inn.legal % 6, delivery, shot: null, timing: 'none', result: { kind: 'extra', type: 'wd', runs: 1 }, striker: striker.name, bowler: bowler.name, text, angle: null })
     print(m, `  ${next(inn.legal)}  ${bowler.name} to ${striker.name}: ${text}  +1 wd`)
+    if (isInningsOver(m, inn)) endInnings(m, inn) // a wide can level or win the chase
     return
   }
   const noBall = roll < ex.wd + ex.nb

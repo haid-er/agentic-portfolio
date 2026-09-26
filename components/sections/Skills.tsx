@@ -217,6 +217,13 @@ function DrawerRow({ drawer }: { drawer: Drawer }) {
   )
 }
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Skills'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+/** Skills renders only skills with at least one visible proof demo. */
+export const shouldRender = (): boolean => buildDrawers().length > 0
+
 export default function Skills({ section, folio }: SectionProps) {
   const drawers = buildDrawers()
   if (!drawers.length) return null
@@ -244,7 +251,7 @@ export default function Skills({ section, folio }: SectionProps) {
   )
 
   return (
-    <SectionShell id={section.id} folio={folio} title={section.title || 'Skills'} note={section.note} aside={aside}>
+    <SectionShell id={section.id} folio={folio} title={section.title || DEFAULT_TITLE} note={section.note} aside={aside}>
       <ul className="list-none m-0 p-0 grid strata:gap-s4">
         {drawers.map((d) => <DrawerRow key={d.pillar} drawer={d} />)}
       </ul>

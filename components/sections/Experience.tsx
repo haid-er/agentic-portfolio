@@ -304,6 +304,12 @@ function EntryBody({ entry, feature }: { entry: Entry; feature?: boolean }) {
 
 const TARGET = 'scroll-mt-24 target:outline-2 target:outline-offset-8 target:outline-accent target:outline-dashed'
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Experience'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export const shouldRender = (): boolean => getExperience().length > 0
+
 export default function Experience({ section, folio }: SectionProps) {
   const items = getExperience()
   if (!items.length) return null
@@ -319,7 +325,7 @@ export default function Experience({ section, folio }: SectionProps) {
   const past = entries.filter((e) => e.item.end)
 
   return (
-    <SectionShell id={section.id} folio={folio} title={section.title || 'Experience'} note={section.note}>
+    <SectionShell id={section.id} folio={folio} title={section.title || DEFAULT_TITLE} note={section.note}>
       <Timeline entries={entries} />
 
       {current.length ? (

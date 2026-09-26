@@ -243,7 +243,8 @@ export async function getGitHubActivity(): Promise<GitHubActivity> {
     // collapse consecutive pushes to the same repo on the same day
     const prev = feed[feed.length - 1]
     if (prev && prev.repo === repo && prev.verb === d.verb && prev.createdAt.slice(0, 10) === e.created_at.slice(0, 10)) continue
-    feed.push({ id: e.id, verb: d.verb, ref: d.ref, repo, repoUrl: `https://github.com/${e.repo.name}`, createdAt: e.created_at })
+    // branch/tag names can carry client terms: drop excluded refs at the source
+    feed.push({ id: e.id, verb: d.verb, ref: d.ref && !isExcluded(d.ref) ? d.ref : '', repo, repoUrl: `https://github.com/${e.repo.name}`, createdAt: e.created_at })
     if (feed.length >= 8) break
   }
 

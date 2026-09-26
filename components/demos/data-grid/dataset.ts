@@ -47,11 +47,14 @@ export const patchSchema = z.object({
 })
 export type ItemPatch = z.infer<typeof patchSchema>
 
+/** The server sleeps at most this long; the client simulates any extra latency itself. */
+export const SERVER_DELAY_MAX = 1000
+
 export const querySchema = z.object({
   page: z.coerce.number().int().min(1).max(50).default(1),
   pageSize: z.coerce.number().int().min(4).max(16).default(PAGE_SIZE),
   status: z.enum(FILTERS).default('all'),
-  delay: z.coerce.number().int().min(0).max(2500).default(300),
+  delay: z.coerce.number().int().min(0).max(SERVER_DELAY_MAX).default(300),
   fail: z.coerce.number().min(0).max(1).default(0),
 })
 export type ItemsQuery = z.infer<typeof querySchema>

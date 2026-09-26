@@ -7,7 +7,9 @@
  * links to the profile. Nothing is estimated.
  */
 import { ButtonLink, Card, Icon, SectionShell, Tag, type Layer } from '@/components/ui'
-import { getGitHubActivity, WINDOW_DAYS, type GhDay, type GitHubActivity as Activity } from '@/lib/github/server'
+import { getGitHubActivity, githubHandle, WINDOW_DAYS, type GhDay, type GitHubActivity as Activity } from '@/lib/github/server'
+import { getSite } from '@/lib/content'
+import { makeExcluded, siteExcluded } from '@/lib/content/privacy'
 import type { SectionProps } from './types'
 
 const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
@@ -138,6 +140,8 @@ function Repos({ repos }: { repos: Activity['repos'] }) {
 
 function Feed({ events }: { events: Activity['events'] }) {
   if (!events.length) return null
+  // Branch and tag names can carry client terms; never print an excluded one (CONTRACTS 7).
+  const isExcluded = makeExcluded(siteExcluded(getSite()))
   return (
     <div className="grid gap-s4 content-start">
       <h3 className="mono text-ink-3 font-normal [font-variation-settings:normal] [font-stretch:100%]">Latest public events</h3>
@@ -150,7 +154,7 @@ function Feed({ events }: { events: Activity['events'] }) {
               <a href={e.repoUrl} target="_blank" rel="noopener noreferrer" className="mono text-ink underline decoration-accent-ink underline-offset-4 hover:text-accent-ink">
                 {e.repo}
               </a>
-              {e.ref ? <> <Tag className="ml-1 align-middle">{e.ref}</Tag></> : null}
+              {e.ref && !isExcluded(e.ref) ? <> <Tag className="ml-1 align-middle">{e.ref}</Tag></> : null}
             </p>
           </li>
         ))}
@@ -170,6 +174,13 @@ function Stat({ value, label }: { value: number | string; label: string }) {
 
 /* ---------- section ---------- */
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'On GitHub'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+/** Same test as the component's `!data.handle` (getGitHubActivity takes its handle from githubHandle()). */
+export const shouldRender = (): boolean => Boolean(githubHandle())
+
 export default async function GitHubActivity({ section, folio }: SectionProps) {
   const data = await getGitHubActivity()
   if (!data.handle) return null
@@ -180,7 +191,7 @@ export default async function GitHubActivity({ section, folio }: SectionProps) {
   )
 
   return (
-    <SectionShell id={section.id} folio={folio} title={section.title || 'On GitHub'} note={section.note} aside={profile}>
+    <SectionShell id={section.id} folio={folio} title={section.title || DEFAULT_TITLE} note={section.note} aside={profile}>
       {data.ok ? (
         <div className="grid gap-s7">
           <div className="grid gap-s5">

@@ -125,6 +125,7 @@ export function useJudge() {
     channel.port1.onmessage = (e: MessageEvent<WorkerMessage>) => {
       const m = e.data
       if (finished) return
+      if (m.type === 'compiled') { window.clearTimeout(watchdog.current); return }
       if (m.type === 'compile-error') {
         for (const r of results) r.verdict = 'skipped'
         finish({ verdict: 'CE', compileError: m.message })
@@ -167,6 +168,15 @@ export function useJudge() {
 
     const req: RunRequest = { type: 'run', code, tests: tests.map((t) => t.args), captureLogs: mode === 'samples' }
     w.postMessage(req, [channel.port2])
+    // Top-level code runs before any test starts, so guard it too (e.g. a loop outside solve).
+    watchdog.current = window.setTimeout(() => {
+      const first = results[0]
+      if (first) {
+        first.verdict = 'TLE'
+        first.error = 'Top-level code did not finish within the time limit; the sandbox was terminated.'
+      }
+      finish({ verdict: 'TLE' })
+    }, Math.max(limit * 2, limit + 800))
   }, [stop])
 
   const abort = useCallback(() => {

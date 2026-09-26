@@ -9,7 +9,7 @@
  *   reconnects on its own after the advertised `retry`.
  * - A `: ping` comment every 15 s keeps proxies from closing an idle connection.
  * - Abuse guard (per edge isolate, like /api/demos/limited): at most 3 open streams and
- *   12 new connections per minute per client IP; over that the answer is 429 + Retry-After,
+ *   30 new connections per minute per client IP; over that the answer is 429 + Retry-After,
  *   which a browser EventSource treats as fatal (no reconnect loop).
  * Values are generated, never measured (see components/demos/live-telemetry/generator.ts).
  */
@@ -25,7 +25,7 @@ const RETRY_MS = 1500
 const MAX_SEQ = 1_000_000_000
 
 const MAX_OPEN_PER_IP = 3
-const MAX_OPENS_PER_MIN = 12
+const MAX_OPENS_PER_MIN = 30
 const OPEN_WINDOW_MS = 60_000
 const MAX_OPEN_TOTAL = 300
 const MAX_KEYS = 5_000

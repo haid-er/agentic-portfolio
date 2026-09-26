@@ -7,6 +7,10 @@ import {
 import { openTransport, type Transport, type TransportKind } from './transport'
 
 const STORE_KEY = 'ghp:live-chat:v1'
+/** Per tab (sessionStorage): a reload keeps its identity, a second tab gets its own. */
+const ME_KEY = 'ghp:live-chat:me'
+/** Readers kept beyond message authors: the most recent ones, so storage stays bounded. */
+const MAX_READERS = 24
 const HEARTBEAT_MS = 5000
 const PEER_TTL_MS = 15000
 const TYPING_TTL_MS = 4000
@@ -22,12 +26,45 @@ function reducer(s: ChatState, a: Action): ChatState {
   return a.t === 'load' ? a.state : reduce(s, a)
 }
 
-function loadState(): ChatState | null {
+function loadMe(): Member {
+  try {
+    const m = JSON.parse(sessionStorage.getItem(ME_KEY) ?? 'null') as Member | null
+    if (m && typeof m.id === 'string' && typeof m.name === 'string' && [1, 2, 3, 4].includes(m.ink)) return m
+  } catch { /* blocked storage: a fresh identity is fine */ }
+  return randomMember()
+}
+
+function saveMe(m: Member) {
+  try { sessionStorage.setItem(ME_KEY, JSON.stringify(m)) } catch { /* private mode */ }
+}
+
+/**
+ * Drop identities from old sessions: keep reads and names only for message authors,
+ * reactors, this tab and the bot, plus the most recent readers (live peers), capped.
+ */
+function prune(s: ChatState, me: string): ChatState {
+  const keep = new Set<string>([me, BOT_ID])
+  for (const m of s.messages) {
+    keep.add(m.author)
+    for (const ids of Object.values(m.reactions)) for (const id of ids ?? []) keep.add(id)
+  }
+  const newest = (r: Partial<Record<ChannelId, number>>) => Math.max(0, ...Object.values(r).map((v) => v ?? 0))
+  const others = Object.entries(s.reads)
+    .filter(([id]) => !keep.has(id))
+    .sort(([, a], [, b]) => newest(b) - newest(a))
+    .slice(0, MAX_READERS)
+  const reads = Object.fromEntries([...Object.entries(s.reads).filter(([id]) => keep.has(id)), ...others])
+  const named = new Set([...keep, ...Object.keys(reads)])
+  const names = Object.fromEntries(Object.entries(s.names).filter(([id]) => named.has(id)))
+  return { ...s, reads, names }
+}
+
+function loadState(me: string): ChatState | null {
   try {
     const raw = localStorage.getItem(STORE_KEY)
     if (!raw) return null
     const s = JSON.parse(raw) as ChatState
-    return Array.isArray(s.messages) && s.reads && s.names ? s : null
+    return Array.isArray(s.messages) && s.reads && s.names ? prune(s, me) : null
   } catch {
     return null
   }
@@ -55,9 +92,9 @@ const welcome = (): Message => ({
 })
 
 export function useChat() {
-  const [me, setMe] = useState<Member>(() => randomMember())
+  const [me, setMe] = useState<Member>(loadMe)
   const meRef = useRef(me)
-  useEffect(() => { meRef.current = me }, [me])
+  useEffect(() => { meRef.current = me; saveMe(me) }, [me])
 
   const [state, dispatch] = useReducer(reducer, EMPTY)
   const stateRef = useRef(state)
@@ -130,7 +167,7 @@ export function useChat() {
 
   /* ---------- lifecycle: load, connect, heartbeat ---------- */
   useEffect(() => {
-    const saved = loadState()
+    const saved = loadState(meRef.current.id)
     dispatch({ t: 'load', state: saved && saved.messages.length ? saved : reduce(saved ?? EMPTY, { t: 'msg', msg: welcome() }) })
     setLoaded(true)
     const tr = openTransport(onRaw)

@@ -57,6 +57,13 @@ function LineRow({ line, layer }: { line: Line; layer: number }) {
   )
 }
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Contact'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+/** Contact always renders (at minimum the email and links). */
+export const shouldRender = (): boolean => true
+
 export default function Contact({ section, folio }: SectionProps) {
   const site = getSite()
   const { contact, contactFormEndpoint } = site
@@ -67,7 +74,7 @@ export default function Contact({ section, folio }: SectionProps) {
   const showForm = contact.formEnabled && Boolean(endpoint || mailTo)
 
   return (
-    <SectionShell id={section.id} folio={folio} title={section.title || 'Contact'} note={section.note}>
+    <SectionShell id={section.id} folio={folio} title={section.title || DEFAULT_TITLE} note={section.note}>
       <div className={cx('grid gap-s7', showForm && 'lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:items-start')}>
         <div className="grid gap-s5 min-w-0 content-start">
           {contact.blurb ? <p className="m-0 text-2 leading-[1.35] measure">{contact.blurb}</p> : null}

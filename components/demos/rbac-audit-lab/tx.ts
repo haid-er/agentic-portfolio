@@ -36,7 +36,16 @@ export interface TxRecord {
   revertedBy?: string
 }
 
-export interface OpStep { action: Action; resourceId: string; set: Record<string, Attr>; label: string }
+export interface OpStep {
+  action: Action
+  resourceId: string
+  set: Record<string, Attr>
+  label: string
+  /** Optimistic concurrency: values the row must still hold, or the transaction rolls back. */
+  expect?: Record<string, Attr>
+  /** Transaction that wrote the expected values, for the conflict message. */
+  expectFrom?: string
+}
 
 export interface Operation {
   id: string
@@ -132,6 +141,8 @@ export function runTx({ roles, resources, user, label, steps, failAt, nextSeq, r
       push({ kind: 'access.denied', state: 'independent', action: step.action, resourceId: target.id, note: `${step.label}: ${decision.reason}` })
       return rollback(`ROLLBACK · permission denied at step ${i + 1}`, 'denied')
     }
+    const changed = step.expect && Object.keys(step.expect).some((k) => target.attrs[k] !== step.expect?.[k])
+    if (changed) return rollback(`ROLLBACK · ${target.id} changed since ${step.expectFrom ?? 'it was read'} (optimistic concurrency conflict)`, 'rolled-back')
     if (failAt === i) return rollback(`ROLLBACK · ${SIMULATED_FAILURE} at step ${i + 1}`, 'rolled-back')
     const before = Object.fromEntries(Object.keys(step.set).map((k) => [k, target.attrs[k] as Attr]))
     working = working.map((r) => (r.id === target.id ? { ...r, attrs: { ...r.attrs, ...step.set } } : r))
@@ -142,10 +153,20 @@ export function runTx({ roles, resources, user, label, steps, failAt, nextSeq, r
   return { resources: working, tx: { id: txId, label, actorId: user.id, outcome: 'committed', events, revertOf } }
 }
 
-/** Compensating steps for a committed transaction: restore each "before", newest first. */
+/**
+ * Compensating steps for a committed transaction: restore each "before", newest first. Each step
+ * expects the row to still hold that transaction's "after", so a later write is never overwritten.
+ */
 export function revertSteps(tx: TxRecord): OpStep[] {
   return tx.events
     .filter((e) => e.kind === 'write' && e.state === 'committed' && e.resourceId && e.before)
     .reverse()
-    .map((e) => ({ action: 'update' as Action, resourceId: e.resourceId as string, set: e.before as Record<string, Attr>, label: `Undo: ${e.note}` }))
+    .map((e) => ({
+      action: 'update' as Action,
+      resourceId: e.resourceId as string,
+      set: e.before as Record<string, Attr>,
+      expect: e.after,
+      expectFrom: tx.id,
+      label: `Undo: ${e.note}`,
+    }))
 }

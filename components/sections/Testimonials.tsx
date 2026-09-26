@@ -191,10 +191,16 @@ function Carousel({ items, label }: { items: Testimonial[]; label: string }) {
   )
 }
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Testimonials'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export const shouldRender = (): boolean => getTestimonials().length > 0
+
 export default function Testimonials({ section, folio }: SectionProps) {
   const items = getTestimonials()
   if (!items.length) return null
-  const title = section.title || 'Testimonials'
+  const title = section.title || DEFAULT_TITLE
   return (
     <SectionShell
       id={section.id}

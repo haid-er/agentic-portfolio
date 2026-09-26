@@ -98,7 +98,8 @@ export default function Demo({ slug }: DemoProps) {
       const list = toPeople(res.object)
       load(list, { kind: 'ai', meta: res, from })
       if (from === 'sample') setSampleScore(score(list))
-      toast(`Extracted ${list.length} people`, { tone: 'ok' })
+      const total = res.object.people.length
+      toast(total > list.length ? `Showing the first ${list.length} of ${total} people` : `Extracted ${list.length} people`, { tone: 'ok' })
     } catch (e) {
       if (ctrl.current !== c) return
       if (e instanceof AiError && e.code === 'aborted') return

@@ -32,12 +32,23 @@ function toContents(messages: AiMessage[]) {
   }))
 }
 
-/** Keep thinking minimal so the answer fits under the admin token cap. */
+/**
+ * Keep thinking minimal so the answer fits under the admin token cap. Lite models accept
+ * `minimal` (no thoughts); full 3.x Flash/Pro reject it, and even `low` spends roughly
+ * 60-100 thought tokens, which count against maxOutputTokens (checked live 2026-09-26).
+ */
 function thinkingConfig(model: string): Record<string, unknown> | undefined {
   if (/gemini-2\.5-flash/i.test(model)) return { thinkingBudget: 0 }
   if (/gemini-2\.5-pro/i.test(model)) return { thinkingBudget: 128 }
+  if (/gemini-\d{1,2}(\.\d)?-flash-lite/i.test(model)) return { thinkingLevel: 'minimal' }
   if (/gemini-(\d{1,2}(\.\d)?-|flash|pro)/i.test(model)) return { thinkingLevel: 'low' }
   return undefined
+}
+
+/** Thought tokens a model may spend on top of the answer (it cannot switch thinking off). */
+const THINKING_HEADROOM = 256
+function thinkingHeadroom(thinking: Record<string, unknown> | undefined): number {
+  return thinking && thinking.thinkingLevel === 'low' ? THINKING_HEADROOM : thinking && typeof thinking.thinkingBudget === 'number' ? thinking.thinkingBudget : 0
 }
 
 function bodies(call: ProviderCall) {
@@ -54,7 +65,8 @@ function bodies(call: ProviderCall) {
   }
 
   const thinking = thinkingConfig(call.model)
-  const fullConfig = { ...generationConfig }
+  // maxOutputTokens covers thoughts too: give thinking its own headroom so a small answer cap still gets an answer.
+  const fullConfig: Record<string, unknown> = { ...generationConfig, maxOutputTokens: call.maxTokens + thinkingHeadroom(thinking) }
   if (thinking) fullConfig.thinkingConfig = thinking
   if (call.json) fullConfig.responseJsonSchema = call.json.schema
   return { full: { ...base, generationConfig: fullConfig }, base }

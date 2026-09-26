@@ -170,6 +170,12 @@ function Row({ a }: { a: Achievement }) {
 /* section                                                             */
 /* ------------------------------------------------------------------ */
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Achievements'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export const shouldRender = (): boolean => getAchievements().length > 0
+
 export default function Achievements({ section, folio }: SectionProps) {
   const items = getAchievements()
   if (!items.length) return null
@@ -177,7 +183,7 @@ export default function Achievements({ section, folio }: SectionProps) {
   const rows = items.filter((a) => !a.stamp)
 
   return (
-    <SectionShell id={section.id} folio={folio} title={section.title || 'Achievements'} note={section.note}>
+    <SectionShell id={section.id} folio={folio} title={section.title || DEFAULT_TITLE} note={section.note}>
       <div className="grid gap-s7">
         {stamps.map((a) => <StampFeature key={a.id} a={a} />)}
         {rows.length ? <ul className="m-0 p-0 list-none">{rows.map((a) => <Row key={a.id} a={a} />)}</ul> : null}

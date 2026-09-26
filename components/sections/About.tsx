@@ -41,19 +41,29 @@ function PillarRow({ pillar, n, proofs }: { pillar: PillarInfo; n: number; proof
   )
 }
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'About'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export function shouldRender(): boolean {
+  const { about, profile } = getSite()
+  const paragraphs = bioParagraphs(about.body.length ? about.body : [profile.shortBio], profile.motto)
+  return paragraphs.length > 0 || Boolean(profile.motto) || profile.pillars.length > 0
+}
+
 export default function About({ section, folio }: SectionProps) {
   const { about, profile } = getSite()
   const paragraphs = bioParagraphs(about.body.length ? about.body : [profile.shortBio], profile.motto)
   const pillars = profile.pillars
   const languages = profile.languages.filter((l) => l.name)
   const interests = profile.interests.filter(Boolean)
-  if (!paragraphs.length && !profile.motto && !pillars.length) return null
+  if (!shouldRender()) return null
 
   const demos = getDemos()
   const proofsFor = (id: PillarInfo['id']) => demos.filter((d) => d.pillar === id).slice(0, 2).map((d) => d.slug)
 
   return (
-    <SectionShell id={section.id} folio={folio} title={section.title || 'About'} note={section.note}>
+    <SectionShell id={section.id} folio={folio} title={section.title || DEFAULT_TITLE} note={section.note}>
       <div className="grid gap-s7 mid:grid-cols-12 mid:gap-s6">
         <div className="grid gap-s6 content-start mid:col-span-7">
           {paragraphs.length ? (

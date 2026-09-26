@@ -12,7 +12,7 @@ import { HREF_HINT, meta } from './options'
 
 export function ServicesEditor() {
   return (
-    <Group title="Services" description="What he can be hired for. Each card carries a Lucide glyph and the demos that prove it.">
+    <Group title="Services" description="What you can be hired for. Each card carries a Lucide glyph and the demos that prove it.">
       <ListField<Service>
         path={['items']}
         label="Services"

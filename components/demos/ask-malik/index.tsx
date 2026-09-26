@@ -234,7 +234,10 @@ export default function Demo({ slug }: DemoProps) {
             options={[{ value: 'model', label: 'Model + citations' }, { value: 'extractive', label: 'Extractive (offline)' }]}
           />
 
-          <div ref={logRef} role="log" aria-label="Conversation" aria-live="polite" className="grid gap-5 min-w-0">
+          {/* Streaming is visual only; screen readers hear one status when each answer settles. */}
+          <p role="status" className="sr-only">{last?.status === 'done' ? 'Answer ready.' : ''}</p>
+
+          <div ref={logRef} aria-label="Conversation" className="grid gap-5 min-w-0">
             {turns.length === 0 ? (
               <EmptyState title="Ask anything about the work on this site">
                 <p className="m-0 mb-3">Answers come only from this site&apos;s content, and every sentence cites its source.</p>

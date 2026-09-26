@@ -47,6 +47,14 @@ function reasoningKnobs(model: string): Record<string, unknown> {
   return {}
 }
 
+/**
+ * gpt-oss cannot switch reasoning off, and its reasoning counts against max_tokens: even
+ * 'low' can use a few dozen tokens, so a small answer cap came back empty (checked live
+ * 2026-09-26). Give reasoning its own headroom. Never applied to DeepSeek (paid, hard cap).
+ */
+const REASONING_HEADROOM = 256
+const reasoningHeadroom = (model: string) => (/gpt-oss/i.test(model) ? REASONING_HEADROOM : 0)
+
 function usageOf(u: OaUsage | null | undefined): AiUsage | null {
   if (!u) return null
   return { inputTokens: u.prompt_tokens ?? 0, outputTokens: u.completion_tokens ?? 0 }
@@ -65,7 +73,7 @@ export function openAiCompatible(endpoint: string): ProviderAdapter {
       base.tools = call.tools.map((t) => ({ type: 'function', function: { name: t.name, description: t.description, parameters: t.parameters } }))
       base.tool_choice = 'auto'
     }
-    const full: Record<string, unknown> = { ...base, ...reasoningKnobs(call.model) }
+    const full: Record<string, unknown> = { ...base, ...reasoningKnobs(call.model), max_tokens: call.maxTokens + reasoningHeadroom(call.model) }
     if (call.json?.rootIsObject) full.response_format = { type: 'json_object' }
     if (stream) full.stream_options = { include_usage: true }
     return { full, base }

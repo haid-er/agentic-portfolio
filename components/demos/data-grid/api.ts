@@ -2,7 +2,7 @@
  * Transport for the lab: the real /api/demos/items route, or an in-browser mock that runs the
  * same generator (used offline, or when chosen). Both honour the latency and failure controls.
  */
-import { applyPatch, paginate, type Item, type ItemPatch, type Override, type Page, type StatusFilter } from './dataset'
+import { applyPatch, paginate, SERVER_DELAY_MAX, type Item, type ItemPatch, type Override, type Page, type StatusFilter } from './dataset'
 
 export type Transport = 'server' | 'browser'
 
@@ -42,7 +42,10 @@ export async function fetchPage(p: PageParams, net: NetSettings, signal?: AbortS
     if (net.failRate > 0 && Math.random() < net.failRate) throw new Error('Injected failure (in-browser API).')
     return paginate({ ...p, pageSize: 8 }, Date.now(), localOverrides, 'browser')
   }
-  const qs = new URLSearchParams({ page: String(p.page), status: p.status, delay: String(net.latencyMs), fail: String(net.failRate) })
+  // The server caps its injected delay (it costs function time); wait out the rest here.
+  const serverDelay = Math.min(net.latencyMs, SERVER_DELAY_MAX)
+  await sleep(net.latencyMs - serverDelay, signal)
+  const qs = new URLSearchParams({ page: String(p.page), status: p.status, delay: String(serverDelay), fail: String(net.failRate) })
   let res: Response
   try {
     res = await fetch(`/api/demos/items?${qs}`, { signal, cache: 'no-store' })

@@ -4,6 +4,8 @@ import { type Person, sanitize } from './model'
 
 /** About 30-35 output tokens per person; 20 fits the gateway's 800-token output cap with room to spare. */
 export const MAX_PEOPLE = 20
+/** Schema ceiling: only guards against runaway output. Models often overshoot MAX_PEOPLE slightly; toPeople trims instead of failing. */
+const SCHEMA_MAX_PEOPLE = 60
 
 export const OrgExtraction = z.object({
   people: z.array(z.object({
@@ -12,7 +14,7 @@ export const OrgExtraction = z.object({
     title: z.string().max(80).describe('Job title as printed, or ""'),
     department: z.string().max(60).describe('Department if printed or clearly grouped, else ""'),
     managerId: z.string().max(12).nullable().describe('id of the box this one reports to; null for the top'),
-  })).min(1).max(MAX_PEOPLE),
+  })).min(1).max(SCHEMA_MAX_PEOPLE),
 })
 export type OrgExtraction = z.infer<typeof OrgExtraction>
 
@@ -25,6 +27,7 @@ export const SYSTEM = [
 
 export const USER_TEXT = 'Extract this organisation chart as a flat list of people with manager ids.'
 
+/** Keeps the first MAX_PEOPLE (top levels come first); sanitize() nulls managerIds that point at dropped boxes. */
 export function toPeople(x: OrgExtraction): Person[] {
-  return sanitize(x.people.map((p) => ({ ...p, managerId: p.managerId || null })))
+  return sanitize(x.people.slice(0, MAX_PEOPLE).map((p) => ({ ...p, managerId: p.managerId || null })))
 }

@@ -18,8 +18,6 @@ import { useEditor, useField } from '../EditorContext'
 import { move, type Path } from '../lib/path'
 import { UnverifiedBadge } from './Item'
 
-let keySeq = 0
-const newKey = () => `k${++keySeq}`
 
 type AnyItem = { enabled?: boolean; verified?: boolean } | string | number | null | object
 
@@ -56,7 +54,11 @@ export function ListField<T extends AnyItem>(props: ListFieldProps<T>) {
   const f = useField<T[] | undefined>(path)
   const items = f.value ?? []
 
-  // Stable React keys that survive edits to ids/titles and follow moves.
+  // Stable React keys that survive edits to ids/titles and follow moves. The counter is
+  // per list instance (not module-wide), so server and client mint the same first keys
+  // and element ids hydrate cleanly on every request.
+  const seqRef = useRef(0)
+  const newKey = () => `k${++seqRef.current}`
   const keysRef = useRef<string[]>([])
   if (keysRef.current.length !== items.length) {
     keysRef.current = items.map((_, i) => keysRef.current[i] ?? newKey())

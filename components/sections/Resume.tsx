@@ -94,6 +94,12 @@ function SheetPreview() {
   )
 }
 
+/** Fallback heading when the admin leaves the section title empty. */
+export const DEFAULT_TITLE = 'Résumé'
+
+/** The same test as this section's early `return null` (used by the nav and index). */
+export const shouldRender = (): boolean => getResume().enabled
+
 export default function Resume({ section, folio }: SectionProps) {
   const resume = getResume()
   if (!resume.enabled) return null
@@ -105,7 +111,7 @@ export default function Resume({ section, folio }: SectionProps) {
     <SectionShell
       id={section.id}
       folio={folio}
-      title={section.title || 'Résumé'}
+      title={section.title || DEFAULT_TITLE}
       note={section.note}
       aside={resume.updated ? <span className="mono text-ink-3 nums">Updated {formatPartialDate(resume.updated)}</span> : undefined}
     >

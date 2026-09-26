@@ -262,10 +262,25 @@ export function useAI(demo: AiTextRequest['demo'], options: UseAIOptions = {}) {
   const opts = useRef(options)
   opts.current = options
 
-  const abort = useCallback(() => { ctrl.current?.abort(); ctrl.current = null }, [])
+  const mounted = useRef(false)
+
+  // Silently cancel whatever is in flight (used before a new run and on unmount).
+  const cancelInFlight = useCallback(() => { ctrl.current?.abort(); ctrl.current = null }, [])
+
+  // User-facing Stop: cancel and return the UI to idle (the superseded run's catch is ignored).
+  const abort = useCallback(() => {
+    const had = ctrl.current
+    cancelInFlight()
+    if (!had || !mounted.current) return
+    setStatus((s) => (s === 'loading' || s === 'streaming' ? 'idle' : s))
+    setLoadProgress(null)
+  }, [cancelInFlight])
 
   // Abort on unmount; never set state on an unmounted demo.
-  useEffect(() => abort, [abort])
+  useEffect(() => {
+    mounted.current = true
+    return () => { mounted.current = false; cancelInFlight() }
+  }, [cancelInFlight])
 
   // Live countdown after a rate limit.
   useEffect(() => {
@@ -275,12 +290,12 @@ export function useAI(demo: AiTextRequest['demo'], options: UseAIOptions = {}) {
   }, [retryIn])
 
   const begin = useCallback(() => {
-    abort()
+    cancelInFlight()
     const c = new AbortController()
     ctrl.current = c
     setStatus('loading'); setText(''); setError(null); setMeta(null); setRetryIn(null)
     return c
-  }, [abort])
+  }, [cancelInFlight])
 
   const fail = useCallback((e: unknown, c: AbortController) => {
     if (ctrl.current !== c) return // superseded by a newer run
@@ -337,16 +352,16 @@ export function useAI(demo: AiTextRequest['demo'], options: UseAIOptions = {}) {
       setMeta(res); setStatus('done'); setLoadProgress(null)
       return res
     } catch (e) {
-      setLoadProgress(null)
+      if (ctrl.current === c) setLoadProgress(null)
       fail(isAbort(e) ? e : new AiError('unavailable', `The on-device model could not run here: ${e instanceof Error ? e.message : String(e)}`), c)
       return null
     }
   }, [begin, fail])
 
   const reset = useCallback(() => {
-    abort()
+    cancelInFlight()
     setStatus('idle'); setText(''); setError(null); setMeta(null); setRetryIn(null); setLoadProgress(null)
-  }, [abort])
+  }, [cancelInFlight])
 
   const fallback = Boolean(
     error && isQuotaError(error) && error.code !== 'rate_limited' && (options.browserFallback ?? true) && browserAllowed !== false,

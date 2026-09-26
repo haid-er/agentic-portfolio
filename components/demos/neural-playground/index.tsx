@@ -144,7 +144,7 @@ export default function Demo(_props: DemoProps) {
     setStopNote(null)
     setTraining((t) => !t)
   }
-  const stepOnce = () => { setTraining(false); runEpochs(0, 10); setTick((t) => t + 1) }
+  const stepOnce = () => { setTraining(false); runEpochs(Infinity, 10); setTick((t) => t + 1) }
   const resetWeights = () => { setTraining(false); setNetSeed((s) => s + 1) }
 
   /** Load a preset and start from fresh weights. */
