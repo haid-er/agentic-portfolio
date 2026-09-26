@@ -235,10 +235,16 @@ export type Theme = z.infer<typeof Theme>
 export const Skill = ItemBase.extend({
   name: z.string().min(1),
   pillar: Pillar,
-  /** Self-assessed band; never a percentage. */
-  level: z.enum(['core', 'working', 'exploring']),
-  /** Every skill maps to >= 1 demo (DESIGN.md 6.3). */
-  demoSlugs: z.array(DemoSlug).min(1),
+  /**
+   * Editorial band (not from any source: docs/context gives no proficiency levels).
+   * Optional and never shown on the public site; kept only as an admin sorting aid.
+   */
+  level: z.enum(['core', 'working', 'exploring']).optional(),
+  /**
+   * Demos that prove the skill (DESIGN.md 6.3). May be empty: the skill is then
+   * listed as "no demo yet" and is never linked or counted as proven.
+   */
+  demoSlugs: z.array(DemoSlug),
   keywords: z.array(z.string()).optional(),
 })
 export type Skill = z.infer<typeof Skill>

@@ -3,7 +3,7 @@
     "name": "Malik Haider Ali",
     "headline": "Full-Stack Engineer",
     "tagline": "Building scalable web platforms, AI-powered systems, and autonomous workflows.",
-    "shortBio": "Full-stack engineer building ESG and AI platforms at Euthyna (Terra Instinct): Node.js, NestJS, React and PostgreSQL underneath, LLM pipelines and agents on top. Co-author of a Springer paper on wearable-sensor activity recognition, with the Android-to-RabbitMQ pipeline that fed it.",
+    "shortBio": "Full-stack engineer building ESG and AI platforms at Euthyna (Terra Instinct): Node.js, NestJS, React and PostgreSQL underneath, LLM pipelines and agents on top. Co-author of a Springer paper on wearable-sensor activity recognition, and builder of MotionIQ, an Android-to-RabbitMQ sensor pipeline.",
     "location": "Lahore, Pakistan",
     "email": "malikhaiderali33@gmail.com",
     "phone": "+92 336 0747027",
@@ -17,7 +17,7 @@
       {
         "id": "ai",
         "title": "AI systems & agents",
-        "summary": "LLM pipelines that return validated JSON, RAG over Pinecone, MCP tools and multi-agent Claude Code workflows."
+        "summary": "LLM pipelines that return validated JSON, RAG and vector search, MCP tools and multi-agent Claude Code workflows."
       },
       {
         "id": "realtime",
@@ -27,7 +27,7 @@
       {
         "id": "esg",
         "title": "ESG & climate",
-        "summary": "Disclosure gap analysis against ISSB, TCFD and CSRD, GHG boundary-setting and ownership extraction for a London climate-tech firm."
+        "summary": "Disclosure gap analysis, GHG calculations, boundary-setting and ownership extraction for a London climate-tech firm."
       },
       {
         "id": "fundamentals",
@@ -55,7 +55,7 @@
       "Machine learning for sensor-based activity recognition",
       "Real-time data streaming and IoT",
       "AI-powered app integration (OpenAI, Groq)",
-      "Web 3.0, blockchain and the metaverse",
+      "Web 3.0, blockchain and the metaverse (exploring)",
       "Graphic design"
     ]
   },
@@ -67,7 +67,7 @@
       "ESG"
     ],
     "role": "Full-stack engineer who proves it with *working* tools.",
-    "lede": "Malik Haider Ali builds scalable web platforms, AI-powered systems and autonomous workflows. Right now that means ESG and GHG reporting at Euthyna. Before it came a 27s → 3.5s speed-up at Piron Labs, creator payments at Webox Systems, and a phone-to-RabbitMQ sensor pipeline behind a Springer paper. Each claim on this page links to a demo that runs in the browser.",
+    "lede": "Malik Haider Ali builds scalable web platforms, AI-powered systems and autonomous workflows. Right now that means ESG and GHG reporting at Euthyna. Before it came a 27s → 3.5s speed-up at Piron Labs, creator payments at Webox Systems, MotionIQ, a phone-to-RabbitMQ sensor pipeline, and co-authorship of a Springer paper. Each claim on this page links to a demo that runs in the browser, or says plainly that none exists yet.",
     "ctas": [
       {
         "label": "Open the playground",
@@ -101,8 +101,8 @@
   "about": {
     "body": [
       "PUCIT in 2021, first repos in C and C++ in 2022, then Express APIs, React frontends and PostgreSQL schemas: student PERN projects that turned into production work.",
-      "Production came in three steps. At Webox Systems, VoodVR needed Stripe Connect payouts, subscriptions and real-time chat. At Piron Labs, Kickstart HQ needed speed, and response time fell from 27s to 3.5s. Since September 2025, Euthyna has needed AI that reads sustainability disclosures, finds gaps against ISSB, TCFD and CSRD, and turns ownership structures into GHG boundaries.",
-      "Research runs alongside: MotionIQ streams phone sensors over Wi-Fi into RabbitMQ, and co-authorship of HumCareADL in Springer's Multimedia Tools and Applications came out of that work. Graphic design is the second discipline, which is why this portfolio is printed rather than templated.",
+      "Production came in three steps. At Webox Systems, VoodVR needed Stripe Connect payouts, subscriptions and real-time chat. At Piron Labs, Kickstart HQ needed speed, and response time fell from 27s to 3.5s. Since September 2025, Euthyna has needed AI for sustainability reporting: disclosure gap analysis, GHG calculations, climate risk and transition planning, and ownership structures turned into GHG boundaries.",
+      "Research runs alongside. MotionIQ streams phone sensors over Wi-Fi into RabbitMQ for activity-recognition data, and he is second author of HumCareADL in Springer's Multimedia Tools and Applications. Graphic design is the second discipline, which is why this portfolio is printed rather than templated.",
       "Motto: code with purpose, build with passion, learn without limits."
     ]
   },

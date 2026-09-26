@@ -34,7 +34,7 @@ export const dynamicParams = false
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const p = getProject((await params).slug)
   if (!p) return {}
-  const base = buildMetadata({ title: p.title, description: p.summary, path: `/projects/${p.slug}` })
+  const base = buildMetadata({ title: p.title, description: p.summary, path: `/projects/${p.slug}`, segmentImage: true })
   return { ...base, keywords: Array.from(new Set([...p.tags, ...p.stack])) }
 }
 

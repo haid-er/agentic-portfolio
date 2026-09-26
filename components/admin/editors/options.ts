@@ -6,12 +6,6 @@ const cap = (s: string) => s.charAt(0).toUpperCase() + s.slice(1)
 
 export const PILLAR_OPTIONS: Option[] = PILLARS.map((p) => ({ value: p, label: cap(p) }))
 
-export const LEVEL_OPTIONS = [
-  { value: 'core', label: 'Core' },
-  { value: 'working', label: 'Working' },
-  { value: 'exploring', label: 'Exploring' },
-] as const
-
 export const MODE_OPTIONS: Option[] = [
   { value: 'remote', label: 'Remote' },
   { value: 'hybrid', label: 'Hybrid' },

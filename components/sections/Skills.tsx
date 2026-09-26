@@ -1,15 +1,18 @@
 /**
  * Skill -> proof (DESIGN.md 6.3): skills set like wood type in a type case, one
- * drawer per pillar, sorted into bands (core / working / exploring).
+ * drawer per pillar.
  *
  * - A skill with one proof is a ProofChip straight to its demo.
  * - A skill with several proofs shows "→ slug +N" and expands on tap into the
  *   full list of demos (native <details>, so it stays a server component).
- * - Only visible playground demos are linked; a skill whose proofs are all hidden
- *   is not shown (every claim must end in a working proof).
+ * - Only visible playground demos are linked. The first few proven skills per
+ *   pillar are shown; the rest sit behind a "more" disclosure to keep the page short.
+ * - Skills with no visible proof are never linked or counted as proven: they are
+ *   listed in plain text as "no demo yet".
+ * - No proficiency bands: docs/context gives none, so none are shown.
  *
  * Everything shown comes from content/skills.json, site.profile.pillars and the
- * demo registry.
+ * demo registry (content order is the editor's order).
  */
 import Link from 'next/link'
 import type { CSSProperties } from 'react'
@@ -19,14 +22,8 @@ import { getDemo, PILLAR_GLYPH, type Demo } from '@/lib/demos'
 import { cx, folio as pad } from '@/lib/utils'
 import type { SectionProps } from './types'
 
-type Level = Skill['level']
-
-/** Band order and UI labels (the band values themselves come from content). */
-const BANDS: ReadonlyArray<{ level: Level; label: string; marks: number }> = [
-  { level: 'core', label: 'Core', marks: 3 },
-  { level: 'working', label: 'Working', marks: 2 },
-  { level: 'exploring', label: 'Exploring', marks: 1 },
-]
+/** Proven skills shown per drawer before the "more" disclosure. */
+const VISIBLE = 5
 
 interface ProvenSkill {
   skill: Skill
@@ -37,50 +34,31 @@ interface Drawer {
   pillar: Pillar
   title: string
   layer: Layer
-  bands: Array<{ level: Level; label: string; marks: number; skills: ProvenSkill[] }>
-  count: number
-  demoCount: number
+  proven: ProvenSkill[]
+  unproven: Skill[]
 }
 
 const toLayer = (n: number) => ((n % 6) + 1) as Layer
 
-/** Group enabled skills (with at least one visible proof) into pillar drawers. */
+/** Group enabled skills into pillar drawers: proven (>= 1 visible demo) and not yet demoed. */
 function buildDrawers(): Drawer[] {
   const pillarTitles = new Map(getProfile().pillars.map((p) => [p.id, p.title]))
-  const proven: ProvenSkill[] = getSkills()
-    .map((skill) => ({
-      skill,
-      proofs: skill.demoSlugs.map((s) => getDemo(s)).filter((d): d is Demo => Boolean(d)),
-    }))
-    .filter((p) => p.proofs.length > 0)
+  const all: ProvenSkill[] = getSkills().map((skill) => ({
+    skill,
+    proofs: skill.demoSlugs.map((s) => getDemo(s)).filter((d): d is Demo => Boolean(d)),
+  }))
 
   return PILLARS.map((pillar) => {
-    const inPillar = proven.filter((p) => p.skill.pillar === pillar)
-    const bands = BANDS.map((b) => ({ ...b, skills: inPillar.filter((p) => p.skill.level === b.level) })).filter(
-      (b) => b.skills.length > 0,
-    )
-    const demoCount = new Set(inPillar.flatMap((p) => p.proofs.map((d) => d.slug))).size
-    return { pillar, title: pillarTitles.get(pillar) || pillar, bands, count: inPillar.length, demoCount }
+    const inPillar = all.filter((p) => p.skill.pillar === pillar)
+    return {
+      pillar,
+      title: pillarTitles.get(pillar) || pillar,
+      proven: inPillar.filter((p) => p.proofs.length > 0),
+      unproven: inPillar.filter((p) => p.proofs.length === 0).map((p) => p.skill),
+    }
   })
-    .filter((d) => d.count > 0)
+    .filter((d) => d.proven.length > 0)
     .map((d, i) => ({ ...d, layer: toLayer(i) }))
-}
-
-/** Three small squares, filled per band: the band is never shown by colour alone. */
-function BandMarks({ marks }: { marks: number }) {
-  return (
-    <span aria-hidden="true" className="inline-flex gap-[3px]">
-      {[0, 1, 2].map((i) => (
-        <span
-          key={i}
-          className={cx(
-            'size-[7px] border border-current strata:rounded-full',
-            i < marks ? 'bg-current' : 'bg-transparent opacity-60',
-          )}
-        />
-      ))}
-    </span>
-  )
 }
 
 /** One row of the expanded proof list. */
@@ -174,8 +152,22 @@ function SkillChip({ item, group, layer }: { item: ProvenSkill; group: string; l
   )
 }
 
+function ChipList({ items, drawer }: { items: ProvenSkill[]; drawer: Drawer }) {
+  return (
+    <ul className="flex flex-wrap gap-x-3 gap-y-2 list-none m-0 p-0 min-w-0">
+      {items.map((item) => (
+        <li key={item.skill.id} className="min-w-0 max-w-full has-[details[open]]:basis-full">
+          <SkillChip item={item} group={`proofs-${drawer.pillar}`} layer={drawer.layer} />
+        </li>
+      ))}
+    </ul>
+  )
+}
+
 function DrawerRow({ drawer }: { drawer: Drawer }) {
   const headingId = `skills-${drawer.pillar}`
+  const shown = drawer.proven.slice(0, VISIBLE)
+  const rest = drawer.proven.slice(VISIBLE)
   return (
     <li
       className={cx(
@@ -191,27 +183,29 @@ function DrawerRow({ drawer }: { drawer: Drawer }) {
         </span>
         <h3 id={headingId} className="text-2 leading-tight">{drawer.title}</h3>
         <p className="mono text-ink-3 m-0">
-          <span className="nums">{pad(drawer.count)}</span> skills <span aria-hidden="true">→</span>
-          <span className="sr-only"> proven by </span> <span className="nums">{pad(drawer.demoCount)}</span> demos
+          <span className="nums">{pad(drawer.proven.length)}</span> with a working proof
         </p>
       </div>
 
-      <div className="grid gap-s4 min-w-0">
-        {drawer.bands.map((band) => (
-          <div key={band.level} className="grid gap-2 min-w-0">
-            <p className="mono text-ink-2 m-0 inline-flex items-center gap-2">
-              <BandMarks marks={band.marks} />
-              {band.label}
-            </p>
-            <ul className="flex flex-wrap gap-x-3 gap-y-2 list-none m-0 p-0 min-w-0">
-              {band.skills.map((item) => (
-                <li key={item.skill.id} className="min-w-0 max-w-full has-[details[open]]:basis-full">
-                  <SkillChip item={item} group={`proofs-${drawer.pillar}`} layer={drawer.layer} />
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
+      <div className="grid gap-s3 min-w-0">
+        <ChipList items={shown} drawer={drawer} />
+        {rest.length ? (
+          <details className="group/more grid gap-2 min-w-0">
+            <summary className="mono inline-flex items-center gap-2 min-h-tap cursor-pointer list-none [&::-webkit-details-marker]:hidden text-accent-ink underline underline-offset-4 justify-self-start">
+              <span aria-hidden="true" className="group-open/more:hidden"><Icon name="plus" size={14} /></span>
+              <span aria-hidden="true" className="hidden group-open/more:inline-flex"><Icon name="minus" size={14} /></span>
+              <span className="group-open/more:hidden">{`${rest.length} more ${drawer.title} skills`}</span>
+              <span className="hidden group-open/more:inline">{`Fewer ${drawer.title} skills`}</span>
+            </summary>
+            <div className="pt-2"><ChipList items={rest} drawer={drawer} /></div>
+          </details>
+        ) : null}
+        {drawer.unproven.length ? (
+          <p className="m-0 text-0 text-ink-2 max-w-[60ch]">
+            <span className="mono text-ink-3">No demo yet: </span>
+            {drawer.unproven.map((s) => s.name).join(', ')}
+          </p>
+        ) : null}
       </div>
     </li>
   )
@@ -228,25 +222,19 @@ export default function Skills({ section, folio }: SectionProps) {
   const drawers = buildDrawers()
   if (!drawers.length) return null
 
-  const skillCount = drawers.reduce((n, d) => n + d.count, 0)
-  const demoCount = new Set(
-    drawers.flatMap((d) => d.bands.flatMap((b) => b.skills.flatMap((s) => s.proofs.map((p) => p.slug)))),
-  ).size
+  const skillCount = drawers.reduce((n, d) => n + d.proven.length, 0)
+  const demoCount = new Set(drawers.flatMap((d) => d.proven.flatMap((s) => s.proofs.map((p) => p.slug)))).size
+  const unprovenCount = drawers.reduce((n, d) => n + d.unproven.length, 0)
 
   const aside = (
     <div className="grid gap-2 md:justify-items-end">
       <p className="mono text-ink-2 m-0">
-        <span className="nums text-ink">{skillCount}</span> skills <span aria-hidden="true">·</span>{' '}
-        <span className="nums text-ink">{demoCount}</span> working proofs
+        <span className="nums text-ink">{skillCount}</span> skills <span aria-hidden="true">→</span>
+        <span className="sr-only"> proven by </span> <span className="nums text-ink">{demoCount}</span> working demos
       </p>
-      <p className="mono text-ink-3 m-0 flex flex-wrap gap-x-3 gap-y-1">
-        {BANDS.map((b) => (
-          <span key={b.level} className="inline-flex items-center gap-2">
-            <BandMarks marks={b.marks} />
-            {b.label}
-          </span>
-        ))}
-      </p>
+      {unprovenCount ? (
+        <p className="mono text-ink-3 m-0"><span className="nums">{unprovenCount}</span> more listed with no demo yet</p>
+      ) : null}
     </div>
   )
 

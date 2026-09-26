@@ -100,7 +100,10 @@ export function getCorpus(): Chunk[] {
     push(out, { key: `pillar:${p.id}`, section: skillsLabel, title: p.title, href: '/#skills' }, join([sentence(p.title), p.summary]))
     if (inPillar.length) {
       push(out, { key: `skills:${p.id}`, section: skillsLabel, title: `${p.title}: skills and proofs`, href: '/#skills' },
-        `${p.title} skills, each with a playground proof: ${inPillar.map((s) => `${s.name} (${s.level}, proof: ${s.demoSlugs.join(', ')})`).join('; ')}.`)
+        join([
+          inPillar.some((s) => s.demoSlugs.length) && `${p.title} skills with a playground proof: ${inPillar.filter((s) => s.demoSlugs.length).map((s) => `${s.name} (proof: ${s.demoSlugs.join(', ')})`).join('; ')}.`,
+          inPillar.some((s) => !s.demoSlugs.length) && `Also used, with no demo yet: ${inPillar.filter((s) => !s.demoSlugs.length).map((s) => s.name).join(', ')}.`,
+        ]))
     }
   }
 

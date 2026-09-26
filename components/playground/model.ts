@@ -20,7 +20,6 @@ export interface SkillRef {
   id: string
   name: string
   pillar: Pillar
-  level: 'core' | 'working' | 'exploring'
   slugs: DemoSlug[]
 }
 
@@ -96,7 +95,8 @@ export function posterOf(d: Pick<Demo, 'glyph' | 'pillar' | 'slug'>): PosterKind
 }
 
 export function getSkillRefs(): SkillRef[] {
-  return getSkills().map((s) => ({ id: s.id, name: s.name, pillar: s.pillar, level: s.level, slugs: s.demoSlugs }))
+  // Only skills with a proof: an unproven skill has nothing to land on in the gallery.
+  return getSkills().filter((s) => s.demoSlugs.length > 0).map((s) => ({ id: s.id, name: s.name, pillar: s.pillar, slugs: s.demoSlugs }))
 }
 
 export function toCardModel(d: Demo, no: number, skills = getSkillRefs()): DemoCardModel {

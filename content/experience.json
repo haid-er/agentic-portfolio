@@ -15,7 +15,7 @@
       "summary": "AI sustainability reporting for a London climate-tech firm: climate risk, GHG calculations, disclosure gap analysis and transition planning, plus the internal tools across Terra Real Estate, Asset Intelligence and Survey Automation.",
       "highlights": [
         {
-          "text": "Built LLM-driven, structured ESG workflows, including disclosure gap analysis against ISSB, TCFD and CSRD (ESRS), and estimation pipelines.",
+          "text": "Built LLM-driven, structured ESG workflows, including disclosure gap analysis and estimation pipelines.",
           "proofDemo": "esg-gap-checker"
         },
         {
@@ -104,8 +104,7 @@
           "proofDemo": "live-chat"
         },
         {
-          "text": "Built dashboards, profile and creator flows in React and Node, then tested them and deployed to AWS.",
-          "proofDemo": "ci-pipeline"
+          "text": "Built dashboards, profile and creator flows in React and Node, then tested them and deployed to AWS."
         }
       ],
       "stack": [
@@ -118,36 +117,21 @@
     },
     {
       "id": "fcit-research",
-      "enabled": true,
-      "source": "experience.md + publications.md ✅. Role title TODO; start = data_fetcher_mobile repo creation, end = last push of data_preprocessing_scripts (research-findings.md)",
-      "role": "Co-author, human activity recognition research",
+      "enabled": false,
+      "source": "experience.md + publications.md ✅. Role title and dates are TODO in docs/context, so this entry stays hidden; MotionIQ (projects) and HumCareADL (research) carry the facts. Do not infer dates from repo activity.",
+      "role": "Research role (title TODO)",
       "org": "Faculty of Computing & IT, University of the Punjab",
       "location": "Lahore, Pakistan",
-      "start": "2024-12",
-      "end": "2025-09",
+      "start": "",
+      "end": "",
       "summary": "Wearable-sensor human activity recognition, published in Springer's Multimedia Tools and Applications (2026).",
       "highlights": [
         {
-          "text": "Built MotionIQ: an Android app that streams phone IMU data over Wi-Fi into RabbitMQ, drained by a Java consumer.",
-          "proofDemo": "rabbitmq-sim"
-        },
-        {
-          "text": "Wrote the Python preprocessing pipeline: name standardisation, atomic 5-second windows and fall segmentation into Fall and ADL datasets.",
-          "proofDemo": "sensor-pipeline"
-        },
-        {
-          "text": "Second of five authors on HumCareADL and HyMCL-Net, a hybrid CNN-LSTM for activity recognition.",
+          "text": "Second of five authors on HumCareADL: a multimodal wearable-IMU dataset and HyMCL-Net, a hybrid CNN-LSTM for activity recognition.",
           "proofDemo": "har-live"
         }
       ],
-      "stack": [
-        "Android",
-        "Java",
-        "RabbitMQ",
-        "Python",
-        "pandas",
-        "NumPy"
-      ]
+      "stack": []
     }
   ]
 }

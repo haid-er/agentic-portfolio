@@ -27,7 +27,6 @@ export function SkillBanner({ ref, resolved, count, pillarLabel, onClear }: {
           {name}
         </h2>
         <div className="flex flex-wrap items-center gap-s2">
-          {resolved.kind === 'skill' ? <Badge tone="accent">{resolved.skill.level}</Badge> : null}
           {pillarLabel ? <Badge>{pillarLabel}</Badge> : null}
           <span className="mono text-ink-2">
             {resolved.kind === 'unknown'

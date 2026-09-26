@@ -6,9 +6,9 @@
       "source": "experience.md + projects.md 🗒️; research-findings.md (résumé) ✅. Employer codebase: no repo link.",
       "slug": "euthyna-esg-platform",
       "title": "Euthyna ESG platform",
-      "summary": "AI sustainability-reporting SaaS: upload a report and get a gap analysis against ISSB, TCFD and CSRD (ESRS), plus GHG boundary-setting and ownership extraction.",
+      "summary": "AI sustainability-reporting SaaS. His work covers disclosure gap analysis, GHG calculations, climate risk and transition planning, plus GHG boundary-setting and ownership extraction.",
       "story": [
-        "Euthyna turns sustainability disclosures into structured data. A report goes in and comes back as a gap analysis against ISSB, TCFD and CSRD (ESRS), with compliance checks and recommendations.",
+        "Euthyna turns sustainability disclosures into structured data. On the product side, a report goes in and comes back as a gap analysis with compliance checks and recommendations; the frameworks it analyses against are listed on euthyna.ai.",
         "The GHG side needs survey flows to collect sustainability data, organisational and operational boundary-setting in the GHG Protocol style, and ownership extraction, which maps equity and control relationships for consolidation.",
         "Under that sit LLM-driven estimation pipelines, background processing, RBAC and transactional audit logging. The org-standard stack is React + Vite, NestJS/Express, PostgreSQL, Drizzle, Zod, CASL and React Query."
       ],
@@ -67,9 +67,6 @@
         "React",
         "Vite",
         "React Query",
-        "NestJS",
-        "Express",
-        "PostgreSQL",
         "Lemlist API"
       ],
       "start": "2025-09",
@@ -78,9 +75,7 @@
       "private": true,
       "featured": false,
       "demoSlugs": [
-        "data-grid",
-        "kanban-board",
-        "layered-api-lab"
+        "data-grid"
       ]
     },
     {
@@ -196,8 +191,7 @@
       "featured": true,
       "demoSlugs": [
         "stripe-connect-flow",
-        "live-chat",
-        "ci-pipeline"
+        "live-chat"
       ]
     },
     {
@@ -299,10 +293,7 @@
       },
       "private": false,
       "featured": false,
-      "demoSlugs": [
-        "kanban-board",
-        "data-grid"
-      ]
+      "demoSlugs": []
     },
     {
       "id": "fb-automation",
@@ -470,9 +461,7 @@
       },
       "private": false,
       "featured": false,
-      "demoSlugs": [
-        "theme-lab"
-      ]
+      "demoSlugs": []
     },
     {
       "id": "autonomous-coding-pipeline",

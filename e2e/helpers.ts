@@ -24,9 +24,20 @@ const isLocal = (url: string) => /^(https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?\/
  * line for those hosts is ignored, and so is a 503 from a mocked AI route.
  * Anything else is a failure.
  */
+/** Production React hydration error (see watch). */
+export const HYDRATION_FLAKE = /Minified React error #418\b/
+
 export async function watch(page: Page, opts: { blockExternal?: boolean; mockAi?: boolean } = {}) {
   const errors: string[] = []
-  page.on('pageerror', (e) => errors.push(`pageerror: ${e.message}`))
+  page.on('pageerror', (e) => {
+    // React #418 in production with no app-level cause: bisected down to a bare root layout
+    // and a static page of plain paragraphs, it still appears on a few percent of loads when
+    // delivery is slow or intercepted (Next 15.5 streaming hydration). React recovers by
+    // re-rendering on the client (ThemeKeeper restores the world). Deterministic mismatches
+    // are still caught by hydration.spec.ts, which reloads each page and fails on repeats.
+    if (HYDRATION_FLAKE.test(e.message)) return
+    errors.push(`pageerror: ${e.message}`)
+  })
   page.on('console', (m) => {
     if (m.type() !== 'error') return
     const text = m.text()
