@@ -12,6 +12,11 @@ describe('calculator tool', () => {
   it('drops thousands separators outside parentheses', () => {
     expect(evaluate('2,340 * 2')).toBe(4680)
   })
+  it('reads thousands inside single-argument functions', () => {
+    expect(evaluate('sqrt(1,764)')).toBe(42)
+    expect(evaluate('17.5% of 2,340 + sqrt(1,764)')).toBeCloseTo(451.5, 10)
+    expect(evaluate('max(1,200, 3)')).toBe(200)
+  })
   it('reads "x% of y"', () => {
     expect(evaluate('17% of 2,340')).toBeCloseTo(397.8, 10)
   })

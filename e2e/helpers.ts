@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright'
 
 type AxePage = ConstructorParameters<typeof AxeBuilder>[0]['page']
-import { expect, type Page, type TestInfo } from '@playwright/test'
+import { expect, type Locator, type Page, type TestInfo } from '@playwright/test'
 import projects from '../content/projects.json' with { type: 'json' }
 import playground from '../content/playground.json' with { type: 'json' }
 import { DEMO_SLUGS } from '../lib/demos/slugs'
@@ -114,3 +114,16 @@ export async function hydrated(page: Page) {
     return !!el && Object.keys(el).some((k) => k.startsWith('__reactFiber'))
   }, undefined, { timeout: 20_000 })
 }
+
+export function stage(page: Page): Locator {
+  return page.locator('figure').filter({ has: page.locator('figcaption', { hasText: /Plate \d+/ }) }).first()
+}
+
+export async function demoReady(page: Page) {
+  const s = stage(page)
+  await expect(s).toBeVisible()
+  await expect(s.getByText('Loading demo')).toHaveCount(0, { timeout: 20_000 })
+  await expect(s.getByRole('alert').filter({ hasText: /stopped working/ })).toHaveCount(0)
+  return s
+}
+

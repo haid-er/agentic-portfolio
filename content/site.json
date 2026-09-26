@@ -6,6 +6,7 @@
     "shortBio": "Full-stack engineer building ESG and AI platforms at Euthyna (Terra Instinct): Node.js, NestJS, React and PostgreSQL underneath, LLM pipelines and agents on top. Co-author of a Springer paper on wearable-sensor activity recognition, with the Android-to-RabbitMQ pipeline that fed it.",
     "location": "Lahore, Pakistan",
     "email": "malikhaiderali33@gmail.com",
+    "phone": "+92 336 0747027",
     "motto": "Code with purpose, build with passion, learn without limits.",
     "pillars": [
       {
@@ -56,8 +57,7 @@
       "AI-powered app integration (OpenAI, Groq)",
       "Web 3.0, blockchain and the metaverse",
       "Graphic design"
-    ],
-    "phone": "+92 336 0747027"
+    ]
   },
   "hero": {
     "kicker": [
@@ -113,61 +113,61 @@
   "socials": [
     {
       "id": "github",
+      "enabled": true,
       "label": "GitHub",
       "url": "https://github.com/haid-er",
       "handle": "haid-er",
-      "icon": "github",
-      "enabled": true
+      "icon": "github"
     },
     {
       "id": "linkedin",
+      "enabled": true,
       "label": "LinkedIn",
       "url": "https://www.linkedin.com/in/haid-er/",
       "handle": "in/haid-er",
-      "icon": "linkedin",
-      "enabled": true
+      "icon": "linkedin"
     },
     {
       "id": "email",
+      "enabled": true,
       "label": "Email",
       "url": "mailto:malikhaiderali33@gmail.com",
       "handle": "malikhaiderali33@gmail.com",
-      "icon": "mail",
-      "enabled": true
+      "icon": "mail"
     },
     {
       "id": "x",
+      "enabled": true,
       "label": "X",
       "url": "https://twitter.com/itzhaidermalik",
       "handle": "@itzhaidermalik",
-      "icon": "x",
-      "enabled": true
+      "icon": "x"
     },
     {
       "id": "springer",
+      "enabled": true,
       "label": "Springer paper",
       "url": "https://link.springer.com/article/10.1007/s11042-026-21905-3",
       "handle": "HumCareADL",
-      "icon": "doc",
-      "enabled": true
+      "icon": "doc"
     },
     {
       "id": "facebook",
+      "enabled": false,
+      "source": "✅ verified, but personal; enable in admin if wanted",
       "label": "Facebook",
       "url": "https://www.facebook.com/haiderfb1",
       "handle": "haiderfb1",
-      "icon": "facebook",
-      "enabled": false,
-      "source": "✅ verified, but personal; enable in admin if wanted"
+      "icon": "facebook"
     },
     {
       "id": "instagram",
+      "enabled": false,
+      "source": "✅ verified, but personal; enable in admin if wanted",
       "label": "Instagram",
       "url": "https://www.instagram.com/haiderfb1",
       "handle": "haiderfb1",
-      "icon": "instagram",
-      "enabled": false,
-      "source": "✅ verified, but personal; enable in admin if wanted"
+      "icon": "instagram"
     }
   ],
   "sections": [
@@ -273,13 +273,13 @@
       "Euthyna"
     ],
     "siteUrl": "https://malik-haider-portfolio.vercel.app",
+    "twitterHandle": "@itzhaidermalik",
     "sameAs": [
       "https://github.com/haid-er",
       "https://www.linkedin.com/in/haid-er/",
       "https://twitter.com/itzhaidermalik",
       "https://malikhaider.vercel.app/"
-    ],
-    "twitterHandle": "@itzhaidermalik"
+    ]
   },
   "analytics": {
     "enabled": true

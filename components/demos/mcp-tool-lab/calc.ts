@@ -15,15 +15,24 @@ type Tok = { t: 'num'; v: number } | { t: 'id'; v: string } | { t: 'op'; v: stri
 
 export class CalcError extends Error {}
 
-/** Drop thousands separators (2,340 -> 2340), but only outside parentheses, so min(1,200) keeps its argument comma. */
+/** Functions whose commas separate arguments; everywhere else a d,ddd comma is a thousands separator. */
+const MULTI_ARG = new Set(['min', 'max', 'pow', 'round'])
+
+/**
+ * Drop thousands separators (2,340 -> 2340) except directly inside a multi-argument
+ * function, so min(1,200) keeps its argument comma while sqrt(1,764) reads 1764.
+ */
 function stripThousands(src: string): string {
-  let depth = 0
+  const stack: boolean[] = [] // true = inside a multi-argument call
   let out = ''
   for (let i = 0; i < src.length; i++) {
     const c = src[i]
-    if (c === '(') depth++
-    else if (c === ')') depth--
-    if (c === ',' && depth === 0 && /\d/.test(src[i - 1] ?? '') && /^\d{3}(?!\d)/.test(src.slice(i + 1))) continue
+    if (c === '(') {
+      const name = /([a-z][a-z0-9]*)\s*$/i.exec(out)?.[1]?.toLowerCase() ?? ''
+      stack.push(MULTI_ARG.has(name))
+    } else if (c === ')') stack.pop()
+    const multi = stack[stack.length - 1] ?? false
+    if (c === ',' && !multi && /\d/.test(src[i - 1] ?? '') && /^\d{3}(?!\d)/.test(src.slice(i + 1))) continue
     out += c
   }
   return out

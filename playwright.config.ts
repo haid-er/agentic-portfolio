@@ -11,6 +11,7 @@ const PORT = Number(process.env.E2E_PORT ?? 3100)
 export default defineConfig({
   testDir: './e2e',
   timeout: 60_000,
+  expect: { timeout: 10_000 },
   fullyParallel: true,
   retries: process.env.CI ? 1 : 0,
   reporter: [['list']],
@@ -25,5 +26,12 @@ export default defineConfig({
     url: `http://localhost:${PORT}`,
     reuseExistingServer: true,
     timeout: 60_000,
+    // Admin e2e saves in disk mode (never commits): no GitHub token, a throwaway signing key.
+    env: {
+      ...(process.env as Record<string, string>),
+      ADMIN_SECRET: process.env.ADMIN_SECRET || 'e2e-only-signing-key-not-for-production',
+      GITHUB_TOKEN: '',
+      GITHUB_REPO: '',
+    },
   },
 })

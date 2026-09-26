@@ -4,23 +4,11 @@
  * overflow, no axe violations. AI routes are mocked to 503 (no quota spent) and
  * third-party hosts are blocked, so each demo's honest fallback path is exercised.
  */
-import { expect, type Locator, type Page, test } from '@playwright/test'
-import { DEMO_PAGES, expectAccessible, expectNoOverflow, openInWorld, settle, THEMES, watch } from './helpers'
+import { expect, type Locator, test } from '@playwright/test'
+import { DEMO_PAGES, demoReady, expectAccessible, expectNoOverflow, openInWorld, settle, THEMES, watch } from './helpers'
 
 /** Buttons that would leave the page, start a file dialog or ask for device permissions. */
 const SKIP = /upload|choose file|browse|location|download|camera|microphone|sensor|motion|permission|print|sign in|delete all|reset all|open the/i
-
-export function stage(page: Page): Locator {
-  return page.locator('figure').filter({ has: page.locator('figcaption', { hasText: /Plate \d+/ }) }).first()
-}
-
-export async function demoReady(page: Page) {
-  const s = stage(page)
-  await expect(s).toBeVisible()
-  await expect(s.getByText('Loading demo')).toHaveCount(0, { timeout: 20_000 })
-  await expect(s.getByRole('alert').filter({ hasText: /stopped working/ })).toHaveCount(0)
-  return s
-}
 
 async function poke(s: Locator) {
   const buttons = s.locator('button:visible:enabled')

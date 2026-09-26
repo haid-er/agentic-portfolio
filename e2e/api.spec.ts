@@ -36,10 +36,11 @@ test('rate limiter: 5 x 200 then 429 with Retry-After and RateLimit', async ({ r
 })
 
 test('layered API lab: malformed JSON 400, missing site 404', async ({ request }) => {
-  const bad = await request.post('/api/demos/lab/sites', { data: '{nope', headers: { 'content-type': 'application/json' } })
+  const headers = { 'x-lab-session': 'e2e-session-1' }
+  const bad = await request.post('/api/demos/lab/sites', { data: Buffer.from('{nope'), headers: { ...headers, 'content-type': 'application/json' } })
   expect(bad.status()).toBe(400)
-  expect((await bad.json()).error.code).toBe('MALFORMED_JSON')
-  const missing = await request.get('/api/demos/lab/sites/999')
+  expect((await bad.json()).body.error.code).toBe('MALFORMED_JSON')
+  const missing = await request.get('/api/demos/lab/sites/999', { headers })
   expect(missing.status()).toBe(404)
 })
 

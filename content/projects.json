@@ -2,9 +2,9 @@
   "items": [
     {
       "id": "euthyna-esg-platform",
-      "slug": "euthyna-esg-platform",
       "enabled": true,
       "source": "experience.md + projects.md 🗒️; research-findings.md (résumé) ✅. Employer codebase: no repo link.",
+      "slug": "euthyna-esg-platform",
       "title": "Euthyna ESG platform",
       "summary": "AI sustainability-reporting SaaS: upload a report and get a gap analysis against ISSB, TCFD and CSRD (ESRS), plus GHG boundary-setting and ownership extraction.",
       "story": [
@@ -32,6 +32,7 @@
         "React Query"
       ],
       "start": "2025-09",
+      "ongoing": true,
       "links": {
         "live": "https://euthyna.ai"
       },
@@ -42,14 +43,13 @@
         "ownership-extractor",
         "ghg-calculator",
         "rbac-audit-lab"
-      ],
-      "ongoing": true
+      ]
     },
     {
       "id": "terra-internal-tools",
-      "slug": "terra-internal-tools",
       "enabled": true,
       "source": "experience.md + projects.md 🗒️. Impact metrics TODO.",
+      "slug": "terra-internal-tools",
       "title": "Terra Instinct internal tools",
       "summary": "A custom CRM that replaces the outreach stack through a Lemlist integration, plus project-management and finance tools, all inside one multi-workspace React + Vite frontend.",
       "story": [
@@ -73,6 +73,7 @@
         "Lemlist API"
       ],
       "start": "2025-09",
+      "ongoing": true,
       "links": {},
       "private": true,
       "featured": false,
@@ -80,14 +81,13 @@
         "data-grid",
         "kanban-board",
         "layered-api-lab"
-      ],
-      "ongoing": true
+      ]
     },
     {
       "id": "motioniq",
-      "slug": "motioniq",
       "enabled": true,
       "source": "projects.md B (public repos data_fetcher_mobile, data_preprocessing_scripts) ✅. Link to HumCareADL is inferred ⚠️, so not claimed. Activity/participant counts omitted (conflict).",
+      "slug": "motioniq",
       "title": "MotionIQ",
       "summary": "A human-activity-recognition data system. An Android app streams phone IMU data over Wi-Fi into RabbitMQ, a Java consumer drains the queues, and a Python pipeline cuts atomic 5-second windows.",
       "story": [
@@ -128,9 +128,9 @@
     },
     {
       "id": "kickstart-hq",
-      "slug": "kickstart-hq",
       "enabled": true,
       "source": "research-findings.md (résumé) ✅",
+      "slug": "kickstart-hq",
       "title": "Kickstart HQ",
       "summary": "Field-service management: scheduling, dispatching, invoicing, technicians and payments. Response time went from 27s to 3.5s.",
       "story": [
@@ -164,9 +164,9 @@
     },
     {
       "id": "voodvr",
-      "slug": "voodvr",
       "enabled": true,
       "source": "research-findings.md (résumé) ✅; = the 'payment gateways + live chat + AI tools' app (medium-high confidence)",
+      "slug": "voodvr",
       "title": "VoodVR",
       "summary": "AI VR video platform: creator dashboards and profiles, Stripe Connect payouts, subscriptions, webhook billing and real-time chat.",
       "story": [
@@ -202,9 +202,9 @@
     },
     {
       "id": "structure-fetcher",
-      "slug": "structure-fetcher",
       "enabled": true,
       "source": "projects.md C (public repos) + research-findings.md (live URL, dates) ✅",
+      "slug": "structure-fetcher",
       "title": "Structure Fetcher",
       "summary": "Upload an org chart as an image or PDF and get the hierarchy back as editable JSON, extracted by Azure OpenAI or Groq vision models.",
       "story": [
@@ -243,9 +243,9 @@
     },
     {
       "id": "ai-lawyer",
-      "slug": "ai-lawyer",
       "enabled": true,
       "source": "research-findings.md (résumé) ✅. Repo is PRIVATE: never link or quote it.",
+      "slug": "ai-lawyer",
       "title": "AI Lawyer",
       "summary": "Legal Q&A assistant: retrieval-augmented answers over legal material, built on OpenAI and Pinecone.",
       "story": [
@@ -272,9 +272,9 @@
     },
     {
       "id": "greenheaven",
-      "slug": "greenheaven",
       "enabled": true,
       "source": "research-findings.md (live URLs, May 2025) ✅",
+      "slug": "greenheaven",
       "title": "GreenHeaven",
       "summary": "Plant e-commerce storefront with Clerk auth, plus an admin dashboard that tracks expenses and profit.",
       "story": [
@@ -306,9 +306,9 @@
     },
     {
       "id": "fb-automation",
-      "slug": "fb-automation",
       "enabled": true,
       "source": "research-findings.md ✅ (Puppeteer marketplace bot, Aug 2025)",
+      "slug": "fb-automation",
       "title": "fb-automation",
       "summary": "Puppeteer bot that fills in and posts Facebook Marketplace listings.",
       "story": [
@@ -335,9 +335,9 @@
     },
     {
       "id": "task-vault",
-      "slug": "task-vault",
       "enabled": true,
       "source": "projects.md C ✅ (README). Stack TODO.",
+      "slug": "task-vault",
       "title": "Task-Vault",
       "summary": "Private task manager. Each user has an account and sees only their own tasks, behind a login.",
       "story": [
@@ -361,9 +361,9 @@
     },
     {
       "id": "sql-learning",
-      "slug": "sql-learning",
       "enabled": true,
       "source": "projects.md C ✅",
+      "slug": "sql-learning",
       "title": "SQL-Learning",
       "summary": "SQL tutorials and LeetCode SQL solutions, kept as a practice log.",
       "story": [],
@@ -386,9 +386,9 @@
     },
     {
       "id": "cricket-game-c",
-      "slug": "cricket-game-c",
       "enabled": true,
       "source": "projects.md C ✅ (created 2022-11)",
+      "slug": "cricket-game-c",
       "title": "Cricket Game in C",
       "summary": "A cricket match simulation written in pure C.",
       "story": [],
@@ -412,9 +412,9 @@
     },
     {
       "id": "c-cpp-foundations",
-      "slug": "c-cpp-foundations",
       "enabled": true,
       "source": "projects.md C + research-findings.md (dates, topics) ✅",
+      "slug": "c-cpp-foundations",
       "title": "C and C++ foundations",
       "summary": "The first repos: pointers, file handling, dynamic memory and OOP, worked through in C and C++.",
       "story": [
@@ -444,9 +444,9 @@
     },
     {
       "id": "early-web-builds",
-      "slug": "early-web-builds",
       "enabled": true,
       "source": "projects.md C ✅ (Nexcent-Web, Travel-Journal, Glozzom, LoopLAB; learning builds)",
+      "slug": "early-web-builds",
       "title": "Early web builds",
       "summary": "Practice builds: Bootstrap multi-page themes, a React component and props exercise deployed on Netlify, and a React + Tailwind travel journal.",
       "story": [],
@@ -476,10 +476,10 @@
     },
     {
       "id": "autonomous-coding-pipeline",
-      "slug": "autonomous-coding-pipeline",
       "enabled": false,
       "verified": false,
       "source": "experience.md 🗒️ + private-repo metadata only (research-findings.md: ✅ skill, ⚠️ project). Private-derived: seeded disabled, no links.",
+      "slug": "autonomous-coding-pipeline",
       "title": "Autonomous coding pipeline",
       "summary": "Multi-agent Claude Code setup that plans, writes and reviews code autonomously.",
       "story": [],
@@ -500,10 +500,10 @@
     },
     {
       "id": "agent-hierarchy-platform",
-      "slug": "agent-hierarchy-platform",
       "enabled": false,
       "verified": false,
       "source": "projects.md A: vision/design stage ⚠️",
+      "slug": "agent-hierarchy-platform",
       "title": "Agent-hierarchy platform",
       "summary": "Design for hierarchical agent orchestration: Temporal workflows, Claude Agent SDK workers, MCP tools, PostgreSQL state and Langfuse tracing.",
       "story": [],
@@ -529,10 +529,10 @@
     },
     {
       "id": "mcp-server-client",
-      "slug": "mcp-server-client",
       "enabled": false,
       "verified": false,
       "source": "private-repo metadata only (Sep 2025): skill ✅, project ⚠️. Never link.",
+      "slug": "mcp-server-client",
       "title": "MCP server and client",
       "summary": "A Model Context Protocol server and client written in TypeScript.",
       "story": [],
@@ -555,10 +555,10 @@
     },
     {
       "id": "eyeguard",
-      "slug": "eyeguard",
       "enabled": false,
       "verified": false,
       "source": "LinkedIn feed only ⚠️: attribution as his FYP unconfirmed",
+      "slug": "eyeguard",
       "title": "EyeGuard",
       "summary": "Real-time shoplifting-detection surveillance system.",
       "story": [],

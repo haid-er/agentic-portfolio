@@ -2,6 +2,8 @@
   "items": [
     {
       "id": "product-engineering",
+      "enabled": true,
+      "source": "résumé expertise; level is an editor's band from context evidence",
       "name": "Full-stack product engineering",
       "pillar": "fullstack",
       "level": "core",
@@ -9,12 +11,12 @@
         "dispatch-board",
         "stripe-connect-flow",
         "kanban-board"
-      ],
-      "enabled": true,
-      "source": "résumé expertise; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "react",
+      "enabled": true,
+      "source": "GH, PF, résumé, work; level is an editor's band from context evidence",
       "name": "React",
       "pillar": "fullstack",
       "level": "core",
@@ -22,352 +24,352 @@
         "kanban-board",
         "web-perf-lab",
         "data-grid"
-      ],
-      "enabled": true,
-      "source": "GH, PF, résumé, work; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "nextjs",
+      "enabled": true,
+      "source": "résumé technologies; level is an editor's band from context evidence",
       "name": "Next.js",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "rate-limiter",
         "web-perf-lab"
-      ],
-      "enabled": true,
-      "source": "résumé technologies; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "vite",
+      "enabled": true,
+      "source": "repos + Euthyna frontend 🗒️; level is an editor's band from context evidence",
       "name": "Vite",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "data-grid",
         "org-chart-extractor"
-      ],
-      "enabled": true,
-      "source": "repos + Euthyna frontend 🗒️; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "react-query",
+      "enabled": true,
+      "source": "Euthyna org standard 🗒️; level is an editor's band from context evidence",
       "name": "React Query",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "data-grid"
-      ],
-      "enabled": true,
-      "source": "Euthyna org standard 🗒️; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "redux",
+      "enabled": true,
+      "source": "GH (Redux Saga), GreenHeaven, Udemy cert; level is an editor's band from context evidence",
       "name": "Redux",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "kanban-board"
-      ],
-      "enabled": true,
-      "source": "GH (Redux Saga), GreenHeaven, Udemy cert; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "tailwind",
+      "enabled": true,
+      "source": "GH; level is an editor's band from context evidence",
       "name": "Tailwind CSS",
       "pillar": "craft",
       "level": "working",
       "demoSlugs": [
         "theme-lab"
-      ],
-      "enabled": true,
-      "source": "GH; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "typescript",
+      "enabled": true,
+      "source": "GH, résumé; level is an editor's band from context evidence",
       "name": "TypeScript",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "layered-api-lab",
         "mcp-tool-lab"
-      ],
-      "enabled": true,
-      "source": "GH, résumé; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "javascript",
+      "enabled": true,
+      "source": "GH; level is an editor's band from context evidence",
       "name": "JavaScript",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "web-perf-lab",
         "algo-visualizer"
-      ],
-      "enabled": true,
-      "source": "GH; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "nodejs",
+      "enabled": true,
+      "source": "GH, PF, résumé, IBM cert; level is an editor's band from context evidence",
       "name": "Node.js",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "layered-api-lab",
         "live-telemetry"
-      ],
-      "enabled": true,
-      "source": "GH, PF, résumé, IBM cert; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "express",
+      "enabled": true,
+      "source": "GH, repos, org standard; level is an editor's band from context evidence",
       "name": "Express.js",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "layered-api-lab"
-      ],
-      "enabled": true,
-      "source": "GH, repos, org standard; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "nestjs",
+      "enabled": true,
+      "source": "PF, résumé, org standard; level is an editor's band from context evidence",
       "name": "NestJS",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "layered-api-lab",
         "rbac-audit-lab"
-      ],
-      "enabled": true,
-      "source": "PF, résumé, org standard; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "rest-apis",
+      "enabled": true,
+      "source": "GH; level is an editor's band from context evidence",
       "name": "REST API design",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "layered-api-lab",
         "rate-limiter"
-      ],
-      "enabled": true,
-      "source": "GH; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "zod",
+      "enabled": true,
+      "source": "org standard 🗒️; level is an editor's band from context evidence",
       "name": "Zod",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "layered-api-lab",
         "esg-gap-checker"
-      ],
-      "enabled": true,
-      "source": "org standard 🗒️; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "casl-rbac",
+      "enabled": true,
+      "source": "org standard 🗒️ + résumé (RBAC); level is an editor's band from context evidence",
       "name": "CASL / RBAC",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "rbac-audit-lab"
-      ],
-      "enabled": true,
-      "source": "org standard 🗒️ + résumé (RBAC); level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "audit-logging",
+      "enabled": true,
+      "source": "résumé; level is an editor's band from context evidence",
       "name": "Transactional audit logging",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "rbac-audit-lab"
-      ],
-      "enabled": true,
-      "source": "résumé; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "logging",
+      "enabled": true,
+      "source": "structure-fetch-express repo; level is an editor's band from context evidence",
       "name": "Structured logging (Winston)",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "layered-api-lab"
-      ],
-      "enabled": true,
-      "source": "structure-fetch-express repo; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "web-performance",
+      "enabled": true,
+      "source": "résumé: 27s → 3.5s; level is an editor's band from context evidence",
       "name": "Web performance (webpack, code splitting)",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "web-perf-lab"
-      ],
-      "enabled": true,
-      "source": "résumé: 27s → 3.5s; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "stripe-connect",
+      "enabled": true,
+      "source": "résumé (VoodVR); level is an editor's band from context evidence",
       "name": "Stripe Connect & billing webhooks",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "stripe-connect-flow"
-      ],
-      "enabled": true,
-      "source": "résumé (VoodVR); level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "puppeteer",
+      "enabled": true,
+      "source": "fb-automation repo; level is an editor's band from context evidence",
       "name": "Puppeteer automation",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "automation-recorder"
-      ],
-      "enabled": true,
-      "source": "fb-automation repo; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "system-design",
+      "enabled": true,
+      "source": "résumé expertise: backend & platform architecture; level is an editor's band from context evidence",
       "name": "System design",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "system-design-canvas"
-      ],
-      "enabled": true,
-      "source": "résumé expertise: backend & platform architecture; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "aws",
+      "enabled": true,
+      "source": "résumé; level is an editor's band from context evidence",
       "name": "AWS",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "ci-pipeline",
         "system-design-canvas"
-      ],
-      "enabled": true,
-      "source": "résumé; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "azure",
+      "enabled": true,
+      "source": "résumé + Azure OpenAI repo; level is an editor's band from context evidence",
       "name": "Azure",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "system-design-canvas",
         "org-chart-extractor"
-      ],
-      "enabled": true,
-      "source": "résumé + Azure OpenAI repo; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "vercel",
+      "enabled": true,
+      "source": "résumé, repos; level is an editor's band from context evidence",
       "name": "Vercel deployment",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "ci-pipeline"
-      ],
-      "enabled": true,
-      "source": "résumé, repos; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "git",
+      "enabled": true,
+      "source": "résumé; level is an editor's band from context evidence",
       "name": "Git & GitHub",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "ci-pipeline"
-      ],
-      "enabled": true,
-      "source": "résumé; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "docker",
+      "enabled": true,
+      "source": "GH learning list; level is an editor's band from context evidence",
       "name": "Docker",
       "pillar": "fullstack",
       "level": "exploring",
       "demoSlugs": [
         "ci-pipeline"
-      ],
-      "enabled": true,
-      "source": "GH learning list; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "ci-cd",
+      "enabled": true,
+      "source": "GH learning list; level is an editor's band from context evidence",
       "name": "CI/CD",
       "pillar": "fullstack",
       "level": "exploring",
       "demoSlugs": [
         "ci-pipeline"
-      ],
-      "enabled": true,
-      "source": "GH learning list; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "postgresql",
+      "enabled": true,
+      "source": "GH, résumé, work; level is an editor's band from context evidence",
       "name": "PostgreSQL",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "sql-playground"
-      ],
-      "enabled": true,
-      "source": "GH, résumé, work; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "drizzle",
+      "enabled": true,
+      "source": "org standard 🗒️; level is an editor's band from context evidence",
       "name": "Drizzle ORM",
       "pillar": "fullstack",
       "level": "core",
       "demoSlugs": [
         "sql-playground"
-      ],
-      "enabled": true,
-      "source": "org standard 🗒️; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "sql",
+      "enabled": true,
+      "source": "SQL-Learning repo; level is an editor's band from context evidence",
       "name": "SQL",
       "pillar": "fundamentals",
       "level": "core",
       "demoSlugs": [
         "sql-playground"
-      ],
-      "enabled": true,
-      "source": "SQL-Learning repo; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "mysql",
+      "enabled": true,
+      "source": "old site technologies; level is an editor's band from context evidence",
       "name": "MySQL",
       "pillar": "fundamentals",
       "level": "working",
       "demoSlugs": [
         "sql-playground"
-      ],
-      "enabled": true,
-      "source": "old site technologies; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "mongodb",
+      "enabled": true,
+      "source": "GH, résumé, structure-fetch-express; level is an editor's band from context evidence",
       "name": "MongoDB",
       "pillar": "fullstack",
       "level": "working",
       "demoSlugs": [
         "org-chart-extractor"
-      ],
-      "enabled": true,
-      "source": "GH, résumé, structure-fetch-express; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "llm-integration",
+      "enabled": true,
+      "source": "PF, résumé, Euthyna; level is an editor's band from context evidence",
       "name": "LLM integration & structured output",
       "pillar": "ai",
       "level": "core",
@@ -375,403 +377,401 @@
         "esg-gap-checker",
         "prompt-cost-lab",
         "ask-malik"
-      ],
-      "enabled": true,
-      "source": "PF, résumé, Euthyna; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "openai",
+      "enabled": true,
+      "source": "GH, résumé; level is an editor's band from context evidence",
       "name": "OpenAI API",
       "pillar": "ai",
       "level": "core",
       "demoSlugs": [
         "legal-rag-assistant",
         "prompt-cost-lab"
-      ],
-      "enabled": true,
-      "source": "GH, résumé; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "anthropic",
+      "enabled": true,
+      "source": "résumé; level is an editor's band from context evidence",
       "name": "Anthropic API",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "prompt-cost-lab",
         "agent-orchestra"
-      ],
-      "enabled": true,
-      "source": "résumé; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "groq",
+      "enabled": true,
+      "source": "GH, structure-fetch-express; level is an editor's band from context evidence",
       "name": "Groq API",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "org-chart-extractor",
         "prompt-cost-lab"
-      ],
-      "enabled": true,
-      "source": "GH, structure-fetch-express; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "azure-openai",
+      "enabled": true,
+      "source": "structure-fetch-express; level is an editor's band from context evidence",
       "name": "Azure OpenAI",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "org-chart-extractor"
-      ],
-      "enabled": true,
-      "source": "structure-fetch-express; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "document-ai",
+      "enabled": true,
+      "source": "Structure Fetcher + résumé (AI document pipelines); level is an editor's band from context evidence",
       "name": "Document & entity extraction",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "org-chart-extractor",
         "ownership-extractor"
-      ],
-      "enabled": true,
-      "source": "Structure Fetcher + résumé (AI document pipelines); level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "rag",
+      "enabled": true,
+      "source": "résumé expertise; level is an editor's band from context evidence",
       "name": "RAG",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "legal-rag-assistant",
         "ask-malik"
-      ],
-      "enabled": true,
-      "source": "résumé expertise; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "pinecone",
+      "enabled": true,
+      "source": "GH, résumé; level is an editor's band from context evidence",
       "name": "Pinecone vector search",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "vector-space-explorer",
         "legal-rag-assistant"
-      ],
-      "enabled": true,
-      "source": "GH, résumé; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "claude-code",
+      "enabled": true,
+      "source": "experience.md 🗒️; level is an editor's band from context evidence",
       "name": "Claude Code multi-agent pipelines",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "agent-orchestra"
-      ],
-      "enabled": true,
-      "source": "experience.md 🗒️; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "claude-agent-sdk",
+      "enabled": true,
+      "source": "experience.md 🗒️; level is an editor's band from context evidence",
       "name": "Claude Agent SDK",
       "pillar": "ai",
       "level": "exploring",
       "demoSlugs": [
         "agent-orchestra"
-      ],
-      "enabled": true,
-      "source": "experience.md 🗒️; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "mcp",
+      "enabled": true,
+      "source": "experience.md 🗒️ + private-repo metadata (skill only); level is an editor's band from context evidence",
       "name": "Model Context Protocol (MCP)",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "mcp-tool-lab"
-      ],
-      "enabled": true,
-      "source": "experience.md 🗒️ + private-repo metadata (skill only); level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "langfuse",
+      "enabled": true,
+      "source": "experience.md 🗒️, old site; level is an editor's band from context evidence",
       "name": "Langfuse",
       "pillar": "ai",
       "level": "exploring",
       "demoSlugs": [
         "agent-orchestra"
-      ],
-      "enabled": true,
-      "source": "experience.md 🗒️, old site; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "temporal",
+      "enabled": true,
+      "source": "experience.md 🗒️; level is an editor's band from context evidence",
       "name": "Temporal",
       "pillar": "ai",
       "level": "exploring",
       "demoSlugs": [
         "agent-orchestra"
-      ],
-      "enabled": true,
-      "source": "experience.md 🗒️; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "machine-learning",
+      "enabled": true,
+      "source": "GH, DeepLearning.AI cert; level is an editor's band from context evidence",
       "name": "Machine learning (scikit-learn, TensorFlow)",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "neural-playground",
         "har-live"
-      ],
-      "enabled": true,
-      "source": "GH, DeepLearning.AI cert; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "cnn-lstm",
+      "enabled": true,
+      "source": "publication; level is an editor's band from context evidence",
       "name": "CNN-LSTM time-series models",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "har-live",
         "neural-playground"
-      ],
-      "enabled": true,
-      "source": "publication; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "python",
+      "enabled": true,
+      "source": "GH, résumé, preprocessing repo; level is an editor's band from context evidence",
       "name": "Python",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "sensor-pipeline",
         "neural-playground"
-      ],
-      "enabled": true,
-      "source": "GH, résumé, preprocessing repo; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "pandas-numpy",
+      "enabled": true,
+      "source": "GH, preprocessing repo; level is an editor's band from context evidence",
       "name": "pandas & NumPy",
       "pillar": "ai",
       "level": "working",
       "demoSlugs": [
         "sensor-pipeline"
-      ],
-      "enabled": true,
-      "source": "GH, preprocessing repo; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "har",
+      "enabled": true,
+      "source": "publication; level is an editor's band from context evidence",
       "name": "Human activity recognition",
       "pillar": "realtime",
       "level": "working",
       "demoSlugs": [
         "har-live",
         "sensor-pipeline"
-      ],
-      "enabled": true,
-      "source": "publication; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "sensor-preprocessing",
+      "enabled": true,
+      "source": "data_preprocessing_scripts; level is an editor's band from context evidence",
       "name": "Sensor-data preprocessing & segmentation",
       "pillar": "realtime",
       "level": "working",
       "demoSlugs": [
         "sensor-pipeline"
-      ],
-      "enabled": true,
-      "source": "data_preprocessing_scripts; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "rabbitmq",
+      "enabled": true,
+      "source": "GH, MotionIQ; level is an editor's band from context evidence",
       "name": "RabbitMQ",
       "pillar": "realtime",
       "level": "working",
       "demoSlugs": [
         "rabbitmq-sim"
-      ],
-      "enabled": true,
-      "source": "GH, MotionIQ; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "bullmq",
+      "enabled": true,
+      "source": "résumé technologies + background processing; level is an editor's band from context evidence",
       "name": "BullMQ & background jobs",
       "pillar": "realtime",
       "level": "working",
       "demoSlugs": [
         "bullmq-jobs"
-      ],
-      "enabled": true,
-      "source": "résumé technologies + background processing; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "android-streaming",
+      "enabled": true,
+      "source": "data_fetcher_mobile; level is an editor's band from context evidence",
       "name": "Android sensor streaming",
       "pillar": "realtime",
       "level": "working",
       "demoSlugs": [
         "live-telemetry",
         "rabbitmq-sim"
-      ],
-      "enabled": true,
-      "source": "data_fetcher_mobile; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "java",
+      "enabled": true,
+      "source": "GH, MotionIQ consumer; level is an editor's band from context evidence",
       "name": "Java",
       "pillar": "realtime",
       "level": "working",
       "demoSlugs": [
         "rabbitmq-sim"
-      ],
-      "enabled": true,
-      "source": "GH, MotionIQ consumer; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "realtime-chat",
+      "enabled": true,
+      "source": "résumé (VoodVR); level is an editor's band from context evidence",
       "name": "Real-time chat (Stream Chat)",
       "pillar": "realtime",
       "level": "working",
       "demoSlugs": [
         "live-chat"
-      ],
-      "enabled": true,
-      "source": "résumé (VoodVR); level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "esg-reporting",
+      "enabled": true,
+      "source": "Euthyna, résumé; level is an editor's band from context evidence",
       "name": "ESG disclosure (ISSB, TCFD, CSRD)",
       "pillar": "esg",
       "level": "working",
       "demoSlugs": [
         "esg-gap-checker"
-      ],
-      "enabled": true,
-      "source": "Euthyna, résumé; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "ghg-accounting",
+      "enabled": true,
+      "source": "experience.md 🗒️, résumé; level is an editor's band from context evidence",
       "name": "GHG accounting & boundary-setting",
       "pillar": "esg",
       "level": "working",
       "demoSlugs": [
         "ghg-calculator",
         "ownership-extractor"
-      ],
-      "enabled": true,
-      "source": "experience.md 🗒️, résumé; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "decarbonisation",
+      "enabled": true,
+      "source": "Terra Real Estate / Asset Intelligence verticals 🗒️; level is an editor's band from context evidence",
       "name": "Real-estate decarbonisation",
       "pillar": "esg",
       "level": "exploring",
       "demoSlugs": [
         "grid-carbon-live",
         "solar-pv-estimator"
-      ],
-      "enabled": true,
-      "source": "Terra Real Estate / Asset Intelligence verticals 🗒️; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "dsa",
+      "enabled": true,
+      "source": "BS IT, LeetCode SQL; level is an editor's band from context evidence",
       "name": "Data structures & algorithms",
       "pillar": "fundamentals",
       "level": "working",
       "demoSlugs": [
         "algo-visualizer",
         "code-judge"
-      ],
-      "enabled": true,
-      "source": "BS IT, LeetCode SQL; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "c-cpp",
+      "enabled": true,
+      "source": "repos; level is an editor's band from context evidence",
       "name": "C / C++",
       "pillar": "fundamentals",
       "level": "working",
       "demoSlugs": [
         "code-judge",
         "cricket-sim"
-      ],
-      "enabled": true,
-      "source": "repos; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "graphic-design",
+      "enabled": true,
+      "source": "GH hobby + Best Graphic Designer credit; level is an editor's band from context evidence",
       "name": "Graphic design",
       "pillar": "craft",
       "level": "working",
       "demoSlugs": [
         "design-studio"
-      ],
-      "enabled": true,
-      "source": "GH hobby + Best Graphic Designer credit; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "figma",
+      "enabled": true,
+      "source": "GH tools; level is an editor's band from context evidence",
       "name": "Figma",
       "pillar": "craft",
       "level": "working",
       "demoSlugs": [
         "design-studio",
         "theme-lab"
-      ],
-      "enabled": true,
-      "source": "GH tools; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "ui-libraries",
+      "enabled": true,
+      "source": "GH; level is an editor's band from context evidence",
       "name": "Component libraries (MUI, Ant Design, Bootstrap)",
       "pillar": "craft",
       "level": "working",
       "demoSlugs": [
         "theme-lab"
-      ],
-      "enabled": true,
-      "source": "GH; level is an editor's band from context evidence"
+      ]
     },
     {
       "id": "competitive-programming",
+      "enabled": false,
+      "verified": false,
+      "source": "LinkedIn only ⚠️",
       "name": "Competitive programming",
       "pillar": "fundamentals",
       "level": "working",
       "demoSlugs": [
         "code-judge",
         "algo-visualizer"
-      ],
-      "enabled": false,
-      "verified": false,
-      "source": "LinkedIn only ⚠️"
+      ]
     },
     {
       "id": "public-speaking",
+      "enabled": false,
+      "verified": false,
+      "source": "LinkedIn only ⚠️ (BYTE CAMP)",
       "name": "Public speaking (CP talks)",
       "pillar": "craft",
       "level": "working",
       "demoSlugs": [
         "code-judge"
-      ],
-      "enabled": false,
-      "verified": false,
-      "source": "LinkedIn only ⚠️ (BYTE CAMP)"
+      ]
     },
     {
       "id": "event-leadership",
+      "enabled": false,
+      "verified": false,
+      "source": "LinkedIn only ⚠️ (PUCon '25)",
       "name": "Event leadership (robotics competition)",
       "pillar": "realtime",
       "level": "working",
       "demoSlugs": [
         "live-telemetry"
-      ],
-      "enabled": false,
-      "verified": false,
-      "source": "LinkedIn only ⚠️ (PUCon '25)"
+      ]
     }
   ]
 }

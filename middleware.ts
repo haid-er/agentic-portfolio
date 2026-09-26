@@ -46,10 +46,7 @@ export async function middleware(req: NextRequest) {
 
   if (PUBLIC.has(pathname)) {
     if (signedIn && pathname === '/admin/login') {
-      const url = req.nextUrl.clone()
-      url.pathname = safeNext(req.nextUrl.searchParams.get('next'))
-      url.search = ''
-      return privateHeaders(NextResponse.redirect(url))
+      return privateHeaders(NextResponse.redirect(new URL(safeNext(req.nextUrl.searchParams.get('next')), req.url)))
     }
     return privateHeaders(NextResponse.next())
   }
@@ -62,6 +59,6 @@ export async function middleware(req: NextRequest) {
   const url = req.nextUrl.clone()
   url.pathname = '/admin/login'
   url.search = ''
-  if (pathname !== '/admin') url.searchParams.set('next', safeNext(pathname))
+  if (pathname !== '/admin') url.searchParams.set('next', safeNext(pathname + req.nextUrl.search))
   return privateHeaders(NextResponse.redirect(url))
 }
